@@ -4,6 +4,7 @@
 
 #include "include/hardware.h"
 #include "include/utils.h"
+#include "include/result.h"
 
 result_t* get_hardware_info(const char* hardware_group, char** header) {
     map_t* map_data;

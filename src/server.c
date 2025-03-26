@@ -1,6 +1,6 @@
 #include "include/server.h"
 
-BENJI_SC_ABI result_t* server_init() {
+BENJIAPI result_t* server_init() {
     struct sockaddr_in server_address;
 
     server_address.sin_family = AF_INET; // ipv4 address family
@@ -69,7 +69,7 @@ BENJI_SC_ABI result_t* server_init() {
     return result_success((void*) (uintptr_t) server_socket);
 }
 
-BENJI_SC_ABI result_t* server_run(BENJI_SOCKET server_socket) {
+BENJIAPI result_t* server_run(BENJI_SOCKET server_socket) {
     while (server_status == BENJI_SERVER_RUNNING) {
         char** data_groups;
         size_t data_group_count;
@@ -177,7 +177,7 @@ BENJI_SC_ABI result_t* server_run(BENJI_SOCKET server_socket) {
     }
 }
 
-BENJI_SC_ABI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** data_groups, size_t* data_group_count) {
+BENJIAPI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** data_groups, size_t* data_group_count) {
     result_t* client_socket_result = server_accept_client(server_socket);
     return_if_error(client_socket_result);
 
@@ -195,7 +195,7 @@ BENJI_SC_ABI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** 
     return result_success((void*) (uintptr_t) client_socket);
 }
 
-BENJI_SC_ABI result_t* server_accept_client(BENJI_SOCKET server_socket) {
+BENJIAPI result_t* server_accept_client(BENJI_SOCKET server_socket) {
     struct sockaddr_storage client;
 
     socklen_t client_length = sizeof(client);
@@ -223,7 +223,7 @@ BENJI_SC_ABI result_t* server_accept_client(BENJI_SOCKET server_socket) {
     return result_success((void*) (uintptr_t) client_socket);
 }
 
-BENJI_SC_ABI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
+BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
     char* data = NULL;
     size_t data_size = 0;
 
@@ -282,7 +282,7 @@ BENJI_SC_ABI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
     return result_success(data);
 }
 
-BENJI_SC_ABI result_t* server_send_to_client(BENJI_SOCKET client_socket, const char* data) {
+BENJIAPI result_t* server_send_to_client(BENJI_SOCKET client_socket, const char* data) {
     int bytes_sent = send(client_socket, data, strlen(data) + 1, 0);
 
     if (bytes_sent == BENJI_SOCKET_ERROR) {
@@ -299,5 +299,5 @@ BENJI_SC_ABI result_t* server_send_to_client(BENJI_SOCKET client_socket, const c
 }
 
 size_t server_parse_client_data(const char* client_data, char*** data_groups) {
-    return splitstr(client_data, data_groups, ';');
+    return strsplit(client_data, data_groups, ';');
 }

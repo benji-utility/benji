@@ -7,6 +7,7 @@
 
 #include "../utils.h"
 #include "../map.h"
+#include "../result.h"
 
 #if defined(_WIN32)
     #include <intrin.h>

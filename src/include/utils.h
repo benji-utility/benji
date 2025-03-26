@@ -51,8 +51,8 @@
         #include <winsock2.h>
         #include <ws2tcpip.h>
 
-        #ifndef BENJI_SC_ABI
-            #define BENJI_SC_ABI WINAPI /* Benji Server Call */
+        #ifndef BENJIAPI
+            #define BENJIAPI WINAPI /* Benji Server Call */
         #endif
 
         #ifndef BENJI_SOCKET_ERROR
@@ -65,8 +65,8 @@
 
         typedef SOCKET BENJI_SOCKET;
 
-        BENJI_SC_ABI void winsock_init();
-        BENJI_SC_ABI void winsock_cleanup();
+        BENJIAPI void winsock_init();
+        BENJIAPI void winsock_cleanup();
     #elif defined(__linux__)
         #include <sys/socket.h>
         #include <arpa/inet.h>
@@ -74,8 +74,8 @@
         #include <fcntl.h>
         #include <errno.h>
 
-        #ifndef BENJI_SC_ABI
-            #define BENJI_SC_ABI /* Benji Server Call */
+        #ifndef BENJIAPI
+            #define BENJIAPI /* Benji Server Call */
         #endif
 
         #ifndef BENJI_SOCKET_ERROR
@@ -102,10 +102,10 @@
         BENJI_SERVER_RUNNING
     } server_status;
 
-    BENJI_SC_ABI result_t* create_socket();
-    BENJI_SC_ABI result_t* close_socket(BENJI_SOCKET sock);
+    BENJIAPI result_t* create_socket();
+    BENJIAPI result_t* close_socket(BENJI_SOCKET sock);
 
-    BENJI_SC_ABI void terminate(const int exit_code);
+    BENJIAPI void terminate(const int exit_code);
 #endif
 
 #ifdef BENJI_USE_SYS_INFO_UTILS
@@ -125,17 +125,17 @@
             info_type cpu_info = *(info_type*) result_unwrap_value(info_result); \
             result_t* map_data_result = convert_to_map(cpu_info); \
             return_if_error(map_data_result); \
-            map_data = (map_t*) result_unwrap(map_data_result);
+            map_data = (map_t*) result_unwrap_value(map_data_result);
     #endif
 
     result_t* get_hardware_info();
 #endif
 
 void strtrim(char* string);
-size_t splitstr(const char* string, char*** tokens, const char character); // returns token count
+size_t strsplit(const char* string, char*** tokens, const char character); // returns token count
 
 #ifdef _WIN32
-    char* wcharp_to_charp(const WCHAR* wchar);
+    char* wcharp_to_charp(const wchar_t* wchar);
 #endif
 
 #endif

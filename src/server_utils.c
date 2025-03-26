@@ -6,7 +6,7 @@
 #include "include/logger.h"
 
 #ifdef _WIN32
-    BENJI_SC_ABI void winsock_init() {
+    BENJIAPI void winsock_init() {
         struct WSAData wsa_data;
 
         log_debug("Initializing Winsock...");
@@ -18,7 +18,7 @@
         log_debug("Winsock initialized successfully");
     }
 
-    BENJI_SC_ABI void winsock_cleanup() {
+    BENJIAPI void winsock_cleanup() {
         log_debug("\nCleaning up Winsock...");
 
         if (WSACleanup() == BENJI_SOCKET_ERROR) {
@@ -29,7 +29,7 @@
     }
 #endif
 
-BENJI_SC_ABI result_t* create_socket() {
+BENJIAPI result_t* create_socket() {
     BENJI_SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sock == BENJI_SOCKET_ERROR) {
@@ -45,7 +45,7 @@ BENJI_SC_ABI result_t* create_socket() {
     return result_success((void*) (uintptr_t) sock);
 }
 
-BENJI_SC_ABI result_t* close_socket(BENJI_SOCKET sock) {
+BENJIAPI result_t* close_socket(BENJI_SOCKET sock) {
     #if defined(_WIN32)
         int return_code = closesocket(sock);
     #elif defined(__linux__)
@@ -65,7 +65,7 @@ BENJI_SC_ABI result_t* close_socket(BENJI_SOCKET sock) {
     return result_success(NULL);
 }
 
-BENJI_SC_ABI void terminate(const int exit_code) {
+BENJIAPI void terminate(const int exit_code) {
     #ifdef _WIN32
         winsock_cleanup();
     #endif
