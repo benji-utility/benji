@@ -31,6 +31,9 @@ result_t* get_gpu_info() {
 result_t* get_gpu_name() {
     #if defined(_WIN32)
         DISPLAY_DEVICEW device;
+
+        ZeroMemory(&device, sizeof(DISPLAY_DEVICEW));
+
         device.cb = sizeof(DISPLAY_DEVICEW);
 
         int i = 0;
@@ -43,6 +46,10 @@ result_t* get_gpu_name() {
             if (device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
                 return result_success(wcharp_to_charp(device.DeviceString));
             }
+
+            ZeroMemory(&device, sizeof(DISPLAY_DEVICEW));
+
+            device.cb = sizeof(DISPLAY_DEVICEW);
 
             i++;
         }
