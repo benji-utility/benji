@@ -3,7 +3,7 @@ GXX = gcc
 GXX_FLAGS = -g
 
 ifeq ($(OS), Windows_NT)
-	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32 -loleaut32 -luuid -lwbemuuid
+	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
 else ifeq ($(shell uname), Linux)
 	LINKED_LIBS =
 endif
