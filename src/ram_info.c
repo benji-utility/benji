@@ -174,7 +174,7 @@ result_t* get_ram_speed() {
     }
 #endif
 
-map_t* ram_info_to_map(ram_info_t ram_info) {
+result_t* ram_info_to_map(ram_info_t ram_info) {
     map_t* ram_info_map = map_init();
 
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
@@ -199,5 +199,5 @@ map_t* ram_info_to_map(ram_info_t ram_info) {
 
     free(buffer);
 
-    return ram_info_map;
+    return result_success(ram_info_map);
 }
