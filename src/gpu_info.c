@@ -31,6 +31,9 @@ result_t* get_gpu_info() {
 result_t* get_gpu_name() {
     #if defined(_WIN32)
         DISPLAY_DEVICEW device;
+
+        ZeroMemory(&device, sizeof(DISPLAY_DEVICEW));
+
         device.cb = sizeof(DISPLAY_DEVICEW);
 
         int i = 0;
@@ -43,6 +46,10 @@ result_t* get_gpu_name() {
             if (device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
                 return result_success(wcharp_to_charp(device.DeviceString));
             }
+
+            ZeroMemory(&device, sizeof(DISPLAY_DEVICEW));
+
+            device.cb = sizeof(DISPLAY_DEVICEW);
 
             i++;
         }
@@ -144,17 +151,17 @@ result_t* get_gpu_shared_system_memory() {
 
 #ifdef _WIN32
     result_t* get_gpu_description() {
-        HRESULT result = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        HRESULT hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
-        if (FAILED(result)) {
-            return result_error(result, "CoInitializeEx() failed", BENJI_ERROR_PACKET);
+        if (FAILED(hresult)) {
+            return result_error(hresult, "CoInitializeEx() failed", BENJI_ERROR_PACKET);
         }
 
         IDXGIFactory* factory = NULL;
-        result = CreateDXGIFactory(&IID_IDXGIFactory, (void**) &factory);
+        hresult = CreateDXGIFactory(&IID_IDXGIFactory, (void**) &factory);
 
-        if (FAILED(result)) {
-            return result_error(result, "CreateDXGIFactory() failed", BENJI_ERROR_PACKET);
+        if (FAILED(hresult)) {
+            return result_error(hresult, "CreateDXGIFactory() failed", BENJI_ERROR_PACKET);
         }
 
         IDXGIAdapter* primary_adapter = NULL;
@@ -165,15 +172,15 @@ result_t* get_gpu_shared_system_memory() {
         }
 
         IDXGIAdapter* adapter = NULL;
-        UINT index = 0;
+        unsigned int index = 0;
         while (factory->lpVtbl->EnumAdapters(factory, index, &adapter) != DXGI_ERROR_NOT_FOUND) {
             IDXGIOutput* output = NULL;
 
-            if ((result = adapter->lpVtbl->EnumOutputs(adapter, 0, &output)) == S_OK) {
+            if ((hresult = adapter->lpVtbl->EnumOutputs(adapter, 0, &output)) == S_OK) {
                 DXGI_OUTPUT_DESC output_description;
-                result = output->lpVtbl->GetDesc(output, &output_description);
+                hresult = output->lpVtbl->GetDesc(output, &output_description);
 
-                if (SUCCEEDED(result) && output_description.AttachedToDesktop) {
+                if (SUCCEEDED(hresult) && output_description.AttachedToDesktop) {
                     primary_adapter = adapter;
                     primary_adapter->lpVtbl->AddRef(primary_adapter);
 
@@ -182,13 +189,13 @@ result_t* get_gpu_shared_system_memory() {
                     break;
                 }
                 else {
-                    return result_error(result, "GetDesc() failed", BENJI_ERROR_PACKET);
+                    return result_error(hresult, "GetDesc() failed", BENJI_ERROR_PACKET);
                 }
 
                 output->lpVtbl->Release(output);
             }
             else {
-                return result_error(result, "EnumOutputs() failed", BENJI_ERROR_PACKET);
+                return result_error(hresult, "EnumOutputs() failed", BENJI_ERROR_PACKET);
             }
 
             adapter->lpVtbl->Release(adapter);
@@ -196,10 +203,10 @@ result_t* get_gpu_shared_system_memory() {
             index++;
         }
 
-        result = primary_adapter->lpVtbl->GetDesc(primary_adapter, primary_adapter_description);
+        hresult = primary_adapter->lpVtbl->GetDesc(primary_adapter, primary_adapter_description);
 
         if (primary_adapter == NULL) {
-            return result_error(result, "GetDesc() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, "GetDesc() failed", BENJI_ERROR_PACKET);
         }
 
         primary_adapter->lpVtbl->Release(primary_adapter);

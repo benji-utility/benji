@@ -22,7 +22,6 @@ void log_debug(const char* string, ...) {
 
     va_end(arguments);
 }
-
 void log_info(const char* info, ...) {
     va_list arguments;
 
