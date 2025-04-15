@@ -14,7 +14,7 @@
         return result_error( \
             error.code, \
             error.message, \
-            BENJI_ERROR_PACKET \
+            error.location \
         ); \
     }
 #endif
@@ -26,7 +26,7 @@
         return result_error( \
             error.code, \
             error.message, \
-            BENJI_ERROR_PACKET \
+            error.location \
         ); \
     }
 #endif

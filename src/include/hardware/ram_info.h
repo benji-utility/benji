@@ -15,6 +15,10 @@
     #define BENJI_SMBIOS_SPEED_OFFSET (0x15)
 #endif
 
+#ifndef BENJI_SYSTEM_FIRMWARE_TABLE
+    #define BENJI_SYSTEM_FIRMWARE_TABLE 'RSMB'
+#endif
+
 typedef struct _BENJI_RAM_INFO {
     double total_memory; // in GB
     double memory_load; // in GB

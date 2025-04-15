@@ -5,6 +5,7 @@ void strtrim(char* string) {
     while (isspace(string[i])) {
         i++;
     }
+
     if (i > 0) {
         memmove(string, string + i, strlen(string) - i + 1);
     }
@@ -13,10 +14,11 @@ void strtrim(char* string) {
     while (length > 0 && isspace(string[length - 1])) {
         length--;
     }
+
     string[length] = '\0';
 }
 
-size_t splitstr(const char* string, char*** tokens, const char character) {
+size_t strsplit(const char* string, char*** tokens, const char character) {
     if (!string) {
         return 0;
     }
@@ -74,7 +76,7 @@ size_t splitstr(const char* string, char*** tokens, const char character) {
 }
 
 #ifdef _WIN32
-    char* wcharp_to_charp(const WCHAR* wchar) {
+    char* wcharp_to_charp(const wchar_t* wchar) {
         if (wchar == NULL) {
             return NULL;
         }

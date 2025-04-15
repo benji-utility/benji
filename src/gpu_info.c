@@ -30,24 +30,13 @@ result_t* get_gpu_info() {
 
 result_t* get_gpu_name() {
     #if defined(_WIN32)
-        DISPLAY_DEVICEW device;
-        device.cb = sizeof(DISPLAY_DEVICEW);
+        result_t* description_result = get_gpu_description();
+        return_if_error(description_result);
 
-        int i = 0;
-        while (true) {
-            if (!EnumDisplayDevicesW(NULL, i, &device, 0)) {
-                return result_error(GetLastError(), "EnumDisplayDevicesW() failed", BENJI_ERROR_PACKET);
-            }
+        DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
-            // get the primary GPU
-            if (device.StateFlags & DISPLAY_DEVICE_PRIMARY_DEVICE) {
-                return result_success(wcharp_to_charp(device.DeviceString));
-            }
-
-            i++;
-        }
-
-        return result_error(-1, "no primary GPU found", BENJI_ERROR_PACKET);
+        // making the assumption that the description value contains the name (usually it does)
+        return result_success(adapter_description.Description);
     #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
@@ -60,9 +49,9 @@ result_t* get_gpu_vendor() {
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
 
-        DXGI_ADAPTER_DESC description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
+        DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
-        switch (description.VendorId) {
+        switch (adapter_description.VendorId) {
             case BENJI_GPU_VENDOR_INTEL: vendor = "Intel"; break;
             case BENJI_GPU_VENDOR_AMD: vendor = "AMD"; break;
             case BENJI_GPU_VENDOR_NVIDIA: vendor = "NVIDIA"; break;
@@ -81,12 +70,12 @@ result_t* get_gpu_dedicated_video_memory() {
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
 
-        DXGI_ADAPTER_DESC description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
+        DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
         void* memory = malloc(sizeof(double));
 
         if (memory) {
-            *(double*) memory = description.DedicatedVideoMemory / (1024.0 * 1024.0 * 1024.0);
+            *(double*) memory = adapter_description.DedicatedVideoMemory / (1024.0 * 1024.0 * 1024.0);
         }
         else {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
@@ -103,12 +92,12 @@ result_t* get_gpu_dedicated_system_memory() {
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
 
-        DXGI_ADAPTER_DESC description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
+        DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
         void* memory = malloc(sizeof(double));
 
         if (memory) {
-            *(double*) memory = description.DedicatedSystemMemory / (1024.0 * 1024.0 * 1024.0);
+            *(double*) memory = adapter_description.DedicatedSystemMemory / (1024.0 * 1024.0 * 1024.0);
         }
         else {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
@@ -125,12 +114,12 @@ result_t* get_gpu_shared_system_memory() {
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
 
-        DXGI_ADAPTER_DESC description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
+        DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
         void* memory = malloc(sizeof(double));
 
         if (memory) {
-            *(double*) memory = description.SharedSystemMemory / (1024.0 * 1024.0 * 1024.0);
+            *(double*) memory = adapter_description.SharedSystemMemory / (1024.0 * 1024.0 * 1024.0);
         }
         else {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
@@ -144,17 +133,19 @@ result_t* get_gpu_shared_system_memory() {
 
 #ifdef _WIN32
     result_t* get_gpu_description() {
-        HRESULT result = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+        HRESULT hresult;
 
-        if (FAILED(result)) {
-            return result_error(result, "CoInitializeEx() failed", BENJI_ERROR_PACKET);
+        hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
+
+        if (FAILED(hresult)) {
+            return result_error(hresult, "CoInitializeEx() failed", BENJI_ERROR_PACKET);
         }
 
         IDXGIFactory* factory = NULL;
-        result = CreateDXGIFactory(&IID_IDXGIFactory, (void**) &factory);
+        hresult = CreateDXGIFactory(&IID_IDXGIFactory, (void**) &factory);
 
-        if (FAILED(result)) {
-            return result_error(result, "CreateDXGIFactory() failed", BENJI_ERROR_PACKET);
+        if (FAILED(hresult)) {
+            return result_error(hresult, "CreateDXGIFactory() failed", BENJI_ERROR_PACKET);
         }
 
         IDXGIAdapter* primary_adapter = NULL;
@@ -164,42 +155,16 @@ result_t* get_gpu_shared_system_memory() {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
         }
 
-        IDXGIAdapter* adapter = NULL;
-        UINT index = 0;
-        while (factory->lpVtbl->EnumAdapters(factory, index, &adapter) != DXGI_ERROR_NOT_FOUND) {
-            IDXGIOutput* output = NULL;
+        hresult = factory->lpVtbl->EnumAdapters(factory, 0, &primary_adapter);
 
-            if ((result = adapter->lpVtbl->EnumOutputs(adapter, 0, &output)) == S_OK) {
-                DXGI_OUTPUT_DESC output_description;
-                result = output->lpVtbl->GetDesc(output, &output_description);
-
-                if (SUCCEEDED(result) && output_description.AttachedToDesktop) {
-                    primary_adapter = adapter;
-                    primary_adapter->lpVtbl->AddRef(primary_adapter);
-
-                    output->lpVtbl->Release(output);
-
-                    break;
-                }
-                else {
-                    return result_error(result, "GetDesc() failed", BENJI_ERROR_PACKET);
-                }
-
-                output->lpVtbl->Release(output);
-            }
-            else {
-                return result_error(result, "EnumOutputs() failed", BENJI_ERROR_PACKET);
-            }
-
-            adapter->lpVtbl->Release(adapter);
-
-            index++;
+        if (FAILED(hresult)) {
+            return result_error(hresult, "EnumAdapters() failed", BENJI_ERROR_PACKET);
         }
 
-        result = primary_adapter->lpVtbl->GetDesc(primary_adapter, primary_adapter_description);
+        hresult = primary_adapter->lpVtbl->GetDesc(primary_adapter, primary_adapter_description);
 
-        if (primary_adapter == NULL) {
-            return result_error(result, "GetDesc() failed", BENJI_ERROR_PACKET);
+        if (FAILED(hresult)) {
+            return result_error(hresult, "GetDesc() failed", BENJI_ERROR_PACKET);
         }
 
         primary_adapter->lpVtbl->Release(primary_adapter);
@@ -236,5 +201,5 @@ result_t* gpu_info_to_map(gpu_info_t gpu_info) {
 
     free(buffer);
 
-    return gpu_info_map;
+    return result_success(gpu_info_map);
 }
