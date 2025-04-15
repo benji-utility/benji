@@ -8,7 +8,7 @@ server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server_socket.connect((host, port))
 
 try:
-    message = "cpu_all;gpu_all;ram_all;"
+    message = "gpu_all;"
 
     print(f"Sending: {message}")
     server_socket.send(message.encode())
