@@ -133,42 +133,6 @@ result_t* get_gpu_shared_system_memory() {
 
 #ifdef _WIN32
     result_t* get_gpu_description() {
-        // HRESULT hresult;
-
-        // IDXGIFactory* factory = NULL;
-        // hresult = CreateDXGIFactory(&IID_IDXGIFactory, (void**) &factory);
-
-        // if (FAILED(hresult)) {
-        //     return result_error(hresult, "CreateDXGIFactory() failed", BENJI_ERROR_PACKET);
-        // }
-
-        // IDXGIAdapter* adapter = NULL;
-        // DXGI_ADAPTER_DESC* adapter_description;
-
-        // hresult = factory->lpVtbl->EnumAdapters(factory, 0, &adapter);
-
-        // if (SUCCEEDED(hresult)) {
-        //     hresult = adapter->lpVtbl->GetDesc(adapter, adapter_description);
-
-        //     if (FAILED(hresult)) {
-        //         adapter->lpVtbl->Release(adapter);
-        //         factory->lpVtbl->Release(factory);
-
-        //         return result_error(hresult, "GetDesc() failed", BENJI_ERROR_PACKET);
-        //     }
-        // }
-        // else {
-        //     adapter->lpVtbl->Release(adapter);
-        //     factory->lpVtbl->Release(factory);
-
-        //     return result_error(hresult, "EnumAdapters() failed", BENJI_ERROR_PACKET);
-        // }
-
-        // adapter->lpVtbl->Release(adapter);
-        // factory->lpVtbl->Release(factory);
-
-        // return result_success((void*) adapter_description);
-
         HRESULT hresult;
 
         hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
