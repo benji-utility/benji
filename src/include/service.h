@@ -14,9 +14,15 @@
     #define BENJI_SERVICE_NAME TEXT("BenjiService")
 #endif
 
+#ifndef BENJI_SERVICE_EVENTS
+    #define BENJI_SERVICE_EVENTS (2) /* i dont want this to be hardcoded, but idk if sizeof will help with WSAEVENTs */
+#endif
+
 static SERVICE_STATUS service_status;
 static SERVICE_STATUS_HANDLE service_status_handle;
-static HANDLE service_stop_event;
+
+static WSAEVENT service_stop_event;
+static WSAEVENT service_socket_event;
 
 static BENJI_SOCKET server_socket;
 
