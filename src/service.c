@@ -44,6 +44,15 @@ BENJIAPI void service_control_handler(unsigned long request) {
         case SERVICE_CONTROL_SHUTDOWN: {
             report_service_status(SERVICE_STOP_PENDING, 0, 0);
 
+            result_t* close_server_socket_result = close_socket(server_socket);
+            if (close_server_socket_result->is_error) {
+                result_error_payload_t close_server_socket_result_error = result_unwrap_error(close_server_socket_result);
+
+                log_warning(close_server_socket_result_error);
+            }
+
+            result_free(close_server_socket_result);
+
             #ifdef _WIN32
                 winsock_cleanup();
             #endif

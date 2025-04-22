@@ -200,6 +200,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     }
 
     result_free(close_client_socket_result);
+
+    return result_success(NULL); // nothing to return, but this signifies a successful server cycle
 }
 
 BENJIAPI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** data_groups, size_t* data_group_count) {
