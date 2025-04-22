@@ -102,14 +102,14 @@ result_t* get_ram_free_memory() {
 
 result_t* get_ram_speed() {
     #if defined(_WIN32)
-        unsigned long size = GetSystemFirmwareTable('RSMB', 0, NULL, 0);
+        unsigned long size = GetSystemFirmwareTable(BENJI_SYSTEM_FIRMWARE_TABLE, 0, NULL, 0);
         if (size == 0) {
             return result_error(-1, "Failed to get SMBIOS table size", BENJI_ERROR_PACKET);
         }
 
         RAW_SMBIOS_DATA* buffer = (RAW_SMBIOS_DATA*) malloc(size);
 
-        if (!GetSystemFirmwareTable('RSMB', 0, buffer, size)) {
+        if (!GetSystemFirmwareTable(BENJI_SYSTEM_FIRMWARE_TABLE, 0, buffer, size)) {
             free(buffer);
 
             return result_error(-1, "Failed to get SMBIOS table", BENJI_ERROR_PACKET);
@@ -174,7 +174,7 @@ result_t* get_ram_speed() {
     }
 #endif
 
-map_t* ram_info_to_map(ram_info_t ram_info) {
+result_t* ram_info_to_map(ram_info_t ram_info) {
     map_t* ram_info_map = map_init();
 
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
@@ -199,5 +199,5 @@ map_t* ram_info_to_map(ram_info_t ram_info) {
 
     free(buffer);
 
-    return ram_info_map;
+    return result_success(ram_info_map);
 }

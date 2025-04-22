@@ -1,6 +1,6 @@
 #include "include/server.h"
 
-BENJI_SC_ABI result_t* server_init() {
+BENJIAPI result_t* server_init() {
     struct sockaddr_in server_address;
 
     server_address.sin_family = AF_INET; // ipv4 address family
@@ -69,115 +69,142 @@ BENJI_SC_ABI result_t* server_init() {
     return result_success((void*) (uintptr_t) server_socket);
 }
 
-BENJI_SC_ABI result_t* server_run(BENJI_SOCKET server_socket) {
-    while (server_status == BENJI_SERVER_RUNNING) {
-        char** data_groups;
-        size_t data_group_count;
+BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
+    char** data_groups;
+    size_t data_group_count;
 
-        result_t* client_handle_result = server_handle_client(server_socket, &data_groups, &data_group_count);
-        if (client_handle_result->is_error) {
-            result_error_payload_t client_handle_result_error = result_unwrap_error(client_handle_result);
+    result_t* client_handle_result = server_handle_client(server_socket, &data_groups, &data_group_count);
+    if (client_handle_result->is_error) {
+        result_error_payload_t client_handle_result_error = result_unwrap_error(client_handle_result);
 
-            log_warning(client_handle_result_error);
+        log_warning(client_handle_result_error);
 
-            continue;
-        }
+        return result_error(
+            client_handle_result_error.code,
+            client_handle_result_error.message,
+            BENJI_ERROR_PACKET
+        );
+    }
 
-        BENJI_SOCKET client_socket = (BENJI_SOCKET) (uintptr_t) result_unwrap_value(client_handle_result);
+    BENJI_SOCKET client_socket = (BENJI_SOCKET) (uintptr_t) result_unwrap_value(client_handle_result);
 
-        char* json = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
-        json[0] = '\0';
+    char* json = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+    json[0] = '\0';
 
-        if (data_groups == NULL || data_group_count <= 0) {
-            log_warning_info("Client data is either empty or incorrectly formatted, closing client connection...");
-
-            result_t* close_client_socket_result = close_socket(client_socket);
-            if (close_client_socket_result->is_error) {
-                result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
-
-                log_warning(close_client_socket_result_error);
-            }
-            else {
-                result_free(close_client_socket_result);
-            }
-
-            continue;
-        }
-
-        for (size_t i = 0; i < data_group_count; i++) {
-            if (data_groups[i] == NULL) {
-                log_warning_info("Invalid data group, closing client connection...");
-
-                result_t* close_client_socket_result = close_socket(client_socket);
-                if (close_client_socket_result->is_error) {
-                    result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
-
-                    log_warning(close_client_socket_result_error);
-                }
-                else {
-                    result_free(close_client_socket_result);
-                }
-
-                continue;
-            }
-
-            char* header;
-
-            result_t* map_data_result = get_hardware_info(data_groups[i], &header);
-            if (map_data_result->is_error) {
-                result_error_payload_t map_data_result_error = result_unwrap_error(map_data_result);
-
-                log_warning(map_data_result_error);
-
-                continue;
-            }
-
-            map_t* map_data = (map_t*) result_unwrap_value(map_data_result);
-
-            char* json_block = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
-            json_block[0] = '\0';
-
-            sprintf(json_block, "%s,", map_serialize(map_data, header));
-            strcat(json, json_block);
-
-            free(json_block);
-
-            map_free(map_data);
-        }
-
-        free(data_groups);
-
-        size_t json_length = strlen(json);
-
-        json[json_length - 1] = '\0'; // remove the trailing comma
-
-        char response[json_length + 2];
-        sprintf(response, "{%s}", json);
-
-        free(json);
-
-        result_t* response_result = server_send_to_client(client_socket, response);
-        if (response_result->is_error) {
-            result_error_payload_t response_result_error = result_unwrap_error(response_result);
-
-            log_warning(response_result_error);
-
-            continue;
-        }
+    if (data_groups == NULL || data_group_count <= 0) {
+        log_warning_info("Client data is either empty or incorrectly formatted, closing client connection...");
 
         result_t* close_client_socket_result = close_socket(client_socket);
         if (close_client_socket_result->is_error) {
             result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
 
             log_warning(close_client_socket_result_error);
+
+            return result_error(
+                close_client_socket_result_error.code,
+                close_client_socket_result_error.message,
+                BENJI_ERROR_PACKET
+            );
         }
-        else {
-            result_free(close_client_socket_result);
-        }
+
+        result_free(close_client_socket_result);
+
+        return result_error(-1, "Client data is either empty or incorrectly formatted", BENJI_ERROR_PACKET);
     }
+
+    for (size_t i = 0; i < data_group_count; i++) {
+        if (data_groups[i] == NULL) {
+            log_warning_info("Invalid data group, closing client connection...");
+
+            result_t* close_client_socket_result = close_socket(client_socket);
+            if (close_client_socket_result->is_error) {
+                result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
+
+                log_warning(close_client_socket_result_error);
+
+                return result_error(
+                    close_client_socket_result_error.code,
+                    close_client_socket_result_error.message,
+                    BENJI_ERROR_PACKET
+                );
+            }
+
+            result_free(close_client_socket_result);
+
+            return result_error(-1, "Invalid data group", BENJI_ERROR_PACKET);
+        }
+
+        char* header;
+
+        result_t* map_data_result = get_hardware_info(data_groups[i], &header);
+        if (map_data_result->is_error) {
+            result_error_payload_t map_data_result_error = result_unwrap_error(map_data_result);
+
+            log_warning(map_data_result_error);
+
+            return result_error(
+                map_data_result_error.code,
+                map_data_result_error.message,
+                BENJI_ERROR_PACKET
+            );
+        }
+
+        map_t* map_data = (map_t*) result_unwrap_value(map_data_result);
+
+        char* json_block = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+        json_block[0] = '\0';
+
+        sprintf(json_block, "%s,", map_serialize(map_data, header));
+        strcat(json, json_block);
+
+        free(json_block);
+
+        map_free(map_data);
+    }
+
+    free(data_groups);
+
+    size_t json_length = strlen(json);
+
+    json[json_length - 1] = '\0'; // remove the trailing comma
+
+    char response[json_length + 2];
+    sprintf(response, "{%s}", json);
+
+    free(json);
+
+    result_t* response_result = server_send_to_client(client_socket, response);
+    if (response_result->is_error) {
+        result_error_payload_t response_result_error = result_unwrap_error(response_result);
+
+        log_warning(response_result_error);
+
+        return result_error(
+            response_result_error.code,
+            response_result_error.message,
+            BENJI_ERROR_PACKET
+        );
+    }
+
+    result_t* close_client_socket_result = close_socket(client_socket);
+    if (close_client_socket_result->is_error) {
+        result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
+
+        log_warning(close_client_socket_result_error);
+
+        return result_error(
+            close_client_socket_result_error.code,
+            close_client_socket_result_error.message,
+            BENJI_ERROR_PACKET
+        );
+    }
+
+    result_free(close_client_socket_result);
+
+    return result_success(NULL); // nothing to return, but this signifies a successful server cycle
 }
 
-BENJI_SC_ABI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** data_groups, size_t* data_group_count) {
+BENJIAPI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** data_groups, size_t* data_group_count) {
     result_t* client_socket_result = server_accept_client(server_socket);
     return_if_error(client_socket_result);
 
@@ -195,7 +222,7 @@ BENJI_SC_ABI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** 
     return result_success((void*) (uintptr_t) client_socket);
 }
 
-BENJI_SC_ABI result_t* server_accept_client(BENJI_SOCKET server_socket) {
+BENJIAPI result_t* server_accept_client(BENJI_SOCKET server_socket) {
     struct sockaddr_storage client;
 
     socklen_t client_length = sizeof(client);
@@ -223,7 +250,7 @@ BENJI_SC_ABI result_t* server_accept_client(BENJI_SOCKET server_socket) {
     return result_success((void*) (uintptr_t) client_socket);
 }
 
-BENJI_SC_ABI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
+BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
     char* data = NULL;
     size_t data_size = 0;
 
@@ -282,7 +309,7 @@ BENJI_SC_ABI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
     return result_success(data);
 }
 
-BENJI_SC_ABI result_t* server_send_to_client(BENJI_SOCKET client_socket, const char* data) {
+BENJIAPI result_t* server_send_to_client(BENJI_SOCKET client_socket, const char* data) {
     int bytes_sent = send(client_socket, data, strlen(data) + 1, 0);
 
     if (bytes_sent == BENJI_SOCKET_ERROR) {
@@ -299,5 +326,5 @@ BENJI_SC_ABI result_t* server_send_to_client(BENJI_SOCKET client_socket, const c
 }
 
 size_t server_parse_client_data(const char* client_data, char*** data_groups) {
-    return splitstr(client_data, data_groups, ';');
+    return strsplit(client_data, data_groups, ';');
 }

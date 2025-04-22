@@ -111,28 +111,28 @@ result_t* get_cpu_clock_speed() {
     #if defined(_WIN32)
         HKEY hkey;
 
-        LONG result = RegOpenKeyEx(
+        HRESULT hresult = RegOpenKeyEx(
             HKEY_LOCAL_MACHINE,
-            "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0",
+            TEXT("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0"),
             0, KEY_READ, &hkey
         );
 
-        if (result != BENJI_NO_ERROR) {
-            return result_error(result, "RegOpenKeyEx() failed", BENJI_ERROR_PACKET);
+        if (hresult != BENJI_NO_ERROR) {
+            return result_error(hresult, "RegOpenKeyEx() failed", BENJI_ERROR_PACKET);
         }
 
         uint32_t speed = 0;
         unsigned long int data_type, data_size = sizeof(speed);
 
-        result = RegQueryValueEx(
-            hkey, "~MHz", NULL, &data_type, (LPBYTE) &speed, &data_size
+        hresult = RegQueryValueEx(
+            hkey, TEXT("~MHz"), NULL, &data_type, (LPBYTE) &speed, &data_size
         );
 
-        if (result == BENJI_NO_ERROR && data_type == REG_DWORD) {
-            result = RegCloseKey(hkey);
+        if (hresult == BENJI_NO_ERROR && data_type == REG_DWORD) {
+            hresult = RegCloseKey(hkey);
 
-            if (result != BENJI_NO_ERROR) {
-                return result_error(result, "RegCloseKey() failed", BENJI_ERROR_PACKET);
+            if (hresult != BENJI_NO_ERROR) {
+                return result_error(hresult, "RegCloseKey() failed", BENJI_ERROR_PACKET);
             }
 
             void* speed_ghz = malloc(sizeof(double));
@@ -142,7 +142,7 @@ result_t* get_cpu_clock_speed() {
             return result_success(speed_ghz);
         }
         else {
-            return result_error(result, "RegQueryValueEx() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, "RegQueryValueEx() failed", BENJI_ERROR_PACKET);
         }
     #elif defined(__linux__)
         /* TODO: add linux stuff */

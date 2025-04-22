@@ -14,6 +14,7 @@ try:
     server_socket.send(message.encode())
     print("Sent")
 
+    print("\nWaiting for response...")
     response = server_socket.recv(1024)
     print(f"Server response: {response.decode()}")
 
