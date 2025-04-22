@@ -13,15 +13,15 @@ result_t* get_gpu_info() {
     info->vendor = strdup((char*) result_unwrap_value(gpu_vendor_result));
     strtrim(info->vendor);
 
-    result_t* gpu_dedicated_video_memory_result = get_gpu_dedicated_video_memory();
+    result_t* gpu_dedicated_video_memory_result = get_gpu_memory(BENJI_GPU_DEDICATED_VIDEO_MEMORY);
     return_if_error(gpu_dedicated_video_memory_result);
     info->dedicated_video_memory = *(double*) result_unwrap_value(gpu_dedicated_video_memory_result);
 
-    result_t* gpu_dedicated_system_memory_result = get_gpu_dedicated_system_memory();
+    result_t* gpu_dedicated_system_memory_result = get_gpu_memory(BENJI_GPU_DEDICATED_SYSTEM_MEMORY);
     return_if_error(gpu_dedicated_system_memory_result);
     info->dedicated_system_memory = *(double*) result_unwrap_value(gpu_dedicated_system_memory_result);
 
-    result_t* gpu_shared_system_memory_result = get_gpu_shared_system_memory();
+    result_t* gpu_shared_system_memory_result = get_gpu_memory(BENJI_GPU_SHARED_SYSTEM_MEMORY);;
     return_if_error(gpu_shared_system_memory_result);
     info->shared_system_memory = *(double*) result_unwrap_value(gpu_shared_system_memory_result);
 
@@ -35,8 +35,8 @@ result_t* get_gpu_name() {
 
         DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
-        // making the assumption that the description value contains the name (usually it does)
-        return result_success(adapter_description.Description);
+        // make the assumption that the description value contains the name (usually it does)
+        return result_success(wcharp_to_charp(adapter_description.Description));
     #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
@@ -65,7 +65,7 @@ result_t* get_gpu_vendor() {
     #endif
 }
 
-result_t* get_gpu_dedicated_video_memory() {
+result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type) {
     #if defined(_WIN32)
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
@@ -75,51 +75,20 @@ result_t* get_gpu_dedicated_video_memory() {
         void* memory = malloc(sizeof(double));
 
         if (memory) {
-            *(double*) memory = adapter_description.DedicatedVideoMemory / (1024.0 * 1024.0 * 1024.0);
-        }
-        else {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
-        }
-
-        return result_success(memory);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
-
-result_t* get_gpu_dedicated_system_memory() {
-    #if defined(_WIN32)
-        result_t* description_result = get_gpu_description();
-        return_if_error(description_result);
-
-        DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
-
-        void* memory = malloc(sizeof(double));
-
-        if (memory) {
-            *(double*) memory = adapter_description.DedicatedSystemMemory / (1024.0 * 1024.0 * 1024.0);
-        }
-        else {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
-        }
-
-        return result_success(memory);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
-
-result_t* get_gpu_shared_system_memory() {
-    #if defined(_WIN32)
-        result_t* description_result = get_gpu_description();
-        return_if_error(description_result);
-
-        DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
-
-        void* memory = malloc(sizeof(double));
-
-        if (memory) {
-            *(double*) memory = adapter_description.SharedSystemMemory / (1024.0 * 1024.0 * 1024.0);
+            switch (memory_type) {
+                case BENJI_GPU_DEDICATED_VIDEO_MEMORY: {
+                    *(double*) memory = adapter_description.DedicatedVideoMemory / (1024.0 * 1024.0 * 1024.0);
+                    break;
+                }
+                case BENJI_GPU_DEDICATED_SYSTEM_MEMORY: {
+                    *(double*) memory = adapter_description.DedicatedSystemMemory / (1024.0 * 1024.0 * 1024.0);
+                    break;
+                }
+                case BENJI_GPU_SHARED_SYSTEM_MEMORY: {
+                    *(double*) memory = adapter_description.SharedSystemMemory / (1024.0 * 1024.0 * 1024.0);
+                    break;
+                }
+            }
         }
         else {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);

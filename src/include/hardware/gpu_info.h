@@ -27,13 +27,17 @@ typedef struct _BENJI_GPU_INFO {
     double shared_system_memory; // in GB
 } gpu_info_t;
 
+enum BENJI_GPU_MEMORY_TYPE {
+    BENJI_GPU_DEDICATED_VIDEO_MEMORY,
+    BENJI_GPU_DEDICATED_SYSTEM_MEMORY,
+    BENJI_GPU_SHARED_SYSTEM_MEMORY
+};
+
 result_t* get_gpu_info();
 
 result_t* get_gpu_name();
 result_t* get_gpu_vendor();
-result_t* get_gpu_dedicated_video_memory();
-result_t* get_gpu_dedicated_system_memory();
-result_t* get_gpu_shared_system_memory();
+result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type);
 
 #ifdef _WIN32
     result_t* get_gpu_description();
