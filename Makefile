@@ -2,18 +2,21 @@ GXX = gcc
 
 GXX_FLAGS = -g
 
-ifeq ($(OS), Windows_NT)
-	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
-else ifeq ($(shell uname), Linux)
-	LINKED_LIBS =
-endif
-
 BUILD = build
 OBJ = $(BUILD)/obj
 EXEC = benji
 
 SRC = $(wildcard src/*.c)
-OBJS = $(subst src/, $(OBJ)/, $(addsuffix .o, $(basename $(SRC))))
+UPDATED_SRC =
+
+ifeq ($(OS), Windows_NT)
+	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
+else ifeq ($(shell uname), Linux)
+	LINKED_LIBS =
+	UPDATED_SRC = $(filter-out src/service.c, $(SRC))
+endif
+
+OBJS = $(subst src/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRC))))
 
 all: clean compile
 
