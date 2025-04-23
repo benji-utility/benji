@@ -49,3 +49,9 @@ else ifeq ($(shell uname), Linux)
 	mkdir -p $(BUILD)
 	mkdir -p $(OBJ)
 endif
+
+install:
+ifeq ($(shell uname), Linux)
+	cp benji.service /etc/systemd/system/benjid.service
+	cp $(BUILD)/$(EXEC) /usr/local/bin/benjid
+endif

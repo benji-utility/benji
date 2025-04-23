@@ -1,11 +1,11 @@
-#include "include/logger.h"
-#include "include/result.h"
-
 #if defined(_WIN32)
     #include "include/service.h"
 #elif defined(__linux__)
-    /* TODO: add linux stuff */
+    #include "include/daemon.h"
 #endif
+
+#include "include/logger.h"
+#include "include/result.h"
 
 int main(int argc, const char* argv[]) {
     #if defined(_WIN32)
@@ -20,7 +20,7 @@ int main(int argc, const char* argv[]) {
             return GetLastError();
         }
     #elif defined(__linux__)
-        
+        spawn_daemon();
     #endif
 
     return EXIT_SUCCESS;
