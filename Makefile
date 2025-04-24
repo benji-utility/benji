@@ -11,6 +11,7 @@ UPDATED_SRC =
 
 ifeq ($(OS), Windows_NT)
 	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
+	UPDATED_SRC = $(filter-out src/daemon.c, $(SRC))
 else ifeq ($(shell uname), Linux)
 	LINKED_LIBS =
 	UPDATED_SRC = $(filter-out src/service.c, $(SRC))
@@ -51,7 +52,8 @@ else ifeq ($(shell uname), Linux)
 endif
 
 install:
-ifeq ($(shell uname), Linux)
+ifeq ($(OS), Windows_NT)
+else ifeq ($(shell uname), Linux)
 	cp benji.service /etc/systemd/system/benjid.service
 	cp $(BUILD)/$(EXEC) /usr/local/bin/benjid
 endif

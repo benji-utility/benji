@@ -34,6 +34,10 @@
     #endif
 #endif
 
+#ifndef BENJI_STRING_EQUALS
+    #define BENJI_STRING_EQUALS(a, b) (strcmp(a, b) == 0)
+#endif
+
 #ifndef BENJI_NO_ERROR
     #ifdef NOERROR
         #define BENJI_NO_ERROR NOERROR
