@@ -133,7 +133,7 @@
             map_data = (map_t*) result_unwrap_value(map_data_result);
     #endif
 
-    result_t* get_hardware_info();
+    result_t* get_hardware_info(const char* hardware_group, char** header);
 #endif
 
 void strtrim(char* string);
