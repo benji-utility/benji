@@ -13,7 +13,11 @@ result_t* get_device_context_info() {
     info->operating_system = strdup((char*) result_unwrap_value(operating_system_result));
     strtrim(info->operating_system);
 
-    info->operating_system_version = "";
+    result_t* operating_system_version_result = get_device_context_operating_system_info(BENJI_OPERATING_SYSTEM_VERSION_NUMBER);
+    return_if_error(operating_system_version_result);
+    info->operating_system_version = strdup((char*) result_unwrap_value(operating_system_version_result));
+    strtrim(info->operating_system_version);
+
     info->hostname = "";
 
     return result_success(info);
@@ -52,7 +56,7 @@ result_t* get_device_context_device_name() {
 
 result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE version_info_type) {
     #if defined(_WIN32)
-        char* operating_system;
+        char* operating_system = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
         HMODULE hmodule = GetModuleHandle(TEXT("ntdll.dll"));
 
@@ -64,11 +68,29 @@ result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_V
                 rtl_os_version_info.dwOSVersionInfoSize = sizeof(RTL_OSVERSIONINFOW);
 
                 if (rtl_get_version(&rtl_os_version_info) == 0) {
-                    operating_system = get_windows_name_from_version(
-                        rtl_os_version_info.dwMajorVersion,
-                        rtl_os_version_info.dwMinorVersion,
-                        rtl_os_version_info.dwBuildNumber
-                    );
+                    switch (version_info_type) {
+                        case BENJI_OPERATING_SYSTEM_VERSION_NAME: {
+                            operating_system = get_windows_name_from_version(
+                                rtl_os_version_info.dwMajorVersion,
+                                rtl_os_version_info.dwMinorVersion,
+                                rtl_os_version_info.dwBuildNumber
+                            );
+
+                            break;
+                        }
+
+                        case BENJI_OPERATING_SYSTEM_VERSION_NUMBER: {
+                            sprintf(
+                                operating_system,
+                                "%lu.%lu (Build %lu)",
+                                rtl_os_version_info.dwMajorVersion,
+                                rtl_os_version_info.dwMinorVersion,
+                                rtl_os_version_info.dwBuildNumber
+                            );
+
+                            break;
+                        }
+                    }
                 }
                 else {
                     return result_error(-1, "Failed to get OS version info", BENJI_ERROR_PACKET);
