@@ -30,10 +30,11 @@ $(OBJ)/%.o: src/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
-.SILENT: clean
+.SILENT: install clean
 endif
 
 .PHONY: clean
+
 clean: mkbuild
 ifeq ($(OS), Windows_NT)
 	del /Q /S $(BUILD)\*
@@ -53,6 +54,7 @@ endif
 
 install:
 ifeq ($(OS), Windows_NT)
+	echo Not supported on Windows (yet)
 else ifeq ($(shell uname), Linux)
 	cp benji.service /etc/systemd/system/benjid.service
 	cp $(BUILD)/$(EXEC) /usr/local/bin/benjid
