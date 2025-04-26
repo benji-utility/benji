@@ -131,7 +131,7 @@ result_t* get_cpu_clock_speed() {
         if (hresult == BENJI_NO_ERROR && data_type == REG_DWORD) {
             hresult = RegCloseKey(hkey);
 
-            if (hresult != BENJI_NO_ERROR) {
+            if (FAILED(hresult)) {
                 return result_error(hresult, "RegCloseKey() failed", BENJI_ERROR_PACKET);
             }
 

@@ -18,37 +18,47 @@ result_t* get_device_context_info() {
     info->operating_system_version = strdup((char*) result_unwrap_value(operating_system_version_result));
     strtrim(info->operating_system_version);
 
-    info->hostname = "";
+    result_t* hostname_result = get_device_context_hostname();
+    return_if_error(hostname_result);
+    info->hostname = strdup((char*) result_unwrap_value(hostname_result));
+    strtrim(info->hostname);
 
     return result_success(info);
 }
 
 result_t* get_device_context_device_name() {
     #if defined(_WIN32)
-        unsigned long device_name_size = 0;
+        HKEY hkey;
 
-        GetComputerNameEx(ComputerNameDnsHostname, NULL, &device_name_size);
-        if (GetLastError() != ERROR_MORE_DATA) {
-            device_name_size = BENJI_BASIC_STRING_LENGTH; // default to something definitely long enough
+        HRESULT hresult = RegOpenKeyEx(
+            HKEY_LOCAL_MACHINE,
+            TEXT("SYSTEM\\CurrentControlSet\\Control\\ComputerName\\ComputerName"),
+            0, KEY_READ, &hkey
+        );
+
+        if (FAILED(hresult)) {
+            return result_error(hresult, "RegOpenKeyEx() failed", BENJI_ERROR_PACKET);
         }
 
-        wchar_t* device_name = malloc(BENJI_CAPACITY(device_name_size, wchar_t));
+        char device_name[MAX_COMPUTERNAME_LENGTH + 1];
 
-        if (!device_name) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        DWORD device_name_size = sizeof(device_name);
+        DWORD type = REG_SZ;
+
+        hresult = RegQueryValueExA(hkey, "ComputerName", NULL, &type, (unsigned char*) device_name, &device_name_size);
+
+        if (FAILED(hresult)) {
+            RegCloseKey(hkey);
+            return result_error(hresult, "RegQueryValueEx() failed", BENJI_ERROR_PACKET);
         }
 
-        // get the name assigned through Windows, not what comes from the BIOS
-        if (GetComputerNameEx(ComputerNameDnsHostname, device_name, &device_name_size)) {
-            return result_success(wcharp_to_charp(device_name));
+        hresult = RegCloseKey(hkey);
+
+        if (FAILED(hresult)) {
+            return result_error(hresult, "RegCloseKey() failed", BENJI_ERROR_PACKET);
         }
-        else {
-            return result_error(
-                GetLastError(),
-                "GetComputerNameEx() failed",
-                BENJI_ERROR_PACKET
-            );
-        }
+
+        return result_success(device_name);
     #elif defined(__linux__)
         // TODO: add linux stuff
     #endif
@@ -93,11 +103,11 @@ result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_V
                     }
                 }
                 else {
-                    return result_error(-1, "Failed to get OS version info", BENJI_ERROR_PACKET);
+                    return result_error(GetLastError(), "Failed to get OS version info", BENJI_ERROR_PACKET);
                 }
             }
             else {
-                return result_error(-1, "GetProcAddress() failed", BENJI_ERROR_PACKET);
+                return result_error(GetLastError(), "GetProcAddress() failed", BENJI_ERROR_PACKET);
             }
         }
         else {
@@ -110,9 +120,35 @@ result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_V
     #endif
 }
 
-result_t* get_device_context_operating_system_version();
+result_t* get_device_context_hostname() {
+    #if defined(_WIN32)
+        unsigned long hostname_size = 0;
 
-result_t* get_device_context_hostname();
+        GetComputerNameEx(ComputerNameDnsHostname, NULL, &hostname_size);
+        if (GetLastError() != ERROR_MORE_DATA) {
+            hostname_size = BENJI_BASIC_STRING_LENGTH; // default to something definitely long enough
+        }
+
+        wchar_t* hostname = malloc(BENJI_CAPACITY(hostname_size, wchar_t));
+
+        if (!hostname) {
+            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        }
+
+        if (GetComputerNameEx(ComputerNameDnsHostname, hostname, &hostname_size)) {
+            return result_success(wcharp_to_charp(hostname));
+        }
+        else {
+            return result_error(
+                GetLastError(),
+                "GetComputerNameEx() failed",
+                BENJI_ERROR_PACKET
+            );
+        }
+    #elif defined(__linux__)
+        // TODO: add linux stuff
+    #endif
+}
 
 #ifdef _WIN32
     char* get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number) {
