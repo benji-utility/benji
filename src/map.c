@@ -3,8 +3,16 @@
 map_t* map_init() {
     map_t* map = malloc(sizeof(map_t));
 
+    if (!map) {
+        return NULL;
+    }
+
     map->keys = malloc(BENJI_CAPACITY(BENJI_MAP_INITIAL_CAPACITY, char*));
     map->values = malloc(BENJI_CAPACITY(BENJI_MAP_INITIAL_CAPACITY, char*));
+
+    if (!map->keys || !map->values) {
+        return NULL;
+    }
 
     map->size = 0;
     map->capacity = BENJI_MAP_INITIAL_CAPACITY;
@@ -54,9 +62,19 @@ int map_get_index_of(map_t* map, const char* key) {
 
 char* map_serialize(map_t* map, const char* header) {
     char* block = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH * map->capacity, char));
+
+    if (!block) {
+        return "";
+    }
+
     block[0] = '\0';
 
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+
+    if (!buffer) {
+        return "";
+    }
+
     buffer[0] = '\0';
 
     sprintf(buffer, "\"%s\": {", header);

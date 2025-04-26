@@ -3,6 +3,10 @@
 result_t* get_device_context_info() {
     device_context_info_t* info = malloc(sizeof(device_context_info_t));
 
+    if (!info) {
+        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+    }
+
     result_t* device_name_result = get_device_context_device_name();
     return_if_error(device_name_result);
     info->device_name = strdup((char*) result_unwrap_value(device_name_result));
@@ -60,13 +64,17 @@ result_t* get_device_context_device_name() {
 
         return result_success(device_name);
     #elif defined(__linux__)
-        // TODO: add linux stuff
+        /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE version_info_type) {
     #if defined(_WIN32)
         char* operating_system = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+
+        if (!operating_system) {
+            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        }
 
         HMODULE hmodule = GetModuleHandle(TEXT("ntdll.dll"));
 
@@ -116,7 +124,7 @@ result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_V
 
         return result_success(operating_system);
     #elif defined(__linux__)
-        // TODO: add linux stuff
+        /* TODO: add linux stuff */
     #endif
 }
 
@@ -146,7 +154,7 @@ result_t* get_device_context_hostname() {
             );
         }
     #elif defined(__linux__)
-        // TODO: add linux stuff
+        /* TODO: add linux stuff */
     #endif
 }
 

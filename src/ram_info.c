@@ -3,6 +3,10 @@
 result_t* get_ram_info() {
     ram_info_t* info = malloc(sizeof(ram_info_t));
 
+    if (!info) {
+        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+    }
+
     result_t* ram_total_memory_result = get_ram_total_memory();
     return_if_error(ram_total_memory_result);
     info->total_memory = *(double*) result_unwrap_value(ram_total_memory_result);
@@ -31,12 +35,11 @@ result_t* get_ram_total_memory() {
 
         void* memory = malloc(sizeof(double));
 
-        if (memory) {
-            *(double*) memory = status.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
-        }
-        else {
+        if (!memory) {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
         }
+
+        *(double*) memory = status.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
 
         return result_success(memory);
     #elif defined(__linux__)
@@ -65,12 +68,12 @@ result_t* get_ram_memory_load() {
 
         void* memory = malloc(sizeof(double));
 
-        if (memory) {
-            *(double*) memory = total_memory * percent; // total memory is already in GB, so no need to convert
-        }
-        else {
+        if (!memory) {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
         }
+
+        // total memory is already in GB, so no need to convert
+        *(double*) memory = total_memory * percent;
 
         return result_success(memory);
     #elif defined(__linux__)
@@ -87,12 +90,11 @@ result_t* get_ram_free_memory() {
 
         void* memory = malloc(sizeof(double));
 
-        if (memory) {
-            *(double*) memory = status.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
-        }
-        else {
+        if (!memory) {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
         }
+
+        *(double*) memory = status.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
 
         return result_success(memory);
     #elif defined(__linux__)
@@ -107,7 +109,11 @@ result_t* get_ram_speed() {
             return result_error(-1, "Failed to get SMBIOS table size", BENJI_ERROR_PACKET);
         }
 
-        RAW_SMBIOS_DATA* buffer = (RAW_SMBIOS_DATA*) malloc(size);
+        RAW_SMBIOS_DATA* buffer = malloc(size);
+
+        if (!buffer) {
+            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        }
 
         if (!GetSystemFirmwareTable(BENJI_SYSTEM_FIRMWARE_TABLE, 0, buffer, size)) {
             free(buffer);

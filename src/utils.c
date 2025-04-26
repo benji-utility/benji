@@ -43,7 +43,8 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
     }
 
     *tokens = malloc(BENJI_CAPACITY(count, char*));
-    if (*tokens == NULL) {
+
+    if (!(*tokens)) {
         return 0; // return 0 because we havent processed any tokens yet
     }
 
@@ -55,8 +56,9 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
 
                 (*tokens)[index] = malloc(BENJI_CAPACITY(token_length + 1, char));
 
-                if ((*tokens)[index] == NULL) {
-                    free((*tokens)[index]); // look at me, being responsible
+                // this line gives me a stroke because haha funny
+                if (!((*tokens)[index])) {
+                    free((*tokens)[index]);
 
                     return count; // return how ever many tokens we managed to get
                 }
@@ -77,7 +79,7 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
 
 #ifdef _WIN32
     char* wcharp_to_charp(const wchar_t* wchar) {
-        if (wchar == NULL) {
+        if (!wchar) {
             return NULL;
         }
 
@@ -89,7 +91,7 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
 
         char* string = malloc(size);
 
-        if (string == NULL) {
+        if (!string) {
             return NULL;
         }
 
