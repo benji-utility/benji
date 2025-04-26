@@ -2,18 +2,22 @@ GXX = gcc
 
 GXX_FLAGS = -g
 
-ifeq ($(OS), Windows_NT)
-	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
-else ifeq ($(shell uname), Linux)
-	LINKED_LIBS =
-endif
-
 BUILD = build
 OBJ = $(BUILD)/obj
 EXEC = benji
 
 SRC = $(wildcard src/*.c)
-OBJS = $(subst src/, $(OBJ)/, $(addsuffix .o, $(basename $(SRC))))
+UPDATED_SRC =
+
+ifeq ($(OS), Windows_NT)
+	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
+	UPDATED_SRC = $(filter-out src/daemon.c, $(SRC))
+else ifeq ($(shell uname), Linux)
+	LINKED_LIBS =
+	UPDATED_SRC = $(filter-out src/service.c, $(SRC))
+endif
+
+OBJS = $(subst src/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRC))))
 
 all: clean compile
 
@@ -26,10 +30,11 @@ $(OBJ)/%.o: src/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
-.SILENT: clean
+.SILENT: install clean
 endif
 
 .PHONY: clean
+
 clean: mkbuild
 ifeq ($(OS), Windows_NT)
 	del /Q /S $(BUILD)\*
@@ -45,4 +50,12 @@ ifeq ($(OS), Windows_NT)
 else ifeq ($(shell uname), Linux)
 	mkdir -p $(BUILD)
 	mkdir -p $(OBJ)
+endif
+
+install:
+ifeq ($(OS), Windows_NT)
+	echo Not supported on Windows (yet)
+else ifeq ($(shell uname), Linux)
+	cp benji.service /etc/systemd/system/benjid.service
+	cp $(BUILD)/$(EXEC) /usr/local/bin/benjid
 endif

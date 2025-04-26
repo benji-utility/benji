@@ -16,7 +16,12 @@ void log_debug(const char* string, ...) {
     vsprintf(output, string, arguments);
 
     strtrim(output);
-    OutputDebugStringA(output);
+
+    #if defined(_WIN32)
+        OutputDebugStringA(output);
+    #elif defined (__linux__)
+        /* TODO: add linux stuff */
+    #endif
 
     free(output);
 
@@ -40,7 +45,12 @@ void log_info(const char* info, ...) {
     fprintf(stdout, ANSI_COLOR_RESET);
 
     strtrim(output);
-    OutputDebugStringA(output);
+
+    #if defined(_WIN32)
+        OutputDebugStringA(output);
+    #elif defined (__linux__)
+        /* TODO: add linux stuff */
+    #endif
 
     free(output);
 
@@ -69,7 +79,12 @@ void log_warning(result_error_payload_t error) {
     fprintf(stderr, output);
 
     strtrim(output);
-    OutputDebugStringA(output);
+
+    #if defined(_WIN32)
+        OutputDebugStringA(output);
+    #elif defined (__linux__)
+        /* TODO: add linux stuff */
+    #endif
 
     free(output);
 }
@@ -92,7 +107,12 @@ void log_warning_info(const char* info, ...) {
     fprintf(stdout, ANSI_COLOR_RESET);
 
     strtrim(output);
-    OutputDebugStringA(output);
+
+    #if defined(_WIN32)
+        OutputDebugStringA(output);
+    #elif defined (__linux__)
+        /* TODO: add linux stuff */
+    #endif
 
     free(output);
 
@@ -121,7 +141,12 @@ void log_error(result_error_payload_t error) {
     fprintf(stderr, output);
 
     strtrim(output);
-    OutputDebugStringA(output);
+
+    #if defined(_WIN32)
+        OutputDebugStringA(output);
+    #elif defined (__linux__)
+        /* TODO: add linux stuff */
+    #endif
 
     free(output);
 }

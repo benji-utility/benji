@@ -34,6 +34,10 @@
     #endif
 #endif
 
+#ifndef BENJI_STRING_EQUALS
+    #define BENJI_STRING_EQUALS(a, b) (strcmp(a, b) == 0)
+#endif
+
 #ifndef BENJI_NO_ERROR
     #ifdef NOERROR
         #define BENJI_NO_ERROR NOERROR
@@ -133,7 +137,7 @@
             map_data = (map_t*) result_unwrap_value(map_data_result);
     #endif
 
-    result_t* get_hardware_info();
+    result_t* get_hardware_info(const char* hardware_group, char** header);
 #endif
 
 void strtrim(char* string);

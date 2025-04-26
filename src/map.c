@@ -44,7 +44,7 @@ const char* map_get(map_t* map, const char* key) {
 
 int map_get_index_of(map_t* map, const char* key) {
     for (size_t i = 0; i < map->size; i++) {
-        if (strcmp(map->keys[i], key) == 0) {
+        if (BENJI_STRING_EQUALS(map->keys[i], key)) {
             return i;
         }
     }
