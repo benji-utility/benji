@@ -42,8 +42,8 @@ result_t* get_device_context_device_name() {
 
         char device_name[MAX_COMPUTERNAME_LENGTH + 1];
 
-        DWORD device_name_size = sizeof(device_name);
-        DWORD type = REG_SZ;
+        unsigned long device_name_size = sizeof(device_name);
+        unsigned long type = REG_SZ;
 
         hresult = RegQueryValueExA(hkey, "ComputerName", NULL, &type, (unsigned char*) device_name, &device_name_size);
 
