@@ -3,6 +3,10 @@
 result_t* get_cpu_info() {
     cpu_info_t* info = malloc(sizeof(cpu_info_t));
 
+    if (!info) {
+        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+    }
+
     result_t* cpu_name_result = get_cpu_name();
     return_if_error(cpu_name_result);
     info->name = strdup((char*) result_unwrap_value(cpu_name_result));
@@ -137,6 +141,10 @@ result_t* get_cpu_clock_speed() {
 
             void* speed_ghz = malloc(sizeof(double));
 
+            if (!speed_ghz) {
+                return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            }
+
             *(double*) speed_ghz = speed / 1000.0;
 
             return result_success(speed_ghz);
@@ -171,7 +179,7 @@ result_t* get_cpu_logical_processors_count() {
 
         GetLogicalProcessorInformation(NULL, &length);
 
-        SYSTEM_LOGICAL_PROCESSOR_INFORMATION* buffer = (SYSTEM_LOGICAL_PROCESSOR_INFORMATION*) malloc(length);
+        SYSTEM_LOGICAL_PROCESSOR_INFORMATION* buffer = malloc(length);
 
         if (!buffer) {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);

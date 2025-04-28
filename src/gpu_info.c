@@ -3,6 +3,10 @@
 result_t* get_gpu_info() {
     gpu_info_t* info = malloc(sizeof(gpu_info_t));
 
+    if (!info) {
+        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+    }
+
     result_t* gpu_name_result = get_gpu_name();
     return_if_error(gpu_name_result);
     info->name = strdup((char*) result_unwrap_value(gpu_name_result));

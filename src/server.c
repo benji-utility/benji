@@ -89,6 +89,11 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     BENJI_SOCKET client_socket = (BENJI_SOCKET) (uintptr_t) result_unwrap_value(client_handle_result);
 
     char* json = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+
+    if (!json) {
+        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+    }
+
     json[0] = '\0';
 
     if (data_groups == NULL || data_group_count <= 0) {
@@ -152,6 +157,11 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         map_t* map_data = (map_t*) result_unwrap_value(map_data_result);
 
         char* json_block = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+
+        if (!json_block) {
+            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        }
+
         json_block[0] = '\0';
 
         sprintf(json_block, "%s,", map_serialize(map_data, header));
