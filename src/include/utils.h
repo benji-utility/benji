@@ -13,7 +13,9 @@
 #include <ctype.h>
 
 #ifdef _WIN32
-    #define WIN32_LEAN_AND_MEAN /* compact Win32 to only common utilities */
+    #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN /* compact Win32 to only common utilities */
+    #endif
 
     #include <windows.h>
 #endif
