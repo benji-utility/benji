@@ -15,7 +15,7 @@ C:\Windows\system32> sc create BenjiService binPath="<path to the Benji executab
 C:\Windows\system32> sc start BenjiService
 ```
 5. Open TCPView, and search for the name of the executable (at time of writing it's simply `benji`)
-6. Run the `test_client.py` script and input the TCP port associated with the process
+6. Run the [`test_client.py`](https://github.com/benji-utility/benji/blob/main/test_client.py) script and input the TCP port associated with the process
 7. It should return a JSON block containing details about the system
     - Change the string in the Python script to modify what data is being obtained
 8. To stop Benji, run the following command
