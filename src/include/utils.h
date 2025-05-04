@@ -133,9 +133,12 @@
         #define collect_map_data(info_type, get_info, convert_to_map, map_data) \
             result_t* info_result = get_info(); \
             return_if_error(info_result); \
+            \
             info_type cpu_info = *(info_type*) result_unwrap_value(info_result); \
+            \
             result_t* map_data_result = convert_to_map(cpu_info); \
             return_if_error(map_data_result); \
+            \
             map_data = (map_t*) result_unwrap_value(map_data_result);
     #endif
 

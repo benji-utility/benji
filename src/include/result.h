@@ -11,6 +11,7 @@
 #ifndef return_if_error
     #define return_if_error(result) if (result->is_error) { \
         result_error_payload_t error = result_unwrap_error(result); \
+        \
         return result_error( \
             error.code, \
             error.message, \
@@ -22,7 +23,9 @@
 #ifndef return_if_error_with_warning
     #define return_if_error_with_warning(result) if (result->is_error) { \
         result_error_payload_t error = result_unwrap_error(result); \
+        \
         log_warning(error); \
+        \
         return result_error( \
             error.code, \
             error.message, \
