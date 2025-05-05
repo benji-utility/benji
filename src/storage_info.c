@@ -7,38 +7,43 @@ result_t* get_storage_info() {
         return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
     }
 
-    size_t device_count = 0;
+    info->device_count = count_storage_devices();
 
-    result_t* models_result = get_storage_models(&device_count);
+    result_t* models_result = get_storage_devices_info(info->device_count, BENJI_STORAGE_DEVICE_MODEL_NAME);
     return_if_error(models_result);
     info->models = strdup((char*) result_unwrap_value(models_result));
     strtrim(info->models);
 
-    info->device_count = device_count;
+    result_t* serial_numbers_result = get_storage_devices_info(info->device_count, BENJI_STORAGE_DEVICE_SERIAL_NUMBER);
+    return_if_error(serial_numbers_result);
+    info->serial_numbers = strdup((char*) result_unwrap_value(serial_numbers_result));
+    strtrim(info->serial_numbers);
 
-    info->serial_numbers = "";
-    info->bus_types = "";
-    info->sizes = "";
+    result_t* bus_types_result = get_storage_devices_info(info->device_count, BENJI_STORAGE_DEVICE_BUS_TYPE);
+    return_if_error(bus_types_result);
+    info->bus_types = strdup((char*) result_unwrap_value(bus_types_result));
+    strtrim(info->bus_types);
+
+    result_t* sizes_result = get_storage_devices_size(info->device_count);
+    return_if_error(sizes_result);
+    info->sizes = strdup((char*) result_unwrap_value(sizes_result));
+    strtrim(info->sizes);
 
     return result_success(info);
 }
 
-result_t* get_storage_models(size_t* device_count) {
+result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE info_type) {
     #if defined(_WIN32)
-        char* models = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
+        char* devices_info = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
-        if (!models) {
+        if (!devices_info) {
             return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
         }
 
-        models[0] = '\0';
+        devices_info[0] = '\0';
 
-        for (*device_count; *device_count < BENJI_MAX_STORAGE_DEVICES; (*device_count)++) {
-            HANDLE handle = open_storage_device_handle(*device_count);
-
-            if (handle == INVALID_HANDLE_VALUE) {
-                continue;
-            }
+        for (int i = 0; i < device_count; i++) {
+            HANDLE handle = open_storage_device_handle(i);
 
             unsigned char* buffer = NULL;
 
@@ -46,14 +51,39 @@ result_t* get_storage_models(size_t* device_count) {
 
             if (storage_device_descriptor_result->is_error) {
                 log_warning(result_unwrap_error(storage_device_descriptor_result));
-                strcat(models, "???");
+                strcat(devices_info, "???");
             }
             else {
                 STORAGE_DEVICE_DESCRIPTOR storage_device_descriptor = *(STORAGE_DEVICE_DESCRIPTOR*) result_unwrap_value(
                     storage_device_descriptor_result
                 );
 
-                strcat(models, (char*) (buffer + storage_device_descriptor.ProductIdOffset));
+                // model name or serial number
+                if (info_type != BENJI_STORAGE_DEVICE_BUS_TYPE) {
+                    unsigned long offset;
+
+                    switch (info_type) {
+                        case BENJI_STORAGE_DEVICE_MODEL_NAME: {
+                            offset = storage_device_descriptor.ProductIdOffset;
+                            break;
+                        }
+
+                        case BENJI_STORAGE_DEVICE_SERIAL_NUMBER: {
+                            offset = storage_device_descriptor.SerialNumberOffset;
+                            break;
+                        }
+                    }
+
+                    if (offset) {
+                        strcat(devices_info, (char*) (buffer + offset));
+                    }
+                    else {
+                        strcat(devices_info, "???");
+                    }
+                }
+                else { // bus type
+                    strcat(devices_info, get_bus_type(storage_device_descriptor.BusType));
+                }
             }
 
             if (buffer) {
@@ -62,27 +92,77 @@ result_t* get_storage_models(size_t* device_count) {
 
             CloseHandle(handle);
 
-            strcat(models, ",");
+            strcat(devices_info, ",");
         }
 
-        size_t models_length = strlen(models);
+        size_t models_length = strlen(devices_info);
 
         // remove trailing comma
-        if (models_length > 0 && models[models_length - 1] == ',') {
-            models[models_length - 1] = '\0';
+        if (models_length > 0 && devices_info[models_length - 1] == ',') {
+            devices_info[models_length - 1] = '\0';
         }
 
-        return result_success(models);
+        return result_success(devices_info);
     #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 }
 
-result_t* get_storage_serial_numbers();
+result_t* get_storage_devices_size(size_t device_count) {
+    #if defined(_WIN32)
+        char* sizes = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
-result_t* get_storage_bus_types();
+        if (!sizes) {
+            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        }
 
-result_t* get_storage_sizes();
+        sizes[0] = '\0';
+
+        for (int i = 0; i < device_count; i++) {
+            HANDLE handle = open_storage_device_handle(i);
+
+            DISK_GEOMETRY_EX storage_device_geometry = { 0 };
+
+            unsigned long bytes_returned;
+
+            boolean result = DeviceIoControl(
+                handle, IOCTL_DISK_GET_DRIVE_GEOMETRY_EX,
+                NULL, 0,
+                &storage_device_geometry, sizeof(storage_device_geometry),
+                &bytes_returned, NULL
+            );
+
+            if (result) {
+                char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+
+                if (!buffer) {
+                    return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+                }
+
+                buffer[0] = '\0';
+
+                sprintf(buffer, "%0.3f", storage_device_geometry.DiskSize.QuadPart / (1024.0 * 1024.0 * 1024.0));
+                strcat(sizes, buffer);
+
+                free(buffer);
+            }
+
+            CloseHandle(handle);
+
+            strcat(sizes, ",");
+        }
+
+        size_t sizes_length = strlen(sizes);
+
+        if (sizes_length > 0 && sizes[sizes_length - 1] == ',') {
+            sizes[sizes_length - 1] = '\0';
+        }
+
+        return result_success(sizes);
+    #elif defined(__linux__)
+        /* TODO: add linux stuff */
+    #endif
+}
 
 #ifdef _WIN32
     HANDLE open_storage_device_handle(size_t device_index) {
@@ -165,7 +245,7 @@ result_t* get_storage_sizes();
                 case BusTypeVirtual: return "Virtual";
                 case BusTypeFileBackedVirtual: return "File-Backed Virtual";
                 case BusTypeSpaces: return "Spaces";
-                case BusTypeNvme: return "NVME";
+                case BusTypeNvme: return "NVMe";
                 case BusTypeSCM: return "SCM";
                 case BusTypeUfs: return "UFS";
             #endif
@@ -174,6 +254,22 @@ result_t* get_storage_sizes();
         }
     }
 #endif
+
+size_t count_storage_devices() {
+    size_t device_count;
+
+    for (size_t i = 0; i < BENJI_MAX_STORAGE_DEVICES; i++) {
+        HANDLE handle = open_storage_device_handle(i);
+
+        if (handle == INVALID_HANDLE_VALUE) {
+            continue;
+        }
+
+        device_count++;
+    }
+
+    return device_count;
+}
 
 result_t* storage_info_to_map(storage_info_t storage_info) {
     map_t* storage_info_map = map_init();
@@ -186,10 +282,15 @@ result_t* storage_info_to_map(storage_info_t storage_info) {
 
     buffer[0] = '\0';
 
+    sprintf(buffer, "%lu", storage_info.device_count);
+    map_insert(storage_info_map, "device_count", buffer);
+
     map_insert(storage_info_map, "models", storage_info.models);
     map_insert(storage_info_map, "serial_numbers", storage_info.serial_numbers);
     map_insert(storage_info_map, "bus_types", storage_info.bus_types);
     map_insert(storage_info_map, "sizes", storage_info.sizes);
+
+    free(buffer);
 
     return result_success(storage_info_map);
 }

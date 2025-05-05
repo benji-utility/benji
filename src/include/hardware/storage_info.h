@@ -31,12 +31,16 @@ typedef struct _BENJI_STORAGE_INFO {
     char* sizes; // in GB
 } storage_info_t;
 
+enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE {
+    BENJI_STORAGE_DEVICE_MODEL_NAME,
+    BENJI_STORAGE_DEVICE_SERIAL_NUMBER,
+    BENJI_STORAGE_DEVICE_BUS_TYPE
+};
+
 result_t* get_storage_info();
 
-result_t* get_storage_models(size_t* device_count); // this has the count only because it is the first one called
-result_t* get_storage_serial_numbers();
-result_t* get_storage_bus_types();
-result_t* get_storage_sizes();
+result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE info_type);
+result_t* get_storage_devices_size(size_t device_count);
 
 #ifdef _WIN32
     HANDLE open_storage_device_handle(size_t device_index);
@@ -44,6 +48,8 @@ result_t* get_storage_sizes();
 
     const char* get_bus_type(STORAGE_BUS_TYPE bus_type);
 #endif
+
+size_t count_storage_devices();
 
 result_t* storage_info_to_map(storage_info_t storage_info);
 

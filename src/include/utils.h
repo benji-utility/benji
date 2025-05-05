@@ -134,10 +134,12 @@
             result_t* info_result = get_info(); \
             return_if_error(info_result); \
             \
-            info_type cpu_info = *(info_type*) result_unwrap_value(info_result); \
+            info_type* info = (info_type*) result_unwrap_value(info_result); \
             \
-            result_t* map_data_result = convert_to_map(cpu_info); \
+            result_t* map_data_result = convert_to_map(*info); \
             return_if_error(map_data_result); \
+            \
+            free(info); \
             \
             map_data = (map_t*) result_unwrap_value(map_data_result);
     #endif
