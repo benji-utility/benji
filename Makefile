@@ -2,22 +2,24 @@ GXX = gcc
 
 GXX_FLAGS = -g
 
+SRC = src
 BUILD = build
 OBJ = $(BUILD)/obj
+
 EXEC = benji
 
-SRC = $(wildcard src/*.c)
-UPDATED_SRC =
+SRCS = $(wildcard src/*.c)
+UPDATED_SRCS =
 
 ifeq ($(OS), Windows_NT)
 	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
-	UPDATED_SRC = $(filter-out src/daemon.c, $(SRC))
+	UPDATED_SRCS = $(filter-out $(SRC)/daemon.c, $(SRCS))
 else ifeq ($(shell uname), Linux)
 	LINKED_LIBS =
-	UPDATED_SRC = $(filter-out src/service.c, $(SRC))
+	UPDATED_SRCS = $(filter-out $(SRC)/service.c, $(SRCS))
 endif
 
-OBJS = $(subst src/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRC))))
+OBJS = $(subst $(SRC)/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRCS))))
 
 all: clean compile
 
@@ -26,7 +28,7 @@ compile: $(BUILD)/$(EXEC)
 $(BUILD)/$(EXEC): $(OBJS)
 	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS)
 
-$(OBJ)/%.o: src/%.c
+$(OBJ)/%.o: $(SRC)/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
