@@ -26,7 +26,7 @@ typedef struct _BENJI_RAM_INFO {
     uint16_t speed; // in MHz
 } ram_info_t;
 
-#ifdef BENJI_IS_ON_WINDOWS
+#ifdef _WIN32
     #pragma pack(push, 1)
         typedef struct _SMBIOS_MEMORY_DEVICE {
             uint8_t type;
@@ -67,7 +67,7 @@ result_t* get_ram_memory_load();
 result_t* get_ram_free_memory();
 result_t* get_ram_speed();
 
-#ifdef BENJI_IS_ON_WINDOWS
+#ifdef _WIN32
     result_t* get_memory_status();
 #endif
 

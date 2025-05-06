@@ -27,7 +27,7 @@ result_t* get_device_context_device_name();
 result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE version_info_type);
 result_t* get_device_context_hostname();
 
-#ifdef BENJI_IS_ON_WINDOWS
+#ifdef _WIN32
     typedef LONG (WINAPI* rtl_get_version_t)(PRTL_OSVERSIONINFOW);
 
     char* get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number);

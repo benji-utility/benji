@@ -17,9 +17,9 @@ void log_debug(const char* string, ...) {
 
     strtrim(output);
 
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         OutputDebugStringA(output);
-    #elif defined (BENJI_IS_ON_LINUX)
+    #elif defined (__linux__)
         /* TODO: add linux stuff */
     #endif
 
@@ -46,9 +46,9 @@ void log_info(const char* info, ...) {
 
     strtrim(output);
 
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         OutputDebugStringA(output);
-    #elif defined (BENJI_IS_ON_LINUX)
+    #elif defined (__linux__)
         /* TODO: add linux stuff */
     #endif
 
@@ -80,9 +80,9 @@ void log_warning(result_error_payload_t error) {
 
     strtrim(output);
 
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         OutputDebugStringA(output);
-    #elif defined (BENJI_IS_ON_LINUX)
+    #elif defined (__linux__)
         /* TODO: add linux stuff */
     #endif
 
@@ -108,9 +108,9 @@ void log_warning_info(const char* info, ...) {
 
     strtrim(output);
 
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         OutputDebugStringA(output);
-    #elif defined (BENJI_IS_ON_LINUX)
+    #elif defined (__linux__)
         /* TODO: add linux stuff */
     #endif
 
@@ -142,9 +142,9 @@ void log_error(result_error_payload_t error) {
 
     strtrim(output);
 
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         OutputDebugStringA(output);
-    #elif defined (BENJI_IS_ON_LINUX)
+    #elif defined (__linux__)
         /* TODO: add linux stuff */
     #endif
 

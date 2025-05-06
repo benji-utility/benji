@@ -1,8 +1,8 @@
-#ifdef BENJI_IS_ON_WINDOWS
+#ifdef _WIN32
     #include "include/service.h"
 
     BENJIAPI void service_main(unsigned long argc, LPTSTR* argv) {
-        service_status.dwServiceType = SERVICEBENJI_IS_ON_WINDOWS_OWN_PROCESS;
+        service_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
         service_status.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
         service_status.dwServiceSpecificExitCode = 0;
         service_status.dwCheckPoint = 0;
@@ -70,7 +70,7 @@
                 WSACloseEvent(service_socket_event);
                 WSACloseEvent(service_stop_event);
 
-                #ifdef BENJI_IS_ON_WINDOWS
+                #ifdef _WIN32
                     winsock_cleanup();
                 #endif
 

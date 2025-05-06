@@ -5,9 +5,9 @@ BENJIAPI result_t* server_init() {
 
     server_address.sin_family = AF_INET; // ipv4 address family
 
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         server_address.sin_addr.S_un.S_addr = INADDR_ANY;
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         server_address.sin_addr.s_addr = INADDR_ANY;
     #endif
 
@@ -30,9 +30,9 @@ BENJIAPI result_t* server_init() {
 
         return_if_error_with_warning(close_server_socket_result);
 
-        #if defined(BENJI_IS_ON_WINDOWS)
+        #if defined(_WIN32)
             int error_code = WSAGetLastError();
-        #elif defined(BENJI_IS_ON_LINUX)
+        #elif defined(__linux__)
             int error_code = -1;
         #endif
 
@@ -48,9 +48,9 @@ BENJIAPI result_t* server_init() {
 
         return_if_error_with_warning(close_server_socket_result);
 
-        #if defined(BENJI_IS_ON_WINDOWS)
+        #if defined(_WIN32)
             int error_code = WSAGetLastError();
-        #elif defined(BENJI_IS_ON_LINUX)
+        #elif defined(__linux__)
             int error_code = -1;
         #endif
 
@@ -240,19 +240,19 @@ BENJIAPI result_t* server_accept_client(BENJI_SOCKET server_socket) {
     BENJI_SOCKET client_socket = accept(server_socket, (struct sockaddr*) &client, &client_length);
 
     if (client_socket == BENJI_INVALID_SOCKET) {
-        #if defined(BENJI_IS_ON_WINDOWS)
+        #if defined(_WIN32)
             int error_code = WSAGetLastError();
-        #elif defined(BENJI_IS_ON_LINUX)
+        #elif defined(__linux__)
             int error_code = -1;
         #endif
 
         return result_error(error_code, "accept() failed", BENJI_ERROR_PACKET);
     }
 
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         u_long non_blocking_mode = true;
         ioctlsocket(client_socket, FIONBIO, &non_blocking_mode);
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         int flags = fcntl(client_socket, F_GETFL, 0);
         fcntl(client_socket, F_SETFL, flags | O_NONBLOCK);
     #endif
@@ -273,9 +273,9 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
         bytes_received = recv(client_socket, buffer, sizeof(buffer) - 1, 0);
 
         if (bytes_received == BENJI_SOCKET_ERROR) {
-            #if defined(BENJI_IS_ON_WINDOWS)
+            #if defined(_WIN32)
                 bool is_blocking = WSAGetLastError() == WSAEWOULDBLOCK;
-            #elif defined(BENJI_IS_ON_LINUX)
+            #elif defined(__linux__)
                 bool is_blocking = EAGAIN | EWOULDBLOCK;
             #endif
 
@@ -292,9 +292,9 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
                 }
             }
             else {
-                #if defined(BENJI_IS_ON_WINDOWS)
+                #if defined(_WIN32)
                     int error_code = WSAGetLastError();
-                #elif defined(BENJI_IS_ON_LINUX)
+                #elif defined(__linux__)
                     int error_code = -1;
                 #endif
 
@@ -323,9 +323,9 @@ BENJIAPI result_t* server_send_to_client(BENJI_SOCKET client_socket, const char*
     int bytes_sent = send(client_socket, data, strlen(data) + 1, 0);
 
     if (bytes_sent == BENJI_SOCKET_ERROR) {
-        #if defined(BENJI_IS_ON_WINDOWS)
+        #if defined(_WIN32)
             int error_code = WSAGetLastError();
-        #elif defined(BENJI_IS_ON_LINUX)
+        #elif defined(__linux__)
             int error_code = -1;
         #endif
 

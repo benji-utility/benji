@@ -5,7 +5,7 @@
 #include "include/utils.h"
 #include "include/logger.h"
 
-#ifdef BENJI_IS_ON_WINDOWS
+#ifdef _WIN32
     BENJIAPI void winsock_init() {
         struct WSAData wsa_data;
 
@@ -33,9 +33,9 @@ BENJIAPI result_t* create_socket() {
     BENJI_SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 
     if (sock == BENJI_SOCKET_ERROR) {
-        #if defined(BENJI_IS_ON_WINDOWS)
+        #if defined(_WIN32)
             int error_code = WSAGetLastError();
-        #elif defined(BENJI_IS_ON_LINUX)
+        #elif defined(__linux__)
             int error_code = -1;
         #endif
 
@@ -46,16 +46,16 @@ BENJIAPI result_t* create_socket() {
 }
 
 BENJIAPI result_t* close_socket(BENJI_SOCKET sock) {
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         int return_code = closesocket(sock);
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         int return_code = close(sock);
     #endif
 
     if (return_code == BENJI_SOCKET_ERROR) {
-        #if defined(BENJI_IS_ON_WINDOWS)
+        #if defined(_WIN32)
             int error_code = WSAGetLastError();
-        #elif defined(BENJI_IS_ON_LINUX)
+        #elif defined(__linux__)
             int error_code = -1;
         #endif
 
@@ -66,7 +66,7 @@ BENJIAPI result_t* close_socket(BENJI_SOCKET sock) {
 }
 
 BENJIAPI void terminate(const int exit_code) {
-    #ifdef BENJI_IS_ON_WINDOWS
+    #ifdef _WIN32
         winsock_cleanup();
     #endif
 

@@ -1,4 +1,4 @@
-#ifdef BENJI_IS_ON_LINUX
+#ifdef __linux__
     #ifndef __BENJI_DAEMON_H
     #define __BENJI_DAEMON_H
 

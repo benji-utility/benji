@@ -38,7 +38,7 @@ result_t* get_cpu_info() {
 }
 
 result_t* get_cpu_name() {
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         int cpuid_info[BENJI_CPUID_BUFFER_LENGTH];
 
         char* cpu_name = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
@@ -55,13 +55,13 @@ result_t* get_cpu_name() {
         }
 
         return result_success(cpu_name);
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_cpu_vendor() {
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         int cpu_info[BENJI_CPUID_BUFFER_LENGTH];
 
         char* cpu_vendor = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
@@ -81,13 +81,13 @@ result_t* get_cpu_vendor() {
         cpu_vendor[strlen(cpu_vendor) - 2] = '\0'; // this is kinda cursed, but it works sooooo
 
         return result_success(cpu_vendor);
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_cpu_arch() {
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         SYSTEM_INFO system_info;
 
         GetSystemInfo(&system_info);
@@ -106,13 +106,13 @@ result_t* get_cpu_arch() {
         }
 
         return result_success(arch);
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_cpu_clock_speed() {
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         HKEY hkey;
 
         HRESULT hresult = RegOpenKeyEx(
@@ -152,28 +152,28 @@ result_t* get_cpu_clock_speed() {
         else {
             return result_error(hresult, "RegQueryValueEx() failed", BENJI_ERROR_PACKET);
         }
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_cpu_core_count() {
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         return get_cpu_processor_info(count_cpu_cores);
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_cpu_logical_processors_count() {
-    #if defined(BENJI_IS_ON_WINDOWS)
+    #if defined(_WIN32)
         return get_cpu_processor_info(count_cpu_logical_processors);
-    #elif defined(BENJI_IS_ON_LINUX)
+    #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 }
 
-#ifdef BENJI_IS_ON_WINDOWS
+#ifdef _WIN32
     result_t* get_cpu_processor_info(processor_info_callback_t callback) {
         unsigned long int length = 0;
 

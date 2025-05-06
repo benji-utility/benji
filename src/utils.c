@@ -77,7 +77,7 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
     return count;  // Return the number of tokens
 }
 
-#ifdef BENJI_IS_ON_WINDOWS
+#ifdef _WIN32
     char* wcharp_to_charp(const wchar_t* wchar) {
         if (!wchar) {
             return NULL;
