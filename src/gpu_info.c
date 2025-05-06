@@ -33,7 +33,7 @@ result_t* get_gpu_info() {
 }
 
 result_t* get_gpu_name() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
 
@@ -41,13 +41,13 @@ result_t* get_gpu_name() {
 
         // make the assumption that the description value contains the name (usually it does)
         return result_success(wcharp_to_charp(adapter_description.Description));
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_gpu_vendor() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         char* vendor;
 
         result_t* description_result = get_gpu_description();
@@ -64,13 +64,13 @@ result_t* get_gpu_vendor() {
         }
 
         return result_success(vendor);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type) {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
 
@@ -99,12 +99,12 @@ result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type) {
         }
 
         return result_success(memory);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     result_t* get_gpu_description() {
         HRESULT hresult;
 

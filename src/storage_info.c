@@ -33,7 +33,7 @@ result_t* get_storage_info() {
 }
 
 result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE info_type) {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         char* devices_info = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
         if (!devices_info) {
@@ -103,13 +103,13 @@ result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVIC
         }
 
         return result_success(devices_info);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_storage_devices_size(size_t device_count) {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         char* sizes = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
         if (!sizes) {
@@ -159,12 +159,12 @@ result_t* get_storage_devices_size(size_t device_count) {
         }
 
         return result_success(sizes);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     HANDLE open_storage_device_handle(size_t device_index) {
         char device_path[BENJI_BASIC_STRING_LENGTH];
 
@@ -233,7 +233,7 @@ result_t* get_storage_devices_size(size_t device_count) {
             case BusTypeUsb: return "USB";
             case BusTypeRAID: return "RAID";
 
-            #if (_WIN32_WINNT >= 0x0600)
+            #if (BENJI_IS_ON_WINDOWS_WINNT >= 0x0600)
                 case BusTypeiScsi: return "iSCSI";
                 case BusTypeSas: return "SAS";
                 case BusTypeSata: return "SATA";
@@ -241,7 +241,7 @@ result_t* get_storage_devices_size(size_t device_count) {
                 case BusTypeMmc: return "MMC";
             #endif
 
-            #if (_WIN32_WINNT >= 0x0601)
+            #if (BENJI_IS_ON_WINDOWS_WINNT >= 0x0601)
                 case BusTypeVirtual: return "Virtual";
                 case BusTypeFileBackedVirtual: return "File-Backed Virtual";
                 case BusTypeSpaces: return "Spaces";

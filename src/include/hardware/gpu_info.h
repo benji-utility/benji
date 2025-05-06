@@ -39,7 +39,7 @@ result_t* get_gpu_name();
 result_t* get_gpu_vendor();
 result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type);
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     result_t* get_gpu_description();
 #endif
 

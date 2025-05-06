@@ -9,7 +9,7 @@
 #include "../map.h"
 #include "../result.h"
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     #include <winioctl.h>
 #endif
 
@@ -42,7 +42,7 @@ result_t* get_storage_info();
 result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE info_type);
 result_t* get_storage_devices_size(size_t device_count);
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     HANDLE open_storage_device_handle(size_t device_index);
     result_t* get_storage_device_descriptor(HANDLE handle, unsigned char** buffer);
 

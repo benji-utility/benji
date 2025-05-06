@@ -31,7 +31,7 @@ result_t* get_device_context_info() {
 }
 
 result_t* get_device_context_device_name() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         HKEY hkey;
 
         HRESULT hresult = RegOpenKeyEx(
@@ -63,13 +63,13 @@ result_t* get_device_context_device_name() {
         }
 
         return result_success(device_name);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE version_info_type) {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         char* operating_system = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
         if (!operating_system) {
@@ -123,13 +123,13 @@ result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_V
         }
 
         return result_success(operating_system);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_device_context_hostname() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         unsigned long hostname_size = 0;
 
         GetComputerNameEx(ComputerNameDnsHostname, NULL, &hostname_size);
@@ -153,12 +153,12 @@ result_t* get_device_context_hostname() {
                 BENJI_ERROR_PACKET
             );
         }
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     char* get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number) {
         if (major_version == 10 && minor_version == 0) {
             if (build_number >= 22000) {

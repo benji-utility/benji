@@ -9,7 +9,7 @@
 #include "../map.h"
 #include "../result.h"
 
-#if defined(_WIN32)
+#if defined(BENJI_IS_ON_WINDOWS)
     #include <intrin.h>
     #include <unistd.h>
 #endif
@@ -45,7 +45,7 @@ result_t* get_cpu_clock_speed();
 result_t* get_cpu_core_count();
 result_t* get_cpu_logical_processors_count();
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     typedef uint32_t (*processor_info_callback_t)(SYSTEM_LOGICAL_PROCESSOR_INFORMATION*);
 
     result_t* get_cpu_processor_info(processor_info_callback_t callback);

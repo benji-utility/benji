@@ -12,7 +12,15 @@
 #include <string.h>
 #include <ctype.h>
 
-#ifdef _WIN32
+#ifndef BENJI_IS_ON_WINDOWS
+    #define BENJI_IS_ON_WINDOWS _WIN32
+#endif
+
+#ifndef BENJI_IS_ON_LINUX
+    #define BENJI_IS_ON_LINUX __linux__
+#endif
+
+#ifdef BENJI_IS_ON_WINDOWS
     #ifndef WIN32_LEAN_AND_MEAN
         #define WIN32_LEAN_AND_MEAN /* compact Win32 to only common utilities */
     #endif
@@ -29,9 +37,9 @@
 #endif
 
 #ifndef BENJI_SLEEP
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         #define BENJI_SLEEP(ms) Sleep(ms)
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         #define BENJI_SLEEP(ms) sleep(ms)
     #endif
 #endif
@@ -55,7 +63,7 @@
 #ifdef BENJI_USE_SERVER_UTILS
     #include "result.h"
 
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         #pragma comment(lib, "ws2_32.lib")
 
         #include <winsock2.h>
@@ -77,7 +85,7 @@
 
         BENJIAPI void winsock_init();
         BENJIAPI void winsock_cleanup();
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         #include <sys/socket.h>
         #include <arpa/inet.h>
         #include <unistd.h>
@@ -123,9 +131,9 @@
     #include "map.h"
     #include "logger.h"
 
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         #include <dxgi.h>
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 
@@ -150,7 +158,7 @@
 void strtrim(char* string);
 size_t strsplit(const char* string, char*** tokens, const char character); // returns token count
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     char* wcharp_to_charp(const wchar_t* wchar);
 #endif
 

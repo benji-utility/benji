@@ -1,4 +1,4 @@
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     #ifndef __BENJI_SERVICE_H
     #define __BENJI_SERVICE_H
 

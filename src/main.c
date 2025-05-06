@@ -1,6 +1,6 @@
-#if defined(_WIN32)
+#if defined(BENJI_IS_ON_WINDOWS)
     #include "include/service.h"
-#elif defined(__linux__)
+#elif defined(BENJI_IS_ON_LINUX)
     #include "include/daemon.h"
 #endif
 
@@ -8,7 +8,7 @@
 #include "include/result.h"
 
 int main(int argc, const char* argv[]) {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         winsock_init();
 
         SERVICE_TABLE_ENTRY service_table[] = {
@@ -19,7 +19,7 @@ int main(int argc, const char* argv[]) {
         if (!StartServiceCtrlDispatcher(service_table)) {
             return GetLastError();
         }
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         spawn_daemon();
     #endif
 

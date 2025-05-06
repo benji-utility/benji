@@ -1,4 +1,4 @@
-#ifdef __linux__
+#ifdef BENJI_IS_ON_LINUX
     #include "include/daemon.h"
 
     void spawn_daemon() {

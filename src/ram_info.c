@@ -27,7 +27,7 @@ result_t* get_ram_info() {
 }
 
 result_t* get_ram_total_memory() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         result_t* status_result = get_memory_status();
         return_if_error(status_result);
 
@@ -42,13 +42,13 @@ result_t* get_ram_total_memory() {
         *(double*) memory = status.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
 
         return result_success(memory);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_ram_memory_load() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         result_t* status_result = get_memory_status();
         return_if_error(status_result);
 
@@ -76,13 +76,13 @@ result_t* get_ram_memory_load() {
         *(double*) memory = total_memory * percent;
 
         return result_success(memory);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_ram_free_memory() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         result_t* status_result = get_memory_status();
         return_if_error(status_result);
 
@@ -97,13 +97,13 @@ result_t* get_ram_free_memory() {
         *(double*) memory = status.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
 
         return result_success(memory);
-    #elif defined(__linux__)
+    #elif defined(BENJI_IS_ON_LINUX)
         /* TODO: add linux stuff */
     #endif
 }
 
 result_t* get_ram_speed() {
-    #if defined(_WIN32)
+    #if defined(BENJI_IS_ON_WINDOWS)
         unsigned long size = GetSystemFirmwareTable(BENJI_SYSTEM_FIRMWARE_TABLE, 0, NULL, 0);
         if (size == 0) {
             return result_error(-1, "Failed to get SMBIOS table size", BENJI_ERROR_PACKET);
@@ -159,7 +159,7 @@ result_t* get_ram_speed() {
     #endif
 }
 
-#ifdef _WIN32
+#ifdef BENJI_IS_ON_WINDOWS
     result_t* get_memory_status() {
         MEMORYSTATUSEX* status = malloc(sizeof(MEMORYSTATUSEX));
 
