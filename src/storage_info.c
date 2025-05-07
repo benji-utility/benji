@@ -170,7 +170,12 @@ result_t* get_storage_devices_size(size_t device_count) {
 
         sprintf(device_path, "\\\\.\\PhysicalDrive%d", device_index);
 
-        return CreateFileA(device_path, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, 0, NULL);
+        return CreateFileA(
+            device_path,
+            GENERIC_READ | GENERIC_WRITE,
+            FILE_SHARE_READ | FILE_SHARE_WRITE,
+            NULL, OPEN_EXISTING, 0, NULL
+        );
     }
 
     result_t* get_storage_device_descriptor(HANDLE handle, unsigned char** buffer) {
@@ -256,7 +261,7 @@ result_t* get_storage_devices_size(size_t device_count) {
 #endif
 
 size_t count_storage_devices() {
-    size_t device_count;
+    size_t device_count = 0;
 
     for (size_t i = 0; i < BENJI_MAX_STORAGE_DEVICES; i++) {
         HANDLE handle = open_storage_device_handle(i);
@@ -266,6 +271,8 @@ size_t count_storage_devices() {
         }
 
         device_count++;
+
+        CloseHandle(handle);
     }
 
     return device_count;

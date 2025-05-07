@@ -88,7 +88,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
     BENJI_SOCKET client_socket = (BENJI_SOCKET) (uintptr_t) result_unwrap_value(client_handle_result);
 
-    char* json = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+    // make sure it is long enough to contain all the data
+    char* json = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH * BENJI_BASIC_STRING_LENGTH, char));
 
     if (!json) {
         return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
