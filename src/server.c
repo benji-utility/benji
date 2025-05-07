@@ -167,6 +167,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         sprintf(json_block, "%s,", map_serialize(map_data, header));
         strcat(json, json_block);
 
+        log_debug("Collected data: '%s'", json_block);
+
         free(json_block);
 
         map_free(map_data);
