@@ -21,6 +21,9 @@ endif
 
 OBJS = $(subst $(SRC)/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRCS))))
 
+TEST_DATA =
+TEST_PORT =
+
 all: clean compile
 
 compile: $(BUILD)/$(EXEC)
@@ -32,7 +35,7 @@ $(OBJ)/%.o: $(SRC)/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
-.SILENT: install clean
+.SILENT: install clean test
 endif
 
 .PHONY: clean
@@ -60,4 +63,9 @@ ifeq ($(OS), Windows_NT)
 else ifeq ($(shell uname), Linux)
 	cp benji.service /etc/systemd/system/benjid.service
 	cp $(BUILD)/$(EXEC) /usr/local/bin/benjid
+endif
+
+test:
+ifeq ($(OS), Windows_NT)
+	(set /p="$(TEST_DATA)") <nul | ncat 127.0.0.1 $(TEST_PORT)
 endif

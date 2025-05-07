@@ -96,7 +96,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
     json[0] = '\0';
 
-    if (data_groups == NULL || data_group_count <= 0) {
+    if (data_groups == NULL || data_group_count == 0) {
         log_warning_info("Client data is either empty or incorrectly formatted, closing client connection...");
 
         result_t* close_client_socket_result = close_socket(client_socket);
@@ -224,6 +224,8 @@ BENJIAPI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** data
     return_if_error(client_data_result);
 
     char* client_data = (char*) result_unwrap_value(client_data_result);
+
+    log_info("Received client data: '%s'", client_data);
 
     *data_group_count = server_parse_client_data(client_data, data_groups);
 
