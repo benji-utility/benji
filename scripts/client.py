@@ -1,14 +1,15 @@
+import sys
 import socket
 
 host = "127.0.0.1"
-port = int(input("port: "))
+port = int(sys.argv[1])
 
 server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 server_socket.connect((host, port))
 
 try:
-    message = "cpu_all;gpu_all;ram_all;device_context_all;"
+    message = "storage_all;"
 
     print(f"Sending: {message}")
     server_socket.send(message.encode())

@@ -13,7 +13,9 @@
 #include <ctype.h>
 
 #ifdef _WIN32
-    #define WIN32_LEAN_AND_MEAN /* compact Win32 to only common utilities */
+    #ifndef WIN32_LEAN_AND_MEAN
+        #define WIN32_LEAN_AND_MEAN /* compact Win32 to only common utilities */
+    #endif
 
     #include <windows.h>
 #endif
@@ -131,9 +133,14 @@
         #define collect_map_data(info_type, get_info, convert_to_map, map_data) \
             result_t* info_result = get_info(); \
             return_if_error(info_result); \
-            info_type cpu_info = *(info_type*) result_unwrap_value(info_result); \
-            result_t* map_data_result = convert_to_map(cpu_info); \
+            \
+            info_type* info = (info_type*) result_unwrap_value(info_result); \
+            \
+            result_t* map_data_result = convert_to_map(*info); \
             return_if_error(map_data_result); \
+            \
+            free(info); \
+            \
             map_data = (map_t*) result_unwrap_value(map_data_result);
     #endif
 

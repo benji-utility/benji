@@ -2,22 +2,27 @@ GXX = gcc
 
 GXX_FLAGS = -g
 
+SRC = src
 BUILD = build
 OBJ = $(BUILD)/obj
+
 EXEC = benji
 
-SRC = $(wildcard src/*.c)
-UPDATED_SRC =
+SRCS = $(wildcard src/*.c)
+UPDATED_SRCS =
 
 ifeq ($(OS), Windows_NT)
 	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
-	UPDATED_SRC = $(filter-out src/daemon.c, $(SRC))
+	UPDATED_SRCS = $(filter-out $(SRC)/daemon.c, $(SRCS))
 else ifeq ($(shell uname), Linux)
 	LINKED_LIBS =
-	UPDATED_SRC = $(filter-out src/service.c, $(SRC))
+	UPDATED_SRCS = $(filter-out $(SRC)/service.c, $(SRCS))
 endif
 
-OBJS = $(subst src/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRC))))
+OBJS = $(subst $(SRC)/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRCS))))
+
+TEST_DATA =
+TEST_PORT =
 
 all: clean compile
 
@@ -26,11 +31,11 @@ compile: $(BUILD)/$(EXEC)
 $(BUILD)/$(EXEC): $(OBJS)
 	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS)
 
-$(OBJ)/%.o: src/%.c
+$(OBJ)/%.o: $(SRC)/%.c
 	$(GXX) $(GXX_FLAGS) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
-.SILENT: install clean
+.SILENT: install clean test
 endif
 
 .PHONY: clean
@@ -58,4 +63,9 @@ ifeq ($(OS), Windows_NT)
 else ifeq ($(shell uname), Linux)
 	cp benji.service /etc/systemd/system/benjid.service
 	cp $(BUILD)/$(EXEC) /usr/local/bin/benjid
+endif
+
+test:
+ifeq ($(OS), Windows_NT)
+	(set /p="$(TEST_DATA)") <nul | ncat 127.0.0.1 $(TEST_PORT)
 endif

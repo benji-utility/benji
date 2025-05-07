@@ -18,6 +18,7 @@ void log_debug(const char* string, ...) {
     strtrim(output);
 
     #if defined(_WIN32)
+        strtrim(output);
         OutputDebugStringA(output);
     #elif defined (__linux__)
         /* TODO: add linux stuff */
@@ -44,9 +45,8 @@ void log_info(const char* info, ...) {
     vsprintf(output, info, arguments);
     fprintf(stdout, ANSI_COLOR_RESET);
 
-    strtrim(output);
-
     #if defined(_WIN32)
+        strtrim(output);
         OutputDebugStringA(output);
     #elif defined (__linux__)
         /* TODO: add linux stuff */
@@ -68,7 +68,7 @@ void log_warning(result_error_payload_t error) {
 
     sprintf(
         output,
-        ANSI_YELLOW "[WARNING] %s:%i under %s() -> %s (%i)\n" ANSI_COLOR_RESET,
+        "[WARNING] %s:%i under %s() -> %s (%i)\n",
         error.location.file_name,
         error.location.lineno,
         error.location.function_name,
@@ -78,9 +78,8 @@ void log_warning(result_error_payload_t error) {
 
     fprintf(stderr, output);
 
-    strtrim(output);
-
     #if defined(_WIN32)
+        strtrim(output);
         OutputDebugStringA(output);
     #elif defined (__linux__)
         /* TODO: add linux stuff */
@@ -102,13 +101,10 @@ void log_warning_info(const char* info, ...) {
 
     output[0] = '\0';
 
-    fprintf(stdout, ANSI_YELLOW);
     vsprintf(output, info, arguments);
-    fprintf(stdout, ANSI_COLOR_RESET);
-
-    strtrim(output);
 
     #if defined(_WIN32)
+        strtrim(output);
         OutputDebugStringA(output);
     #elif defined (__linux__)
         /* TODO: add linux stuff */
@@ -130,7 +126,7 @@ void log_error(result_error_payload_t error) {
 
     sprintf(
         output,
-        ANSI_RED "[FATAL] %s:%i under %s() -> %s (%i)\n" ANSI_COLOR_RESET,
+        "[FATAL] %s:%i under %s() -> %s (%i)\n" ANSI_COLOR_RESET,
         error.location.file_name,
         error.location.lineno,
         error.location.function_name,
@@ -140,9 +136,8 @@ void log_error(result_error_payload_t error) {
 
     fprintf(stderr, output);
 
-    strtrim(output);
-
     #if defined(_WIN32)
+        strtrim(output);
         OutputDebugStringA(output);
     #elif defined (__linux__)
         /* TODO: add linux stuff */
