@@ -15,8 +15,6 @@ void log_debug(const char* string, ...) {
 
     vsprintf(output, string, arguments);
 
-    strtrim(output);
-
     #if defined(_WIN32)
         strtrim(output);
         OutputDebugStringA(output);
