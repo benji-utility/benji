@@ -40,13 +40,15 @@ C:\Windows\system32> sc delete BenjiService
 
 ## Data Requests (WIP)
 These are the data groups that comprise the request sent to Benji
-| Info                | Group              | Data                                                                                |
-|---------------------|--------------------|-------------------------------------------------------------------------------------|
-| CPU                 | cpu_all            | Name, Vendor, Architecture, Clock Speed (GHz), Core Count, Logical Processor Count  |
-| GPU                 | gpu_all            | Name, Vendor, Dedicated Video Memory, Dedicated System Memory, Shared System Memory |
-| RAM                 | ram_all            | Total Memory, Memory Load, Free Memory, Speed (MHz)                                 |
-| Device Context      | device_context_all | Device Name, Operating System, Operating System Version + Build Number, Hostname    |
-| Storage Devices[^1] | storage_all        | Model Name, Serial Number, Bus Type, Size (GB)                                      |
+| Info             | Group              | Data                                                                                |
+|------------------|--------------------|-------------------------------------------------------------------------------------|
+| CPU              | cpu_all            | Name, Vendor, Architecture, Clock Speed (GHz), Core Count, Logical Processor Count  |
+| GPU              | gpu_all            | Name, Vendor, Dedicated Video Memory, Dedicated System Memory, Shared System Memory |
+| RAM              | ram_all            | Total Memory, Memory Load, Free Memory, Speed (MHz)                                 |
+| Device Context   | device_context_all | Device Name, Operating System, Operating System Version + Build Number, Hostname    |
+| Storage Devices* | storage_all        | Model Name, Serial Number, Bus Type, Size (GB)                                      |
+
+\* The values returned by this group are formated as CSV strings
 
 The groups are sent all at once, in a string separated by semicolons (;). Here is an example:
 ```
@@ -54,8 +56,6 @@ cpu_all;gpu_all;ram_all;
 ```
 
 When creating this request manually, make sure all the data groups are followed by a semicolon, including the last one.
-
-[^1] The values returned by this group are formated as CSV strings
 
 ## Building Manually
 1. Clone the repository in your chosen location with the following command
