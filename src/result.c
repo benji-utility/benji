@@ -40,6 +40,8 @@ result_t* result_error(int error_code, error_packet_t location, const char* mess
     result->payload.error.message = error_message;
     result->payload.error.location = location;
 
+    va_end(arguments);
+
     return result;
 }
 

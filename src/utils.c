@@ -77,6 +77,21 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
     return count;  // Return the number of tokens
 }
 
+char* strprepend(const char* string, const char* prefix) {
+    size_t string_length = strlen(string);
+    size_t prefix_length = strlen(prefix);
+
+    char* result = malloc(string_length + prefix_length + 1);
+
+    if (!result) {
+        return string; // just return the original string
+    }
+
+    sprintf(result, "%s%s", prefix, string);
+
+    return result;
+}
+
 #ifdef _WIN32
     char* wcharp_to_charp(const wchar_t* wchar) {
         if (!wchar) {

@@ -40,6 +40,14 @@
     #define BENJI_STRING_EQUALS(a, b) (strcmp(a, b) == 0)
 #endif
 
+#ifndef BENJI_STRINGIFY
+    #define BENJI_STRINGIFY(x) #x
+#endif
+
+#ifndef BENJI_STRINGIFY_VALUE_OF
+    #define BENJI_STRINGIFY_VALUE_OF(x) BENJI_STRINGIFY(x)
+#endif
+
 #ifndef BENJI_NO_ERROR
     #ifdef NOERROR
         #define BENJI_NO_ERROR NOERROR
@@ -150,6 +158,7 @@
 
 void strtrim(char* string);
 size_t strsplit(const char* string, char*** tokens, const char character); // returns token count
+char* strprepend(const char* string, const char* prefix);
 
 #ifdef _WIN32
     char* wcharp_to_charp(const wchar_t* wchar);

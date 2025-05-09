@@ -1,6 +1,6 @@
 GXX = gcc
 
-GXX_FLAGS = -g
+GXX_FLAGS = -g -Wno-discarded-qualifiers
 
 SRC = src
 TOML = $(SRC)/include/toml-c
@@ -24,7 +24,7 @@ else ifeq ($(shell uname), Linux)
 endif
 
 INCLUDES = -I$(TOML)
-DEFINES = -DBENJI_CONFIG_PATH=$(CONFIG_FILE)
+DEFINES = -DBENJI_CONFIG_PATH=$(abspath $(CONFIG_FILE))
 
 OBJS = $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
 OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/toml-c/%.o, $(TOML_SRCS))
@@ -34,10 +34,10 @@ all: clean compile
 compile: $(BUILD)/$(EXEC)
 
 $(BUILD)/$(EXEC): $(OBJS)
-	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS) $(DEFINES)
+	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS)
 
 $(OBJ)/%.o: $(SRC)/%.c
-	$(GXX) $(GXX_FLAGS) $(INCLUDES) -c $< -o $@
+	$(GXX) $(GXX_FLAGS) $(INCLUDES) $(DEFINES) -c $< -o $@
 
 $(OBJ)/toml-c/%.o: $(TOML)/%.c
 	$(GXX) $(GXX_FLAGS) $(INCLUDES) -c $< -o $@

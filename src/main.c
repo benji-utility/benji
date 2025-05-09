@@ -9,7 +9,20 @@
 #include "include/result.h"
 
 int main(int argc, const char* argv[]) {
-    result_t* config = open_config(BENJI_CONFIG_PATH);
+    // i dont really understand how this macro witchcraft works. but it does, so im not gonna question it
+    result_t* config_result = open_config(BENJI_STRINGIFY_VALUE_OF(BENJI_CONFIG_PATH));
+
+    if (config_result->is_error) {
+        result_error_payload_t config_result_error = result_unwrap_error(config_result);
+
+        log_error_info(config_result_error.message);
+
+        return config_result_error.code;
+    }
+
+    toml_table_t* config = (toml_table_t*) result_unwrap_value(config_result);
+
+    config_details_t config_details = get_details_from_config(config);
 
     #if defined(_WIN32)
         winsock_init();

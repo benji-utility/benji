@@ -1,0 +1,1 @@
+just a collection of scripts used to aid development, none are essential to project functionality
