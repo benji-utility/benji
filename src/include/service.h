@@ -8,7 +8,7 @@
 
     #include <tchar.h>
 
-    #include "config_parser.h"
+    #include "config_loader.h"
     #include "server.h"
     #include "utils.h"
 

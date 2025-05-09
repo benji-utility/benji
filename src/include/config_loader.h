@@ -1,5 +1,5 @@
-#ifndef __BENJI_CONFIG_PARSER_H
-#define __BENJI_CONFIG_PARSER_H
+#ifndef __BENJI_CONFIG_LOADER_H
+#define __BENJI_CONFIG_LOADER_H
 
 #include "toml-c/toml.h"
 

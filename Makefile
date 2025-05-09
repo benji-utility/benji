@@ -27,7 +27,7 @@ INCLUDES = -I$(TOML)
 DEFINES = -DBENJI_CONFIG_PATH=$(abspath $(CONFIG_FILE))
 
 OBJS = $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
-OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/toml-c/%.o, $(TOML_SRCS))
+OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/%.o, $(TOML_SRCS))
 
 all: clean compile
 
@@ -39,7 +39,7 @@ $(BUILD)/$(EXEC): $(OBJS)
 $(OBJ)/%.o: $(SRC)/%.c
 	$(GXX) $(GXX_FLAGS) $(INCLUDES) $(DEFINES) -c $< -o $@
 
-$(OBJ)/toml-c/%.o: $(TOML)/%.c
+$(OBJ)/%.o: $(TOML)/%.c
 	$(GXX) $(GXX_FLAGS) $(INCLUDES) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)

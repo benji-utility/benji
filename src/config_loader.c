@@ -1,4 +1,4 @@
-#include "include/config_parser.h"
+#include "include/config_loader.h"
 
 result_t* open_config(const char* filepath) {
     FILE* file = fopen(filepath, "r");
