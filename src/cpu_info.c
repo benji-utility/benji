@@ -4,7 +4,7 @@ result_t* get_cpu_info() {
     cpu_info_t* info = malloc(sizeof(cpu_info_t));
 
     if (!info) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     result_t* cpu_name_result = get_cpu_name();
@@ -44,7 +44,7 @@ result_t* get_cpu_name() {
         char* cpu_name = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
         if (!cpu_name) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         cpu_name[0] = '\0';
@@ -67,7 +67,7 @@ result_t* get_cpu_vendor() {
         char* cpu_vendor = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
         if (!cpu_vendor) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         cpu_vendor[0] = '\0';
@@ -122,7 +122,7 @@ result_t* get_cpu_clock_speed() {
         );
 
         if (hresult != BENJI_NO_ERROR) {
-            return result_error(hresult, "RegOpenKeyEx() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegOpenKeyEx() failed");
         }
 
         uint32_t speed = 0;
@@ -136,13 +136,13 @@ result_t* get_cpu_clock_speed() {
             hresult = RegCloseKey(hkey);
 
             if (FAILED(hresult)) {
-                return result_error(hresult, "RegCloseKey() failed", BENJI_ERROR_PACKET);
+                return result_error(hresult, BENJI_ERROR_PACKET, "RegCloseKey() failed");
             }
 
             void* speed_ghz = malloc(sizeof(double));
 
             if (!speed_ghz) {
-                return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+                return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
             }
 
             *(double*) speed_ghz = speed / 1000.0;
@@ -150,7 +150,7 @@ result_t* get_cpu_clock_speed() {
             return result_success(speed_ghz);
         }
         else {
-            return result_error(hresult, "RegQueryValueEx() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegQueryValueEx() failed");
         }
     #elif defined(__linux__)
         /* TODO: add linux stuff */
@@ -182,13 +182,13 @@ result_t* get_cpu_logical_processors_count() {
         SYSTEM_LOGICAL_PROCESSOR_INFORMATION* buffer = malloc(length);
 
         if (!buffer) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         if (!GetLogicalProcessorInformation(buffer, &length)) {
             free(buffer);
 
-            return result_error(-1, "GetLogicalProcessorInformation() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "GetLogicalProcessorInformation() failed");
         }
 
         uint32_t result = 0;
@@ -220,7 +220,7 @@ result_t* cpu_info_to_map(cpu_info_t cpu_info) {
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
     if (!buffer) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     buffer[0] = '\0';

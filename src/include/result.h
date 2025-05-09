@@ -17,8 +17,8 @@
         \
         return result_error( \
             error.code, \
-            error.message, \
-            error.location \
+            error.location, \
+            error.message \
         ); \
     }
 #endif
@@ -31,8 +31,8 @@
         \
         return result_error( \
             error.code, \
-            error.message, \
-            error.location \
+            error.location, \
+            error.message \
         ); \
     }
 #endif
@@ -61,7 +61,7 @@ typedef struct _BENJI_RESULT {
 result_t* result_init();
 
 result_t* result_success(void* value);
-result_t* result_error(int error_code, const char* message, error_packet_t location, ...);
+result_t* result_error(int error_code, error_packet_t location, const char* message, ...);
 
 void* result_unwrap_value(result_t* result);
 result_error_payload_t result_unwrap_error(result_t* result);

@@ -4,10 +4,13 @@
     #include "include/daemon.h"
 #endif
 
+#include "include/config_parser.h"
 #include "include/logger.h"
 #include "include/result.h"
 
 int main(int argc, const char* argv[]) {
+    result_t* config = open_config(BENJI_CONFIG_PATH);
+
     #if defined(_WIN32)
         winsock_init();
 

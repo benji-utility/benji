@@ -39,7 +39,7 @@ BENJIAPI result_t* create_socket() {
             int error_code = -1;
         #endif
 
-        return result_error(error_code, "Failed to create socket", BENJI_ERROR_PACKET);
+        return result_error(error_code, BENJI_ERROR_PACKET, "Failed to create socket");
     }
 
     return result_success((void*) (uintptr_t) sock);
@@ -59,7 +59,7 @@ BENJIAPI result_t* close_socket(BENJI_SOCKET sock) {
             int error_code = -1;
         #endif
 
-        return result_error(error_code, "Failed to close socket", BENJI_ERROR_PACKET);
+        return result_error(error_code, BENJI_ERROR_PACKET, "Failed to close socket");
     }
 
     return result_success(NULL);

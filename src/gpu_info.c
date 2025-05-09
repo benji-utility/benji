@@ -4,7 +4,7 @@ result_t* get_gpu_info() {
     gpu_info_t* info = malloc(sizeof(gpu_info_t));
 
     if (!info) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     result_t* gpu_name_result = get_gpu_name();
@@ -95,7 +95,7 @@ result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type) {
             }
         }
         else {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         return result_success(memory);
@@ -111,33 +111,33 @@ result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type) {
         hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
         if (FAILED(hresult)) {
-            return result_error(hresult, "CoInitializeEx() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "CoInitializeEx() failed");
         }
 
         IDXGIFactory* factory = NULL;
         hresult = CreateDXGIFactory(&IID_IDXGIFactory, (void**) &factory);
 
         if (FAILED(hresult)) {
-            return result_error(hresult, "CreateDXGIFactory() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "CreateDXGIFactory() failed");
         }
 
         IDXGIAdapter* primary_adapter = NULL;
         DXGI_ADAPTER_DESC* primary_adapter_description = malloc(sizeof(DXGI_ADAPTER_DESC));
 
         if (!primary_adapter_description) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         hresult = factory->lpVtbl->EnumAdapters(factory, 0, &primary_adapter);
 
         if (FAILED(hresult)) {
-            return result_error(hresult, "EnumAdapters() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "EnumAdapters() failed");
         }
 
         hresult = primary_adapter->lpVtbl->GetDesc(primary_adapter, primary_adapter_description);
 
         if (FAILED(hresult)) {
-            return result_error(hresult, "GetDesc() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "GetDesc() failed");
         }
 
         primary_adapter->lpVtbl->Release(primary_adapter);
@@ -155,7 +155,7 @@ result_t* gpu_info_to_map(gpu_info_t gpu_info) {
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
     if (!buffer) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     buffer[0] = '\0';

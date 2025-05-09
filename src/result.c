@@ -17,7 +17,7 @@ result_t* result_success(void* value) {
     return result;
 }
 
-result_t* result_error(int error_code, const char* message, error_packet_t location, ...) {
+result_t* result_error(int error_code, error_packet_t location, const char* message, ...) {
     result_t* result = result_init();
 
     result->is_error = true;
@@ -25,7 +25,7 @@ result_t* result_error(int error_code, const char* message, error_packet_t locat
     char* error_message = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
     if (!error_message) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     error_message[0] = '\0';
