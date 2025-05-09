@@ -4,7 +4,6 @@
     #include "include/daemon.h"
 #endif
 
-#include "include/config_parser.h"
 #include "include/logger.h"
 #include "include/result.h"
 
@@ -21,8 +20,9 @@ int main(int argc, const char* argv[]) {
     }
 
     toml_table_t* config = (toml_table_t*) result_unwrap_value(config_result);
-
     config_details_t config_details = get_details_from_config(config);
+
+    collect_server_details(config_details);
 
     #if defined(_WIN32)
         winsock_init();

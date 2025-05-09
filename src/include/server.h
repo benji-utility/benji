@@ -13,7 +13,7 @@
 #include "hardware.h"
 #include "logger.h"
 
-BENJIAPI result_t* server_init();
+BENJIAPI result_t* server_init(const char* hostname, uint16_t port);
 BENJIAPI result_t* server_update(BENJI_SOCKET server_socket);
 
 BENJIAPI result_t* server_handle_client(BENJI_SOCKET server_socket, char*** data_groups, size_t* data_group_count);

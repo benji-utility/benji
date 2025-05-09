@@ -1,15 +1,17 @@
 #include "include/server.h"
 
-BENJIAPI result_t* server_init() {
+BENJIAPI result_t* server_init(const char* hostname, uint16_t port) {
     struct sockaddr_in server_address;
 
     server_address.sin_family = AF_INET; // ipv4 address family
 
     #if defined(_WIN32)
-        server_address.sin_addr.S_un.S_addr = INADDR_ANY;
+        server_address.sin_addr.S_un.S_addr = inet_addr(hostname);
     #elif defined(__linux__)
-        server_address.sin_addr.s_addr = INADDR_ANY;
+        server_address.sin_addr.s_addr = inet_addr(hostname);
     #endif
+
+    server_address.sin_port = htons(port);
 
     server_status = BENJI_SERVER_STOPPED;
 
@@ -60,6 +62,7 @@ BENJIAPI result_t* server_init() {
     log_debug("Server socket put into listening mode succesfully");
 
     socklen_t server_address_length = sizeof(server_address);
+
     getsockname(server_socket, (struct sockaddr*) &server_address, &server_address_length);
 
     log_info("\nServer created at '127.0.0.1:%d'", ntohs(server_address.sin_port));
@@ -101,6 +104,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         log_warning_info("Client data is either empty or incorrectly formatted, closing client connection...");
 
         result_t* close_client_socket_result = close_socket(client_socket);
+
         if (close_client_socket_result->is_error) {
             result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
 
@@ -123,6 +127,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
             log_warning_info("Invalid data group, closing client connection...");
 
             result_t* close_client_socket_result = close_socket(client_socket);
+
             if (close_client_socket_result->is_error) {
                 result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
 
@@ -143,6 +148,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         char* header;
 
         result_t* map_data_result = get_hardware_info(data_groups[i], &header);
+
         if (map_data_result->is_error) {
             result_error_payload_t map_data_result_error = result_unwrap_error(map_data_result);
 
@@ -187,6 +193,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     free(json);
 
     result_t* response_result = server_send_to_client(client_socket, response);
+
     if (response_result->is_error) {
         result_error_payload_t response_result_error = result_unwrap_error(response_result);
 
@@ -200,6 +207,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     }
 
     result_t* close_client_socket_result = close_socket(client_socket);
+
     if (close_client_socket_result->is_error) {
         result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
 
@@ -256,6 +264,7 @@ BENJIAPI result_t* server_accept_client(BENJI_SOCKET server_socket) {
 
     #if defined(_WIN32)
         u_long non_blocking_mode = true;
+
         ioctlsocket(client_socket, FIONBIO, &non_blocking_mode);
     #elif defined(__linux__)
         int flags = fcntl(client_socket, F_GETFL, 0);
@@ -270,6 +279,7 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
     size_t data_size = 0;
 
     char buffer[BENJI_BASIC_STRING_LENGTH];
+
     size_t bytes_received = 0;
 
     unsigned int tries = 0;
@@ -288,9 +298,10 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
                 if (tries < BENJI_MAX_TRIES) {
                     tries++;
 
+                    // TODO: Change this to a macro constant
                     BENJI_SLEEP(50); // wait 50ms and try again
 
-                    continue; // no data is available, just try again
+                    continue;
                 }
                 else {
                     break;

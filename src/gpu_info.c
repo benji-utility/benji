@@ -39,7 +39,7 @@ result_t* get_gpu_name() {
 
         DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
-        // make the assumption that the description value contains the name (usually it does)
+        // make the assumption that the description value contains the name (it usually does)
         return result_success(wcharp_to_charp(adapter_description.Description));
     #elif defined(__linux__)
         /* TODO: add linux stuff */
@@ -55,6 +55,7 @@ result_t* get_gpu_vendor() {
 
         DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
+        // TODO: Extend this to any vendor DXGI_ADAPTER_DESC recognizes
         switch (adapter_description.VendorId) {
             case BENJI_GPU_VENDOR_INTEL: vendor = "Intel"; break;
             case BENJI_GPU_VENDOR_AMD: vendor = "AMD"; break;
@@ -115,6 +116,7 @@ result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type) {
         }
 
         IDXGIFactory* factory = NULL;
+
         hresult = CreateDXGIFactory(&IID_IDXGIFactory, (void**) &factory);
 
         if (FAILED(hresult)) {

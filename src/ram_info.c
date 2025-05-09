@@ -55,6 +55,7 @@ result_t* get_ram_memory_load() {
         MEMORYSTATUSEX status = *(MEMORYSTATUSEX*) result_unwrap_value(status_result);
 
         result_t* total_memory_result = get_ram_total_memory();
+
         if (total_memory_result->is_error) {
             return result_error(
                 total_memory_result->payload.error.code,
@@ -64,6 +65,7 @@ result_t* get_ram_memory_load() {
         }
 
         double total_memory = *(double*) result_unwrap_value(total_memory_result);
+
         double percent = status.dwMemoryLoad / 100.0; // dwMemoryLoad returns a value between [0, 100]
 
         void* memory = malloc(sizeof(double));
@@ -105,6 +107,7 @@ result_t* get_ram_free_memory() {
 result_t* get_ram_speed() {
     #if defined(_WIN32)
         unsigned long size = GetSystemFirmwareTable(BENJI_SYSTEM_FIRMWARE_TABLE, 0, NULL, 0);
+
         if (size == 0) {
             return result_error(-1, BENJI_ERROR_PACKET, "Failed to get SMBIOS table size");
         }

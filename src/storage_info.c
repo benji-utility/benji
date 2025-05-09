@@ -142,6 +142,7 @@ result_t* get_storage_devices_size(size_t device_count) {
                 buffer[0] = '\0';
 
                 sprintf(buffer, "%0.3f", storage_device_geometry.DiskSize.QuadPart / (1024.0 * 1024.0 * 1024.0));
+
                 strcat(sizes, buffer);
 
                 free(buffer);
@@ -185,6 +186,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         };
 
         STORAGE_DEVICE_DESCRIPTOR storage_device_descriptor = { 0 };
+
         unsigned long bytes_returned = 0;
 
         boolean result = DeviceIoControl(

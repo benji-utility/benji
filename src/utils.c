@@ -2,6 +2,7 @@
 
 void strtrim(char* string) {
     int i = 0;
+
     while (isspace(string[i])) {
         i++;
     }
@@ -11,6 +12,7 @@ void strtrim(char* string) {
     }
 
     int length = strlen(string);
+
     while (length > 0 && isspace(string[length - 1])) {
         length--;
     }
@@ -24,6 +26,7 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
     }
 
     int string_length = strlen(string);
+
     size_t count = 0;
 
     for (int i = 0; i < string_length; i++) {

@@ -194,6 +194,7 @@ result_t* get_cpu_logical_processors_count() {
         uint32_t result = 0;
 
         size_t count = length / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION);
+
         for (size_t i = 0; i < count; i++) {
             if (buffer[i].Relationship == RelationProcessorCore) {
                 result += callback(&buffer[i]);

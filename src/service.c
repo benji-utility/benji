@@ -15,16 +15,13 @@
         );
 
         if (service_status_handle == NULL) {
-            log_error((result_error_payload_t) {
-                .code = -1,
-                .message = "Service status handle is NULL",
-                .location = BENJI_ERROR_PACKET
-            });
+            log_error_info("Service status handle is NULL");
 
             return;
         }
 
-        result_t* server_socket_result = server_init();
+        result_t* server_socket_result = server_init(server_info.hostname, server_info.port);
+
         if (server_socket_result->is_error) {
             result_error_payload_t server_socket_result_error = result_unwrap_error(server_socket_result);
 
@@ -52,13 +49,14 @@
 
     BENJIAPI void service_control_handler(unsigned long request) {
         switch (request) {
-            case SERVICE_CONTROL_STOP:
+            case SERVICE_CONTROL_STOP: // this and shutdown are handled the same, so perform the same actions
             case SERVICE_CONTROL_SHUTDOWN: {
                 report_service_status(SERVICE_STOP_PENDING, 0, 0);
 
                 WSASetEvent(service_stop_event);
 
                 result_t* close_server_socket_result = close_socket(server_socket);
+
                 if (close_server_socket_result->is_error) {
                     result_error_payload_t close_server_socket_result_error = result_unwrap_error(close_server_socket_result);
 
@@ -126,5 +124,10 @@
         service_status.dwWaitHint = wait_hint;
 
         SetServiceStatus(service_status_handle, &service_status);
+    }
+
+    void collect_server_details(config_details_t config_details) {
+        server_info.hostname = config_details.server_config.hostname;
+        server_info.port = config_details.server_config.port;
     }
 #endif

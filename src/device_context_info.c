@@ -45,14 +45,17 @@ result_t* get_device_context_device_name() {
         }
 
         char device_name[MAX_COMPUTERNAME_LENGTH + 1];
-
         unsigned long device_name_size = sizeof(device_name);
+
         unsigned long type = REG_SZ;
 
         hresult = RegQueryValueExA(hkey, "ComputerName", NULL, &type, (unsigned char*) device_name, &device_name_size);
 
         if (FAILED(hresult)) {
             RegCloseKey(hkey);
+
+            // dont error if RegCloseKey failed, RegQueryValueEx() matters more
+
             return result_error(hresult, BENJI_ERROR_PACKET, "RegQueryValueEx() failed");
         }
 
@@ -133,6 +136,7 @@ result_t* get_device_context_hostname() {
         unsigned long hostname_size = 0;
 
         GetComputerNameEx(ComputerNameDnsHostname, NULL, &hostname_size);
+
         if (GetLastError() != ERROR_MORE_DATA) {
             hostname_size = BENJI_BASIC_STRING_LENGTH; // default to something definitely long enough
         }
