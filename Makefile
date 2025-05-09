@@ -1,28 +1,33 @@
 GXX = gcc
 
-GXX_FLAGS = -g
+GXX_FLAGS = -g -Wno-discarded-qualifiers
 
 SRC = src
+TOML = $(SRC)/include/toml-c
+
 BUILD = build
 OBJ = $(BUILD)/obj
 
 EXEC = benji
 
 SRCS = $(wildcard src/*.c)
-UPDATED_SRCS =
+TOML_SRCS = $(wildcard $(TOML)/toml.c)
+
+CONFIG_FILE =
+TEST_DATA =
+TEST_PORT =
 
 ifeq ($(OS), Windows_NT)
 	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
-	UPDATED_SRCS = $(filter-out $(SRC)/daemon.c, $(SRCS))
 else ifeq ($(shell uname), Linux)
 	LINKED_LIBS =
-	UPDATED_SRCS = $(filter-out $(SRC)/service.c, $(SRCS))
 endif
 
-OBJS = $(subst $(SRC)/, $(OBJ)/, $(addsuffix .o, $(basename $(UPDATED_SRCS))))
+INCLUDES = -I$(TOML)
+DEFINES = -DBENJI_CONFIG_PATH=$(abspath $(CONFIG_FILE))
 
-TEST_DATA =
-TEST_PORT =
+OBJS = $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
+OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/%.o, $(TOML_SRCS))
 
 all: clean compile
 
@@ -32,7 +37,10 @@ $(BUILD)/$(EXEC): $(OBJS)
 	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS)
 
 $(OBJ)/%.o: $(SRC)/%.c
-	$(GXX) $(GXX_FLAGS) -c $< -o $@
+	$(GXX) $(GXX_FLAGS) $(INCLUDES) $(DEFINES) -c $< -o $@
+
+$(OBJ)/%.o: $(TOML)/%.c
+	$(GXX) $(GXX_FLAGS) $(INCLUDES) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
 .SILENT: install clean test

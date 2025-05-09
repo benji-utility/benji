@@ -4,7 +4,7 @@ result_t* get_storage_info() {
     storage_info_t* info = malloc(sizeof(storage_info_t));
 
     if (!info) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     info->device_count = count_storage_devices();
@@ -37,7 +37,7 @@ result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVIC
         char* devices_info = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
         if (!devices_info) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         devices_info[0] = '\0';
@@ -113,7 +113,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         char* sizes = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
         if (!sizes) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         sizes[0] = '\0';
@@ -136,12 +136,13 @@ result_t* get_storage_devices_size(size_t device_count) {
                 char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
                 if (!buffer) {
-                    return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+                    return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
                 }
 
                 buffer[0] = '\0';
 
                 sprintf(buffer, "%0.3f", storage_device_geometry.DiskSize.QuadPart / (1024.0 * 1024.0 * 1024.0));
+
                 strcat(sizes, buffer);
 
                 free(buffer);
@@ -185,6 +186,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         };
 
         STORAGE_DEVICE_DESCRIPTOR storage_device_descriptor = { 0 };
+
         unsigned long bytes_returned = 0;
 
         boolean result = DeviceIoControl(
@@ -195,7 +197,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         );
 
         if (!result) {
-            return result_error(GetLastError(), "DeviceIoControl() failed", BENJI_ERROR_PACKET);
+            return result_error(GetLastError(), BENJI_ERROR_PACKET, "DeviceIoControl() failed");
         }
 
         size_t required_size = storage_device_descriptor.Size;
@@ -207,7 +209,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         *buffer = malloc(required_size);
 
         if (!(*buffer)) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         result = DeviceIoControl(
@@ -220,7 +222,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         if (!result) {
             free(*buffer);
 
-            return result_error(GetLastError(), "DeviceIoControl() failed", BENJI_ERROR_PACKET);
+            return result_error(GetLastError(), BENJI_ERROR_PACKET, "DeviceIoControl() failed");
         }
 
         return result_success((STORAGE_DEVICE_DESCRIPTOR*) *buffer);
@@ -284,7 +286,7 @@ result_t* storage_info_to_map(storage_info_t storage_info) {
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
     if (!buffer) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     buffer[0] = '\0';

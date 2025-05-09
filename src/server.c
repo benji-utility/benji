@@ -1,15 +1,17 @@
 #include "include/server.h"
 
-BENJIAPI result_t* server_init() {
+BENJIAPI result_t* server_init(const char* hostname, uint16_t port) {
     struct sockaddr_in server_address;
 
     server_address.sin_family = AF_INET; // ipv4 address family
 
     #if defined(_WIN32)
-        server_address.sin_addr.S_un.S_addr = INADDR_ANY;
+        server_address.sin_addr.S_un.S_addr = inet_addr(hostname);
     #elif defined(__linux__)
-        server_address.sin_addr.s_addr = INADDR_ANY;
+        server_address.sin_addr.s_addr = inet_addr(hostname);
     #endif
+
+    server_address.sin_port = htons(port);
 
     server_status = BENJI_SERVER_STOPPED;
 
@@ -36,7 +38,7 @@ BENJIAPI result_t* server_init() {
             int error_code = -1;
         #endif
 
-        return result_error(error_code, "Failed to bind server socket to server address", BENJI_ERROR_PACKET);
+        return result_error(error_code, BENJI_ERROR_PACKET, "Failed to bind server socket to server address");
     }
 
     log_debug("Server socket binded successfully");
@@ -54,12 +56,13 @@ BENJIAPI result_t* server_init() {
             int error_code = -1;
         #endif
 
-        return result_error(error_code, "Failed to put server socket into listening mode", BENJI_ERROR_PACKET);
+        return result_error(error_code, BENJI_ERROR_PACKET, "Failed to put server socket into listening mode");
     }
 
     log_debug("Server socket put into listening mode succesfully");
 
     socklen_t server_address_length = sizeof(server_address);
+
     getsockname(server_socket, (struct sockaddr*) &server_address, &server_address_length);
 
     log_info("\nServer created at '127.0.0.1:%d'", ntohs(server_address.sin_port));
@@ -81,8 +84,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         return result_error(
             client_handle_result_error.code,
-            client_handle_result_error.message,
-            BENJI_ERROR_PACKET
+            BENJI_ERROR_PACKET,
+            client_handle_result_error.message
         );
     }
 
@@ -92,7 +95,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     char* json = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH * BENJI_BASIC_STRING_LENGTH, char));
 
     if (!json) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     json[0] = '\0';
@@ -101,6 +104,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         log_warning_info("Client data is either empty or incorrectly formatted, closing client connection...");
 
         result_t* close_client_socket_result = close_socket(client_socket);
+
         if (close_client_socket_result->is_error) {
             result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
 
@@ -108,14 +112,14 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
             return result_error(
                 close_client_socket_result_error.code,
-                close_client_socket_result_error.message,
-                BENJI_ERROR_PACKET
+                BENJI_ERROR_PACKET,
+                close_client_socket_result_error.message
             );
         }
 
         result_free(close_client_socket_result);
 
-        return result_error(-1, "Client data is either empty or incorrectly formatted", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "Client data is either empty or incorrectly formatted");
     }
 
     for (size_t i = 0; i < data_group_count; i++) {
@@ -123,6 +127,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
             log_warning_info("Invalid data group, closing client connection...");
 
             result_t* close_client_socket_result = close_socket(client_socket);
+
             if (close_client_socket_result->is_error) {
                 result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
 
@@ -130,19 +135,20 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
                 return result_error(
                     close_client_socket_result_error.code,
-                    close_client_socket_result_error.message,
-                    BENJI_ERROR_PACKET
+                    BENJI_ERROR_PACKET,
+                    close_client_socket_result_error.message
                 );
             }
 
             result_free(close_client_socket_result);
 
-            return result_error(-1, "Invalid data group", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "Invalid data group");
         }
 
         char* header;
 
         result_t* map_data_result = get_hardware_info(data_groups[i], &header);
+
         if (map_data_result->is_error) {
             result_error_payload_t map_data_result_error = result_unwrap_error(map_data_result);
 
@@ -150,8 +156,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
             return result_error(
                 map_data_result_error.code,
-                map_data_result_error.message,
-                BENJI_ERROR_PACKET
+                BENJI_ERROR_PACKET,
+                map_data_result_error.message
             );
         }
 
@@ -160,7 +166,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         char* json_block = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
         if (!json_block) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         json_block[0] = '\0';
@@ -187,6 +193,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     free(json);
 
     result_t* response_result = server_send_to_client(client_socket, response);
+
     if (response_result->is_error) {
         result_error_payload_t response_result_error = result_unwrap_error(response_result);
 
@@ -194,12 +201,13 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         return result_error(
             response_result_error.code,
-            response_result_error.message,
-            BENJI_ERROR_PACKET
+            BENJI_ERROR_PACKET,
+            response_result_error.message
         );
     }
 
     result_t* close_client_socket_result = close_socket(client_socket);
+
     if (close_client_socket_result->is_error) {
         result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
 
@@ -207,8 +215,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         return result_error(
             close_client_socket_result_error.code,
-            close_client_socket_result_error.message,
-            BENJI_ERROR_PACKET
+            BENJI_ERROR_PACKET,
+            close_client_socket_result_error.message
         );
     }
 
@@ -251,11 +259,12 @@ BENJIAPI result_t* server_accept_client(BENJI_SOCKET server_socket) {
             int error_code = -1;
         #endif
 
-        return result_error(error_code, "accept() failed", BENJI_ERROR_PACKET);
+        return result_error(error_code, BENJI_ERROR_PACKET, "accept() failed");
     }
 
     #if defined(_WIN32)
         u_long non_blocking_mode = true;
+
         ioctlsocket(client_socket, FIONBIO, &non_blocking_mode);
     #elif defined(__linux__)
         int flags = fcntl(client_socket, F_GETFL, 0);
@@ -270,6 +279,7 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
     size_t data_size = 0;
 
     char buffer[BENJI_BASIC_STRING_LENGTH];
+
     size_t bytes_received = 0;
 
     unsigned int tries = 0;
@@ -288,9 +298,10 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
                 if (tries < BENJI_MAX_TRIES) {
                     tries++;
 
+                    // TODO: Change this to a macro constant
                     BENJI_SLEEP(50); // wait 50ms and try again
 
-                    continue; // no data is available, just try again
+                    continue;
                 }
                 else {
                     break;
@@ -303,7 +314,7 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
                     int error_code = -1;
                 #endif
 
-                return result_error(error_code, "recv() failed", BENJI_ERROR_PACKET);
+                return result_error(error_code, BENJI_ERROR_PACKET, "recv() failed");
             }
         }
 
@@ -313,7 +324,7 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
         if (data == NULL) {
             free(data);
 
-            return result_error(-1, "realloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "realloc() failed");
         }
 
         memcpy(data + data_size, buffer, bytes_received + 1);
@@ -334,7 +345,7 @@ BENJIAPI result_t* server_send_to_client(BENJI_SOCKET client_socket, const char*
             int error_code = -1;
         #endif
 
-        return result_error(error_code, "send() failed", BENJI_ERROR_PACKET);
+        return result_error(error_code, BENJI_ERROR_PACKET, "send() failed");
     }
 
     return result_success((void*) (uintptr_t) bytes_sent);

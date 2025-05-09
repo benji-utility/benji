@@ -4,7 +4,7 @@ result_t* get_ram_info() {
     ram_info_t* info = malloc(sizeof(ram_info_t));
 
     if (!info) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     result_t* ram_total_memory_result = get_ram_total_memory();
@@ -36,7 +36,7 @@ result_t* get_ram_total_memory() {
         void* memory = malloc(sizeof(double));
 
         if (!memory) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         *(double*) memory = status.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
@@ -55,21 +55,23 @@ result_t* get_ram_memory_load() {
         MEMORYSTATUSEX status = *(MEMORYSTATUSEX*) result_unwrap_value(status_result);
 
         result_t* total_memory_result = get_ram_total_memory();
+
         if (total_memory_result->is_error) {
             return result_error(
                 total_memory_result->payload.error.code,
-                total_memory_result->payload.error.message,
-                BENJI_ERROR_PACKET
+                BENJI_ERROR_PACKET,
+                total_memory_result->payload.error.message
             );
         }
 
         double total_memory = *(double*) result_unwrap_value(total_memory_result);
+
         double percent = status.dwMemoryLoad / 100.0; // dwMemoryLoad returns a value between [0, 100]
 
         void* memory = malloc(sizeof(double));
 
         if (!memory) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         // total memory is already in GB, so no need to convert
@@ -91,7 +93,7 @@ result_t* get_ram_free_memory() {
         void* memory = malloc(sizeof(double));
 
         if (!memory) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         *(double*) memory = status.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
@@ -105,20 +107,21 @@ result_t* get_ram_free_memory() {
 result_t* get_ram_speed() {
     #if defined(_WIN32)
         unsigned long size = GetSystemFirmwareTable(BENJI_SYSTEM_FIRMWARE_TABLE, 0, NULL, 0);
+
         if (size == 0) {
-            return result_error(-1, "Failed to get SMBIOS table size", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "Failed to get SMBIOS table size");
         }
 
         RAW_SMBIOS_DATA* buffer = malloc(size);
 
         if (!buffer) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         if (!GetSystemFirmwareTable(BENJI_SYSTEM_FIRMWARE_TABLE, 0, buffer, size)) {
             free(buffer);
 
-            return result_error(-1, "Failed to get SMBIOS table", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "Failed to get SMBIOS table");
         }
 
         uint8_t* data = buffer->data;
@@ -150,9 +153,9 @@ result_t* get_ram_speed() {
         free(buffer);
 
         if (!found_memory_device) {
-            return result_error(-1, "SMBIOS Type 17 (Memory Device) not found", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "SMBIOS Type 17 (Memory Device) not found");
         } else if (speed == 0) {
-            return result_error(-1, "RAM speed reported as 0 (unknown/unsupported by BIOS)", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "RAM speed reported as 0 (unknown/unsupported by BIOS)");
         }
 
         return result_success((void*) (uintptr_t) speed);
@@ -164,7 +167,7 @@ result_t* get_ram_speed() {
         MEMORYSTATUSEX* status = malloc(sizeof(MEMORYSTATUSEX));
 
         if (!status) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         status->dwLength = sizeof(MEMORYSTATUSEX);
@@ -173,7 +176,7 @@ result_t* get_ram_speed() {
         if (!GlobalMemoryStatusEx(status)) {
             free(status);
 
-            return result_error(GetLastError(), "GlobalMemoryStatusEx() failed", BENJI_ERROR_PACKET);
+            return result_error(GetLastError(), BENJI_ERROR_PACKET, "GlobalMemoryStatusEx() failed");
         }
 
         return result_success((void*) status);
@@ -186,7 +189,7 @@ result_t* ram_info_to_map(ram_info_t ram_info) {
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
     if (!buffer) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     buffer[0] = '\0';

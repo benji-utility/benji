@@ -2,6 +2,7 @@
 
 void strtrim(char* string) {
     int i = 0;
+
     while (isspace(string[i])) {
         i++;
     }
@@ -11,6 +12,7 @@ void strtrim(char* string) {
     }
 
     int length = strlen(string);
+
     while (length > 0 && isspace(string[length - 1])) {
         length--;
     }
@@ -24,6 +26,7 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
     }
 
     int string_length = strlen(string);
+
     size_t count = 0;
 
     for (int i = 0; i < string_length; i++) {
@@ -75,6 +78,21 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
     }
 
     return count;  // Return the number of tokens
+}
+
+char* strprepend(const char* string, const char* prefix) {
+    size_t string_length = strlen(string);
+    size_t prefix_length = strlen(prefix);
+
+    char* result = malloc(string_length + prefix_length + 1);
+
+    if (!result) {
+        return string; // just return the original string
+    }
+
+    sprintf(result, "%s%s", prefix, string);
+
+    return result;
 }
 
 #ifdef _WIN32

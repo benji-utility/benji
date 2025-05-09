@@ -4,7 +4,7 @@ result_t* get_device_context_info() {
     device_context_info_t* info = malloc(sizeof(device_context_info_t));
 
     if (!info) {
-        return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     result_t* device_name_result = get_device_context_device_name();
@@ -41,25 +41,28 @@ result_t* get_device_context_device_name() {
         );
 
         if (FAILED(hresult)) {
-            return result_error(hresult, "RegOpenKeyEx() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegOpenKeyEx() failed");
         }
 
         char device_name[MAX_COMPUTERNAME_LENGTH + 1];
-
         unsigned long device_name_size = sizeof(device_name);
+
         unsigned long type = REG_SZ;
 
         hresult = RegQueryValueExA(hkey, "ComputerName", NULL, &type, (unsigned char*) device_name, &device_name_size);
 
         if (FAILED(hresult)) {
             RegCloseKey(hkey);
-            return result_error(hresult, "RegQueryValueEx() failed", BENJI_ERROR_PACKET);
+
+            // dont error if RegCloseKey failed, RegQueryValueEx() matters more
+
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegQueryValueEx() failed");
         }
 
         hresult = RegCloseKey(hkey);
 
         if (FAILED(hresult)) {
-            return result_error(hresult, "RegCloseKey() failed", BENJI_ERROR_PACKET);
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegCloseKey() failed");
         }
 
         return result_success(device_name);
@@ -73,7 +76,7 @@ result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_V
         char* operating_system = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
         if (!operating_system) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         HMODULE hmodule = GetModuleHandle(TEXT("ntdll.dll"));
@@ -111,15 +114,15 @@ result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_V
                     }
                 }
                 else {
-                    return result_error(GetLastError(), "Failed to get OS version info", BENJI_ERROR_PACKET);
+                    return result_error(GetLastError(), BENJI_ERROR_PACKET, "Failed to get OS version info");
                 }
             }
             else {
-                return result_error(GetLastError(), "GetProcAddress() failed", BENJI_ERROR_PACKET);
+                return result_error(GetLastError(), BENJI_ERROR_PACKET, "GetProcAddress() failed");
             }
         }
         else {
-            return result_error(GetLastError(), "GetModuleHandle() failed", BENJI_ERROR_PACKET);
+            return result_error(GetLastError(), BENJI_ERROR_PACKET, "GetModuleHandle() failed");
         }
 
         return result_success(operating_system);
@@ -133,6 +136,7 @@ result_t* get_device_context_hostname() {
         unsigned long hostname_size = 0;
 
         GetComputerNameEx(ComputerNameDnsHostname, NULL, &hostname_size);
+
         if (GetLastError() != ERROR_MORE_DATA) {
             hostname_size = BENJI_BASIC_STRING_LENGTH; // default to something definitely long enough
         }
@@ -140,18 +144,14 @@ result_t* get_device_context_hostname() {
         wchar_t* hostname = malloc(BENJI_CAPACITY(hostname_size, wchar_t));
 
         if (!hostname) {
-            return result_error(-1, "malloc() failed", BENJI_ERROR_PACKET);
+            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
         if (GetComputerNameEx(ComputerNameDnsHostname, hostname, &hostname_size)) {
             return result_success(wcharp_to_charp(hostname));
         }
         else {
-            return result_error(
-                GetLastError(),
-                "GetComputerNameEx() failed",
-                BENJI_ERROR_PACKET
-            );
+            return result_error(GetLastError(), BENJI_ERROR_PACKET, "GetComputerNameEx() failed");
         }
     #elif defined(__linux__)
         /* TODO: add linux stuff */
