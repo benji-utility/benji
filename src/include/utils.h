@@ -53,8 +53,6 @@
 #endif
 
 #ifdef BENJI_USE_SERVER_UTILS
-    #include "result.h"
-
     #if defined(_WIN32)
         #pragma comment(lib, "ws2_32.lib")
 
@@ -119,7 +117,6 @@
 #endif
 
 #ifdef BENJI_USE_SYS_INFO_UTILS
-    #include "result.h"
     #include "map.h"
     #include "logger.h"
 

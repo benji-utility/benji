@@ -1,5 +1,5 @@
-#ifndef __BENJI_GPU_INFO
-#define __BENJI_GPU_INFO
+#ifndef __BENJI_GPU_INFO_H
+#define __BENJI_GPU_INFO_H
 
 #ifndef BENJI_USE_SYS_INFO_UTILS
     #define BENJI_USE_SYS_INFO_UTILS

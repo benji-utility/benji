@@ -3,6 +3,9 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdarg.h>
+
+#include "utils.h"
 
 #ifndef BENJI_ERROR_PACKET
     #define BENJI_ERROR_PACKET (struct _BENJI_ERROR_PACKET) { .file_name = __FILE__, .function_name = __func__, .lineno = __LINE__ }
@@ -58,7 +61,7 @@ typedef struct _BENJI_RESULT {
 result_t* result_init();
 
 result_t* result_success(void* value);
-result_t* result_error(int error_code, const char* message, error_packet_t location);
+result_t* result_error(int error_code, const char* message, error_packet_t location, ...);
 
 void* result_unwrap_value(result_t* result);
 result_error_payload_t result_unwrap_error(result_t* result);
