@@ -3,8 +3,7 @@ GXX = gcc
 GXX_FLAGS = -g
 
 SRC = src
-SRC_INCLUDE = $(SRC)/include
-TOML = $(SRC_INCLUDE)/toml-c
+TOML = $(SRC)/include/toml-c
 
 BUILD = build
 OBJ = $(BUILD)/obj
