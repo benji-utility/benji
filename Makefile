@@ -73,7 +73,7 @@ else ifeq ($(shell uname), Linux)
 	mkdir -p $(OBJ)
 endif
 
-install:
+install: all
 ifeq ($(OS), Windows_NT)
 	if exist "$(BUILD)/$(INSTALL_EXEC).exe" del /S $(BUILD)\$(INSTALL_EXEC).exe
 	$(GXX) $(GXX_FLAGS) $(INSTALLER_SRCS) -o $(BUILD)/$(INSTALL_EXEC)
