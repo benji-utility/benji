@@ -44,6 +44,9 @@ result_t* get_hardware_info(const char* hardware_group, char** header) {
 
         *header = "storage_info";
     }
+    else {
+        return result_error(-1, BENJI_ERROR_PACKET, "Invalid data group: '%s'", hardware_group);
+    }
 
     return result_success(map_data);
 }
