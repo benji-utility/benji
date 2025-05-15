@@ -28,7 +28,7 @@ int main(int argc, const char* argv[]) {
         winsock_init();
 
         SERVICE_TABLE_ENTRY service_table[] = {
-            {BENJI_SERVICE_NAME, (LPSERVICE_MAIN_FUNCTION) service_main},
+            {TEXT(BENJI_SERVICE_NAME), (LPSERVICE_MAIN_FUNCTION) service_main},
             {NULL, NULL}
         };
 

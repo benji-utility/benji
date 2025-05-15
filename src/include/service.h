@@ -12,10 +12,6 @@
     #include "server.h"
     #include "utils.h"
 
-    #ifndef BENJI_SERVICE_NAME
-        #define BENJI_SERVICE_NAME TEXT("BenjiService")
-    #endif
-
     #ifndef BENJI_SERVICE_EVENTS
         #define BENJI_SERVICE_EVENTS (2) /* i dont want this to be hardcoded, but idk if sizeof will help with WSAEVENTs */
     #endif
