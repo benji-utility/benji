@@ -10,7 +10,7 @@
         report_service_status(SERVICE_START_PENDING, 0, 0);
 
         service_status_handle = RegisterServiceCtrlHandler(
-            TEXT("BenjiService"),
+            TEXT(BENJI_SERVICE_NAME),
             (LPHANDLER_FUNCTION) service_control_handler
         );
 

@@ -3,8 +3,15 @@
 
 #include "toml-c/toml.h"
 
-#ifndef BENJI_CONFIG_PATH
-    #define BENJI_CONFIG_PATH "" /* just have this here as a placeholder */
+#include "utils.h"
+#include "logger.h"
+
+#ifndef BENJI_CONFIG_REGISTRY_PATH
+    #define BENJI_CONFIG_REGISTRY_PATH "SYSTEM\\CurrentControllerSet\\Services\\" BENJI_SERVICE_NAME
+#endif
+
+#ifndef BENJI_CONFIG_REGISTRY_KEY
+    #define BENJI_CONFIG_REGISTRY_KEY "ConfigPath"
 #endif
 
 #ifndef BENJI_DEFAULT_SERVER_HOSTNAME
@@ -27,7 +34,7 @@ typedef struct _BENJI_CONFIG_DETAILS {
 #include "utils.h"
 #include "result.h"
 
-result_t* open_config(const char* filepath);
+result_t* open_config();
 
 // no need to return a result, as we have default config values
 config_details_t get_details_from_config(toml_table_t* config);

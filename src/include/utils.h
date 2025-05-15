@@ -20,6 +20,10 @@
     #include <windows.h>
 #endif
 
+#ifndef BENJI_SERVICE_NAME
+    #define BENJI_SERVICE_NAME "BenjiService"
+#endif
+
 #ifndef BENJI_BASIC_STRING_LENGTH
     #define BENJI_BASIC_STRING_LENGTH (1024) /* good general beginning size for a string */
 #endif

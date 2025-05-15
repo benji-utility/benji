@@ -117,11 +117,11 @@ result_t* get_cpu_clock_speed() {
 
         HRESULT hresult = RegOpenKeyEx(
             HKEY_LOCAL_MACHINE,
-            TEXT("HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0"),
+            TEXT(BENJI_CPU_CLOCK_SPEED_REGISTRY_PATH),
             0, KEY_READ, &hkey
         );
 
-        if (hresult != BENJI_NO_ERROR) {
+        if (FAILED(hresult)) {
             return result_error(hresult, BENJI_ERROR_PACKET, "RegOpenKeyEx() failed");
         }
 
@@ -129,10 +129,10 @@ result_t* get_cpu_clock_speed() {
         unsigned long int data_type, data_size = sizeof(speed);
 
         hresult = RegQueryValueEx(
-            hkey, TEXT("~MHz"), NULL, &data_type, (LPBYTE) &speed, &data_size
+            hkey, TEXT(BENJI_CPU_CLOCK_SPEED_REGISTRY_KEY), NULL, &data_type, (LPBYTE) &speed, &data_size
         );
 
-        if (hresult == BENJI_NO_ERROR && data_type == REG_DWORD) {
+        if (SUCCEEDED(hresult) && data_type == REG_DWORD) {
             hresult = RegCloseKey(hkey);
 
             if (FAILED(hresult)) {

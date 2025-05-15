@@ -1,10 +1,47 @@
 #include "include/config_loader.h"
 
-result_t* open_config(const char* filepath) {
-    FILE* file = fopen(filepath, "r");
+result_t* open_config() {
+    #if defined(_WIN32)
+        HKEY hkey;
+
+        char config_path[BENJI_BASIC_STRING_LENGTH];
+        unsigned long config_path_length = sizeof(config_path);
+
+        HRESULT hresult = RegOpenKeyExA(
+            HKEY_LOCAL_MACHINE,
+            BENJI_CONFIG_REGISTRY_PATH,
+            0, KEY_READ, &hkey
+        );
+
+        if (FAILED(hresult)) {
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegOpenKeyEx() failed");
+        }
+
+        unsigned long type = REG_SZ;
+
+        hresult = RegQueryValueExA(
+            hkey, BENJI_CONFIG_REGISTRY_KEY, NULL, &type, (unsigned char*) config_path, &config_path_length
+        );
+
+        if (FAILED(hresult)) {
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegQueryValueEx() failed");
+        }
+
+        hresult = RegCloseKey(hkey);
+
+        if (FAILED(hresult)) {
+            return result_error(hresult, BENJI_ERROR_PACKET, "RegCloseKey() failed");
+        }
+
+        config_path[config_path_length] = '\0';
+
+        log_info("Collected config path from Windows registry: '%s'", config_path);
+    #endif
+
+    FILE* file = fopen(config_path, "r");
 
     if (!file) {
-        return result_error(ERROR_FILE_NOT_FOUND, BENJI_ERROR_PACKET, "Unable to open config file '%s'", filepath);
+        return result_error(ERROR_FILE_NOT_FOUND, BENJI_ERROR_PACKET, "Unable to open config file '%s'", config_path);
     }
 
     char error_buffer[BENJI_BASIC_STRING_LENGTH];

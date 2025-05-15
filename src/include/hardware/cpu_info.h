@@ -26,6 +26,14 @@
     #define BENJI_CPUID_CPU_NAME_START (0x80000002)
 #endif
 
+#ifndef BENJI_CPU_CLOCK_SPEED_REGISTRY_PATH
+    #define BENJI_CPU_CLOCK_SPEED_REGISTRY_PATH "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0"
+#endif
+
+#ifndef BENJI_CPU_CLOCK_SPEED_REGISTRY_KEY
+    #define BENJI_CPU_CLOCK_SPEED_REGISTRY_KEY "~MHz"
+#endif
+
 typedef struct _BENJI_CPU_INFO {
     char* name;
     char* vendor;

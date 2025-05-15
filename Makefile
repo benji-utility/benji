@@ -2,16 +2,25 @@ GXX = gcc
 
 GXX_FLAGS = -g -Wno-discarded-qualifiers
 
-SRC = src
-TOML = $(SRC)/include/toml-c
+MAIN_SRC = src
+INSTALLER_SRC = installer
+TOML = $(MAIN_SRC)/include/toml-c
 
 BUILD = build
 OBJ = $(BUILD)/obj
 
-EXEC = benji
+MAIN_EXEC =
+INSTALL_EXEC = benji-installer
 
-SRCS = $(wildcard src/*.c)
-TOML_SRCS = $(wildcard $(TOML)/toml.c)
+ifeq ($(OS), Windows_NT)
+	MAIN_EXEC = benji-service
+else ifeq ($(shell uname), Linux)
+	MAIN_EXEC = benjid
+endif
+
+MAIN_SRCS = $(wildcard $(MAIN_SRC)/*.c)
+INSTALLER_SRCS = $(wildcard $(INSTALLER_SRC)/*.c)
+TOML_SRCS = $(TOML)/toml.c
 
 CONFIG_FILE =
 TEST_DATA =
@@ -24,26 +33,25 @@ else ifeq ($(shell uname), Linux)
 endif
 
 INCLUDES = -I$(TOML)
-DEFINES = -DBENJI_CONFIG_PATH=$(abspath $(CONFIG_FILE))
 
-OBJS = $(patsubst $(SRC)/%.c, $(OBJ)/%.o, $(SRCS))
+OBJS = $(patsubst $(MAIN_SRC)/%.c, $(OBJ)/%.o, $(MAIN_SRCS))
 OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/%.o, $(TOML_SRCS))
 
 all: clean compile
 
-compile: $(BUILD)/$(EXEC)
+compile: $(BUILD)/$(MAIN_EXEC)
 
-$(BUILD)/$(EXEC): $(OBJS)
+$(BUILD)/$(MAIN_EXEC): $(OBJS)
 	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS)
 
-$(OBJ)/%.o: $(SRC)/%.c
-	$(GXX) $(GXX_FLAGS) $(INCLUDES) $(DEFINES) -c $< -o $@
+$(OBJ)/%.o: $(MAIN_SRC)/%.c
+	$(GXX) $(GXX_FLAGS) $(INCLUDES) -c $< -o $@
 
 $(OBJ)/%.o: $(TOML)/%.c
 	$(GXX) $(GXX_FLAGS) $(INCLUDES) -c $< -o $@
 
 ifeq ($(OS), Windows_NT)
-.SILENT: install clean test
+.SILENT: clean test
 endif
 
 .PHONY: clean
@@ -67,10 +75,11 @@ endif
 
 install:
 ifeq ($(OS), Windows_NT)
-	echo Not supported on Windows (yet)
+	if exist "$(BUILD)/$(INSTALL_EXEC).exe" del /S $(BUILD)\$(INSTALL_EXEC).exe
+	$(GXX) $(GXX_FLAGS) $(INSTALLER_SRCS) -o $(BUILD)/$(INSTALL_EXEC)
 else ifeq ($(shell uname), Linux)
 	cp benji.service /etc/systemd/system/benjid.service
-	cp $(BUILD)/$(EXEC) /usr/local/bin/benjid
+	cp $(BUILD)/$(MAIN_EXEC) /usr/local/bin/benjid
 endif
 
 test:
