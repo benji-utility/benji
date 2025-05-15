@@ -85,18 +85,27 @@ int main(int argc, const char* argv[]) {
     }
 
     int uninstall_service() {
-        SC_HANDLE sc_manager = OpenSCManager(NULL, NULL, SC_MANAGER_CONNECT);
+        SC_HANDLE sc_manager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 
         if (!sc_manager) {
             return BENJI_ERROR_UNABLE_TO_OPEN_SC_MANAGER;
         }
 
-        SC_HANDLE service = OpenServiceA(sc_manager, BENJI_SERVICE_NAME, DELETE);
+        SC_HANDLE service = OpenServiceA(sc_manager, BENJI_SERVICE_NAME, SERVICE_STOP | DELETE);
 
         if (!service) {
             CloseServiceHandle(sc_manager);
 
             return BENJI_ERROR_UNABLE_TO_OPEN_SERVICE;
+        }
+
+        SERVICE_STATUS service_status;
+
+        if (!ControlService(service, SERVICE_CONTROL_STOP, &service_status)) {
+            CloseServiceHandle(service);
+            CloseServiceHandle(sc_manager);
+
+            return BENJI_ERROR_UNABLE_TO_START_SERVICE;
         }
 
         if (!DeleteService(service)) {

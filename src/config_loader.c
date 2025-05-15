@@ -52,6 +52,8 @@ result_t* open_config() {
         return result_error(-1, BENJI_ERROR_PACKET, "Error parsing config file: '%s'", error_buffer);
     }
 
+    log_info("Loaded config succesfully");
+
     return result_success(toml_table);
 }
 

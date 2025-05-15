@@ -1,3 +1,3 @@
 @echo off
 
-cloc src --exclude-dir=toml-c
+cloc src installer --exclude-dir=toml-c
