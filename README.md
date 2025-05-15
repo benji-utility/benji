@@ -11,17 +11,17 @@ A light background application written in C that collects hardware information, 
 4. To modify the config before installation, see the [Config](#config) section
 4. Use the following command to install and start the Windows service:
 ```
-C:\Windows\system32> .\benji-installer.exe install benji-service.exe config.toml
+.\benji-installer.exe install benji-service.exe config.toml
 ```
 5. To verify the service is running, run either `sc query BenjiService` or `echo %errorlevel%` (the former should say RUNNING if success, the latter will print 0 if success)
 5. To test grabbing [data](#data-requests-wip) from Benji, install Netcat [here](https://nmap.org/download.html#windows) and use one of the corresponding commands:
     - If the repo was cloned/downloaded:
     ```
-    $ make test TEST_DATA=<desired data> TEST_PORT=<the port stored in config.toml>
+    make test TEST_DATA=<desired data> TEST_PORT=<the port stored in config.toml>
     ```
     - If using the executable from the latest release:
     ```
-    $ (set /p="<desired data>") <nul | ncat 127.0.0.1 <the port stored in config.toml>
+    (set /p="<desired data>") <nul | ncat 127.0.0.1 <the port stored in config.toml>
     ```
 ## Data Requests (WIP)
 These are the data groups that comprise the request sent to Benji
@@ -42,7 +42,7 @@ cpu_all;gpu_all;ram_all;
 
 When creating this request manually, make sure all the data groups are followed by a semicolon, including the last one.
 
-## Config
+## Config (WIP)
 Benji can be configured to run under certain contexts using a `config.toml` file provided during installation. See each subsection for the corresponding entries.
 
 ### Server
@@ -55,11 +55,11 @@ port = <any integer value between 1 and 65535, defaults to 8000>
 ## Building Manually
 1. Clone the repository to a chosen location with the following command
 ```
-$ git clone --recurse-submodules https://github.com/benji-utility/benji.git
+git clone --recurse-submodules https://github.com/benji-utility/benji.git
 ```
 2. To build the main project, simply move into the root of the repository and run the `make` command
 ```
-$ cd benji
-$ make
+cd benji
+make
 ```
 3. The main executable will be stored at the top of the automatically-created `build` folder
