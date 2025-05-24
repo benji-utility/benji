@@ -94,13 +94,23 @@ result_t* get_cpu_arch() {
 
         char* arch;
 
-        // TODO: use all the possible CPU architectures found in winnt.h
+        // copied from "winnt.h" for max support
         switch (system_info.wProcessorArchitecture) {
             case PROCESSOR_ARCHITECTURE_INTEL: arch = "x86"; break;
-            case PROCESSOR_ARCHITECTURE_AMD64: arch = "x64"; break;
+            case PROCESSOR_ARCHITECTURE_MIPS: arch = "MIPS"; break;
+            case PROCESSOR_ARCHITECTURE_ALPHA: arch = "Alpha"; break;
+            case PROCESSOR_ARCHITECTURE_PPC: arch = "PowerPC"; break;
+            case PROCESSOR_ARCHITECTURE_SHX: arch = "Hitachi SHx"; break;
             case PROCESSOR_ARCHITECTURE_ARM: arch = "ARM"; break;
-            case PROCESSOR_ARCHITECTURE_ARM64: arch = "ARM64"; break;
             case PROCESSOR_ARCHITECTURE_IA64: arch = "IA-64"; break;
+            case PROCESSOR_ARCHITECTURE_ALPHA64: arch = "Alpha64"; break;
+            case PROCESSOR_ARCHITECTURE_MSIL: arch = "MSIL"; break;
+            case PROCESSOR_ARCHITECTURE_AMD64: arch = "x64"; break;
+            case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64: arch = "x86 on x64"; break;
+            case PROCESSOR_ARCHITECTURE_NEUTRAL: arch = "Neutral"; break;
+            case PROCESSOR_ARCHITECTURE_ARM64: arch = "ARM64"; break;
+            case PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64: arch = "ARM32 on x64"; break;
+            case PROCESSOR_ARCHITECTURE_IA32_ON_ARM64: arch = "x86 on ARM64"; break;
 
             case PROCESSOR_ARCHITECTURE_UNKNOWN: // make this one fall through because i dont wanna deal with edge cases
             default: arch = "???"; break;

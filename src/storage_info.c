@@ -228,8 +228,8 @@ result_t* get_storage_devices_size(size_t device_count) {
         return result_success((STORAGE_DEVICE_DESCRIPTOR*) *buffer);
     }
 
-    // largely copied from the "winioctl.h" header, hence the jank win32 macro usage
     const char* get_bus_type(STORAGE_BUS_TYPE bus_type) {
+        // largely copied from the "winioctl.h" header, hence the jank win32 macro usage
         switch (bus_type) {
             case BusTypeScsi: return "SCSI";
             case BusTypeAtapi: return "ATAPI";
