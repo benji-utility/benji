@@ -298,8 +298,7 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
                 if (tries < BENJI_MAX_TRIES) {
                     tries++;
 
-                    // TODO: Change this to a macro constant
-                    BENJI_SLEEP(50); // wait 50ms and try again
+                    BENJI_SLEEP(BENJI_RECV_RETRY_WAIT_TIME); // wait 50ms and try again
 
                     continue;
                 }

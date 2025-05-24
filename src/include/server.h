@@ -13,6 +13,10 @@
 #include "hardware.h"
 #include "logger.h"
 
+#ifndef BENJI_RECV_RETRY_WAIT_TIME
+    #define BENJI_RECV_RETRY_WAIT_TIME (50) // ms
+#endif
+
 BENJIAPI result_t* server_init(const char* hostname, uint16_t port);
 BENJIAPI result_t* server_update(BENJI_SOCKET server_socket);
 

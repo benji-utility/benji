@@ -94,6 +94,7 @@ result_t* get_cpu_arch() {
 
         char* arch;
 
+        // TODO: use all the possible CPU architectures found in winnt.h
         switch (system_info.wProcessorArchitecture) {
             case PROCESSOR_ARCHITECTURE_INTEL: arch = "x86"; break;
             case PROCESSOR_ARCHITECTURE_AMD64: arch = "x64"; break;
