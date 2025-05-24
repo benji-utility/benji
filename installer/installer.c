@@ -1,27 +1,51 @@
 #include "installer.h"
 
 int main(int argc, const char* argv[]) {
-    if (BENJI_STRING_EQUALS(argv[1], "install")) {
+    int return_code = 0;
+
+    if (argc < 2) {
+        return_code = BENJI_ERROR_INSUFFICIENT_ARGUMENT_COUNT;
+
+        goto end;
+    }
+
+    if (BENJI_STRING_EQUALS(argv[1], "help")) {
+        printf("Help Menu:\n");
+        printf("\t%s help\n", argv[0]);
+        printf("\t%s install <path to service executable> <path to config.toml>\n", argv[0]);
+        printf("\t%s uninstall\n", argv[0]);
+
+        return EXIT_SUCCESS;
+    }
+    else if (BENJI_STRING_EQUALS(argv[1], "install")) {
         if (argc < 4) {
-            return EXIT_FAILURE;
+            return_code = BENJI_ERROR_INSUFFICIENT_ARGUMENT_COUNT;
+
+            goto end;
         }
 
         int error_code = install_service(argv[2], argv[3]);
 
-        if (error_code < 0) {
-            return error_code;
-        }
-
-        return start_service();
+        return_code = (error_code < 0) ? error_code : start_service();
     }
     else if (BENJI_STRING_EQUALS(argv[1], "uninstall")) {
-        return uninstall_service();
+        return_code = uninstall_service();
     }
     else {
-        return EXIT_FAILURE;
+        return_code = BENJI_ERROR_UNKNOWN_COMMAND;
     }
 
-    return EXIT_SUCCESS;
+    end:
+    if (return_code == BENJI_ERROR_NONE) {
+        printf("Success\n");
+
+        return EXIT_SUCCESS;
+    }
+    else {
+        printf("Failed with error code %i\n", return_code);
+
+        return EXIT_FAILURE;
+    }
 }
 
 #if defined(_WIN32)
@@ -53,7 +77,7 @@ int main(int argc, const char* argv[]) {
         CloseServiceHandle(service);
         CloseServiceHandle(sc_manager);
 
-        write_config_to_registry(config_filepath);
+        return write_config_to_registry(config_filepath);
     }
 
     int start_service() {
@@ -81,7 +105,7 @@ int main(int argc, const char* argv[]) {
         CloseServiceHandle(service);
         CloseServiceHandle(sc_manager);
 
-        return 0;
+        return BENJI_ERROR_NONE;
     }
 
     int uninstall_service() {
@@ -118,7 +142,7 @@ int main(int argc, const char* argv[]) {
         CloseServiceHandle(service);
         CloseServiceHandle(sc_manager);
 
-        return 0;
+        return BENJI_ERROR_NONE;
     }
 
     int write_config_to_registry(const char* config_filepath) {
@@ -152,6 +176,6 @@ int main(int argc, const char* argv[]) {
 
         RegCloseKey(hkey);
 
-        return 0;
+        return BENJI_ERROR_NONE;
     }
 #endif
