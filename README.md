@@ -8,7 +8,7 @@ A light background application written in C that collects hardware information, 
 1. Download and extract the zip attached to the latest release [here](https://github.com/benji-utility/benji/releases/latest)
 2. open Command Prompt as Administrator
 3. Change the current working directory to where the files in the zip were extracted to
-4. To modify the config before installation, see the [Config](#config) section
+4. To modify the config before installation, see the [Config](#config-wip) section
 4. Use the following command to install and start the Windows service:
 ```
 .\benji-installer.exe install benji-service.exe config.toml
@@ -43,13 +43,13 @@ cpu_all;gpu_all;ram_all;
 When creating this request manually, make sure all the data groups are followed by a semicolon, including the last one.
 
 ## Config (WIP)
-Benji can be configured to run under certain contexts using a `config.toml` file provided during installation. See each subsection for the corresponding entries.
+Benji can be configured to run under certain contexts using a `config.toml` file provided during installation. See each subsection for the corresponding entries and their default values if not specified.
 
 ### Server
 ```toml
 [server]
-hostname = "<desired IP, defaults to 127.0.0.1>"
-port = <any integer value between 1 and 65535, defaults to 8000>
+hostname = "127.0.0.1"
+port = 8000
 ```
 
 ## Building Manually
