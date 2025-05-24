@@ -9,7 +9,15 @@ int main(int argc, const char* argv[]) {
         goto end;
     }
 
-    if (BENJI_STRING_EQUALS(argv[1], "install")) {
+    if (BENJI_STRING_EQUALS(argv[1], "help")) {
+        printf("Help Menu:\n");
+        printf("\t%s help\n", argv[0]);
+        printf("\t%s install <path to service executable> <path to config.toml>\n", argv[0]);
+        printf("\t%s uninstall\n", argv[0]);
+
+        return EXIT_SUCCESS;
+    }
+    else if (BENJI_STRING_EQUALS(argv[1], "install")) {
         if (argc < 4) {
             return_code = BENJI_ERROR_INSUFFICIENT_ARGUMENT_COUNT;
 
