@@ -266,11 +266,13 @@ size_t count_storage_devices() {
     size_t device_count = 0;
 
     for (size_t i = 0; i < BENJI_MAX_STORAGE_DEVICES; i++) {
-        HANDLE handle = open_storage_device_handle(i);
+        #ifdef _WIN32
+            HANDLE handle = open_storage_device_handle(i);
 
-        if (handle == INVALID_HANDLE_VALUE) {
-            continue;
-        }
+            if (handle == INVALID_HANDLE_VALUE) {
+                continue;
+            }
+        #endif
 
         device_count++;
 
