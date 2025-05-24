@@ -7,17 +7,7 @@
 
 #include "../utils.h"
 
-#ifndef BENJI_GPU_VENDOR_INTEL
-    #define BENJI_GPU_VENDOR_INTEL (0x8086)
-#endif
-
-#ifndef BENJI_GPU_VENDOR_AMD
-    #define BENJI_GPU_VENDOR_AMD (0x1002)
-#endif
-
-#ifndef BENJI_GPU_VENDOR_NVIDIA
-    #define BENJI_GPU_VENDOR_NVIDIA (0x10de)
-#endif
+#include "../gpu_vendors.h"
 
 typedef struct _BENJI_GPU_INFO {
     char* name;

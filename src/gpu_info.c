@@ -55,11 +55,32 @@ result_t* get_gpu_vendor() {
 
         DXGI_ADAPTER_DESC adapter_description = *(DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
 
-        // TODO: Extend this to any vendor DXGI_ADAPTER_DESC recognizes
         switch (adapter_description.VendorId) {
-            case BENJI_GPU_VENDOR_INTEL: vendor = "Intel"; break;
-            case BENJI_GPU_VENDOR_AMD: vendor = "AMD"; break;
             case BENJI_GPU_VENDOR_NVIDIA: vendor = "NVIDIA"; break;
+            case BENJI_GPU_VENDOR_AMD: vendor = "AMD"; break;
+            case BENJI_GPU_VENDOR_INTEL: vendor = "Intel"; break;
+            case BENJI_GPU_VENDOR_MICROSOFT: vendor = "Microsoft"; break;
+            case BENJI_GPU_VENDOR_QUALCOMM: vendor = "Qualcomm"; break;
+            case BENJI_GPU_VENDOR_ARM: vendor = "ARM"; break;
+            case BENJI_GPU_VENDOR_APPLE: vendor = "Apple"; break;
+            case BENJI_GPU_VENDOR_IMAGINATION: vendor = "Imagination Technologies"; break;
+            case BENJI_GPU_VENDOR_S3: vendor = "S3 Graphics"; break;
+            case BENJI_GPU_VENDOR_MATROX: vendor = "Matrox"; break;
+            case BENJI_GPU_VENDOR_VIA: vendor = "VIA"; break;
+            case BENJI_GPU_VENDOR_SIS: vendor = "SiS"; break;
+            case BENJI_GPU_VENDOR_3DFX: vendor = "3Dfx"; break;
+            case BENJI_GPU_VENDOR_TRIDENT: vendor = "Trident Microsystems"; break;
+            case BENJI_GPU_VENDOR_XGI: vendor = "XGI Technology"; break;
+            case BENJI_GPU_VENDOR_ASPEED: vendor = "ASPEED"; break;
+            case BENJI_GPU_VENDOR_VMWARE: vendor = "VMware"; break;
+            case BENJI_GPU_VENDOR_PARALLELS: vendor = "Parallels"; break;
+            case BENJI_GPU_VENDOR_VIRTUALBOX: vendor = "VirtualBox"; break;
+            case BENJI_GPU_VENDOR_BOCHS: vendor = "Bochs/QEMU"; break;
+            case BENJI_GPU_VENDOR_REDHAT: vendor = "Red Hat (virtio)"; break;
+            case BENJI_GPU_VENDOR_NUMBER_NINE: vendor = "Number Nine"; break;
+            case BENJI_GPU_VENDOR_TSENG_LABS: vendor = "Tseng Labs"; break;
+            case BENJI_GPU_VENDOR_RENDITION: vendor = "Rendition"; break;
+            case BENJI_GPU_VENDOR_CIRRUS_LOGIC: vendor = "Cirrus Logic"; break;
 
             default: vendor = "???"; break;
         }
