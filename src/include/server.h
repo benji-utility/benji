@@ -14,8 +14,21 @@
 #include "logger.h"
 
 #ifndef BENJI_RECV_RETRY_WAIT_TIME
-    #define BENJI_RECV_RETRY_WAIT_TIME (50) // ms
+    #define BENJI_RECV_RETRY_WAIT_TIME (50) /* in ms */
 #endif
+
+#ifndef BENJI_SLEEP
+    #if defined(_WIN32)
+        #define BENJI_SLEEP(ms) Sleep(ms)
+    #elif defined(__linux__)
+        #define BENJI_SLEEP(ms) sleep(ms)
+    #endif
+#endif
+
+static enum _BENJI_SERVER_STATUS {
+    BENJI_SERVER_STOPPED,
+    BENJI_SERVER_RUNNING
+} server_status;
 
 BENJIAPI result_t* server_init(const char* hostname, uint16_t port);
 BENJIAPI result_t* server_update(BENJI_SOCKET server_socket);

@@ -32,14 +32,6 @@
     #define BENJI_CAPACITY(n, t) ((n) * sizeof(t))
 #endif
 
-#ifndef BENJI_SLEEP
-    #if defined(_WIN32)
-        #define BENJI_SLEEP(ms) Sleep(ms)
-    #elif defined(__linux__)
-        #define BENJI_SLEEP(ms) sleep(ms)
-    #endif
-#endif
-
 #ifndef BENJI_STRING_EQUALS
     #define BENJI_STRING_EQUALS(a, b) (strcmp(a, b) == 0)
 #endif
@@ -50,10 +42,6 @@
     #else
         #define BENJI_NO_ERROR (0)
     #endif
-#endif
-
-#ifndef BENJI_NO_FLAGS
-    #define BENJI_NO_FLAGS (0)
 #endif
 
 #ifdef BENJI_USE_SERVER_UTILS
@@ -110,11 +98,6 @@
     #ifndef BENJI_MAX_TRIES
         #define BENJI_MAX_TRIES (3) /* max attempts to try something */
     #endif
-
-    static enum _BENJI_SERVER_STATUS {
-        BENJI_SERVER_STOPPED,
-        BENJI_SERVER_RUNNING
-    } server_status;
 
     BENJIAPI result_t* create_socket();
     BENJIAPI result_t* close_socket(BENJI_SOCKET sock);
