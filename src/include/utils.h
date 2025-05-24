@@ -44,14 +44,6 @@
     #define BENJI_STRING_EQUALS(a, b) (strcmp(a, b) == 0)
 #endif
 
-#ifndef BENJI_STRINGIFY
-    #define BENJI_STRINGIFY(x) #x
-#endif
-
-#ifndef BENJI_STRINGIFY_VALUE_OF
-    #define BENJI_STRINGIFY_VALUE_OF(x) BENJI_STRINGIFY(x)
-#endif
-
 #ifndef BENJI_NO_ERROR
     #ifdef NOERROR
         #define BENJI_NO_ERROR NOERROR

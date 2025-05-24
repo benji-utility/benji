@@ -8,8 +8,7 @@
 #include "include/result.h"
 
 int main(int argc, const char* argv[]) {
-    // i dont really understand how this macro witchcraft works. but it does, so im not gonna question it
-    result_t* config_result = open_config(BENJI_STRINGIFY_VALUE_OF(BENJI_CONFIG_PATH));
+    result_t* config_result = open_config();
 
     if (config_result->is_error) {
         result_error_payload_t config_result_error = result_unwrap_error(config_result);
