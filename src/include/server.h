@@ -26,7 +26,7 @@
 #endif
 
 #ifndef close_socket_with_result
-    #define close_socket_with_result(_socket) \
+    #define close_socket_with_result(_socket) { \
         result_t* close_client_socket_result = close_socket(_socket); \
         \
         if (close_client_socket_result->is_error) { \
@@ -41,7 +41,8 @@
             ); \
         } \
         \
-        result_free(close_client_socket_result);
+        result_free(close_client_socket_result); \
+    }
 #endif
 
 static enum _BENJI_SERVER_STATUS {

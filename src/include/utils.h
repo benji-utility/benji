@@ -118,7 +118,7 @@
     #endif
 
     #ifndef collect_map_data
-        #define collect_map_data(_info_type, _get_info, _convert_to_map, _map_data) \
+        #define collect_map_data(_info_type, _get_info, _convert_to_map, _map_data) { \
             result_t* info_result = _get_info(); \
             return_if_error(info_result); \
             \
@@ -129,7 +129,8 @@
             \
             free(info); \
             \
-            _map_data = (map_t*) result_unwrap_value(map_data_result);
+            _map_data = (map_t*) result_unwrap_value(map_data_result); \
+        }
     #endif
 
     result_t* get_hardware_info(const char* hardware_group, char** header);

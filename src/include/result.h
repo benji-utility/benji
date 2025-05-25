@@ -12,7 +12,7 @@
 #endif
 
 #ifndef return_if_error
-    #define return_if_error(_result) \
+    #define return_if_error(_result) { \
         if (_result->is_error) { \
             result_error_payload_t error = result_unwrap_error(_result); \
             \
@@ -21,11 +21,12 @@
                 error.location, \
                 error.message \
             ); \
-        }
+        } \
+    }
 #endif
 
 #ifndef return_if_error_with_warning
-    #define return_if_error_with_warning(_result) \
+    #define return_if_error_with_warning(_result) { \
         if (_result->is_error) { \
             result_error_payload_t error = result_unwrap_error(_result); \
             \
@@ -36,7 +37,8 @@
                 error.location, \
                 error.message \
             ); \
-        }
+        } \
+    }
 #endif
 
 typedef struct _BENJI_ERROR_PACKET {
