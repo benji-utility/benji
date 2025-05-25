@@ -25,17 +25,18 @@
 #endif
 
 #ifndef return_if_error_with_warning
-    #define return_if_error_with_warning(_result) if (_result->is_error) { \
-        result_error_payload_t error = result_unwrap_error(_result); \
-        \
-        log_error_payload(BENJI_LOG_LEVEL_WARNING, error); \
-        \
-        return result_error( \
-            error.code, \
-            error.location, \
-            error.message \
-        ); \
-    }
+    #define return_if_error_with_warning(_result) \
+        if (_result->is_error) { \
+            result_error_payload_t error = result_unwrap_error(_result); \
+            \
+            log_error_payload(BENJI_LOG_LEVEL_WARNING, error); \
+            \
+            return result_error( \
+                error.code, \
+                error.location, \
+                error.message \
+            ); \
+        }
 #endif
 
 typedef struct _BENJI_ERROR_PACKET {
