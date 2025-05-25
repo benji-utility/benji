@@ -35,8 +35,16 @@ int main(int argc, const char* argv[]) {
         };
 
         if (!StartServiceCtrlDispatcher(service_table)) {
-            // TODO: make this a result
-            return GetLastError();
+            log_error_payload(
+                BENJI_LOG_LEVEL_ERROR,
+                (result_error_payload_t) {
+                    .code = GetLastError(),
+                    .message = "StartServiceCtrlDispatcher() failed",
+                    .location = BENJI_ERROR_PACKET
+                }
+            );
+
+            return EXIT_FAILURE;
         }
     #elif defined(__linux__)
         spawn_daemon();
