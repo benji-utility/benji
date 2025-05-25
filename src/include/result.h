@@ -12,20 +12,21 @@
 #endif
 
 #ifndef return_if_error
-    #define return_if_error(result) if (result->is_error) { \
-        result_error_payload_t error = result_unwrap_error(result); \
-        \
-        return result_error( \
-            error.code, \
-            error.location, \
-            error.message \
-        ); \
-    }
+    #define return_if_error(_result) \
+        if (_result->is_error) { \
+            result_error_payload_t error = result_unwrap_error(_result); \
+            \
+            return result_error( \
+                error.code, \
+                error.location, \
+                error.message \
+            ); \
+        }
 #endif
 
 #ifndef return_if_error_with_warning
-    #define return_if_error_with_warning(result) if (result->is_error) { \
-        result_error_payload_t error = result_unwrap_error(result); \
+    #define return_if_error_with_warning(_result) if (_result->is_error) { \
+        result_error_payload_t error = result_unwrap_error(_result); \
         \
         log_error_payload(BENJI_LOG_LEVEL_WARNING, error); \
         \

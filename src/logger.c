@@ -55,6 +55,13 @@ void log_error_payload(log_level_t log_level, result_error_payload_t payload) {
         payload.code
     );
 
+    #if defined(_WIN32)
+        strtrim(output);
+        OutputDebugStringA(output);
+    #elif defined (__linux__)
+        /* TODO: add linux stuff */
+    #endif
+
     free(output);
 }
 

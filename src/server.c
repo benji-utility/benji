@@ -103,7 +103,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     if (data_groups == NULL || data_group_count == 0) {
         log_message(BENJI_LOG_LEVEL_WARNING, "Client data is either empty or incorrectly formatted, closing client connection...");
 
-        close_socket_with_result();
+        close_socket_with_result(client_socket);
 
         return result_error(-1, BENJI_ERROR_PACKET, "Client data is either empty or incorrectly formatted");
     }
@@ -112,7 +112,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         if (data_groups[i] == NULL) {
             log_message(BENJI_LOG_LEVEL_WARNING, "Invalid data group, closing client connection...");
 
-            close_socket_with_result();
+            close_socket_with_result(client_socket);
 
             return result_error(-1, BENJI_ERROR_PACKET, "Invalid data group");
         }
@@ -125,6 +125,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
             result_error_payload_t map_data_result_error = result_unwrap_error(map_data_result);
 
             log_error_payload(BENJI_LOG_LEVEL_WARNING, map_data_result_error);
+
+            close_socket_with_result(client_socket);
 
             return result_error(
                 map_data_result_error.code,
@@ -171,6 +173,8 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         log_error_payload(BENJI_LOG_LEVEL_WARNING, response_result_error);
 
+        close_socket_with_result(client_socket);
+
         return result_error(
             response_result_error.code,
             BENJI_ERROR_PACKET,
@@ -178,7 +182,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         );
     }
 
-    close_socket_with_result();
+    close_socket_with_result(client_socket);
 
     return result_success(NULL); // nothing to return, but this signifies a successful server cycle
 }

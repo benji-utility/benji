@@ -89,11 +89,11 @@
     }
 
     BENJIAPI unsigned long service_worker_thread() {
-        WSAEVENT events[BENJI_SERVICE_EVENTS] = {service_socket_event, service_stop_event};
+        WSAEVENT events[BENJI_SERVICE_EVENTS_COUNT] = {service_socket_event, service_stop_event};
 
         // this is safe ;)
         while (true) {
-            unsigned long wait = WSAWaitForMultipleEvents(BENJI_SERVICE_EVENTS, events, false, WSA_INFINITE, false);
+            unsigned long wait = WSAWaitForMultipleEvents(BENJI_SERVICE_EVENTS_COUNT, events, false, WSA_INFINITE, false);
 
             if (wait == WSA_WAIT_EVENT_0) {
                 WSANETWORKEVENTS network_events;

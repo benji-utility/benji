@@ -29,11 +29,11 @@
 #endif
 
 #ifndef BENJI_CAPACITY
-    #define BENJI_CAPACITY(n, t) ((n) * sizeof(t))
+    #define BENJI_CAPACITY(_count, _type) ((_count) * sizeof(_type))
 #endif
 
 #ifndef BENJI_STRING_EQUALS
-    #define BENJI_STRING_EQUALS(a, b) (strcmp(a, b) == 0)
+    #define BENJI_STRING_EQUALS(_a, _b) (strcmp(_a, _b) == 0)
 #endif
 
 #ifndef BENJI_NO_ERROR
@@ -118,18 +118,18 @@
     #endif
 
     #ifndef collect_map_data
-        #define collect_map_data(info_type, get_info, convert_to_map, map_data) \
-            result_t* info_result = get_info(); \
+        #define collect_map_data(_info_type, _get_info, _convert_to_map, _map_data) \
+            result_t* info_result = _get_info(); \
             return_if_error(info_result); \
             \
-            info_type* info = (info_type*) result_unwrap_value(info_result); \
+            _info_type* info = (_info_type*) result_unwrap_value(info_result); \
             \
-            result_t* map_data_result = convert_to_map(*info); \
+            result_t* map_data_result = _convert_to_map(*info); \
             return_if_error(map_data_result); \
             \
             free(info); \
             \
-            map_data = (map_t*) result_unwrap_value(map_data_result);
+            _map_data = (map_t*) result_unwrap_value(map_data_result);
     #endif
 
     result_t* get_hardware_info(const char* hardware_group, char** header);

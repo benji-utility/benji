@@ -19,15 +19,15 @@
 
 #ifndef BENJI_SLEEP
     #if defined(_WIN32)
-        #define BENJI_SLEEP(ms) Sleep(ms)
+        #define BENJI_SLEEP(_time) Sleep(_time)
     #elif defined(__linux__)
-        #define BENJI_SLEEP(ms) sleep(ms)
+        #define BENJI_SLEEP(_time) sleep(_time)
     #endif
 #endif
 
 #ifndef close_socket_with_result
-    #define close_socket_with_result() \
-        result_t* close_client_socket_result = close_socket(client_socket); \
+    #define close_socket_with_result(_socket) \
+        result_t* close_client_socket_result = close_socket(_socket); \
         \
         if (close_client_socket_result->is_error) { \
             result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result); \
