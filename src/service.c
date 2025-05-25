@@ -7,6 +7,8 @@
         service_status.dwServiceSpecificExitCode = 0;
         service_status.dwCheckPoint = 0;
 
+        log_message(BENJI_LOG_LEVEL_INFO, "Starting the service...");
+
         report_service_status(SERVICE_START_PENDING, 0, 0);
 
         service_status_handle = RegisterServiceCtrlHandler(
@@ -15,8 +17,14 @@
         );
 
         if (service_status_handle == NULL) {
-            // TODO: more error context
-            log_message(BENJI_LOG_LEVEL_ERROR, "Service status handle is NULL");
+            log_error_payload(
+                BENJI_LOG_LEVEL_ERROR,
+                (result_error_payload_t) {
+                    .code = -1,
+                    .message = "Service status handle is NULL",
+                    .location = BENJI_ERROR_PACKET
+                }
+            );
 
             return;
         }
@@ -40,7 +48,11 @@
 
         report_service_status(SERVICE_RUNNING, 0, 0);
 
+        log_message(BENJI_LOG_LEVEL_INFO, "Service started, spawning worker thread...");
+
         HANDLE worker_thread = CreateThread(NULL, 0, service_worker_thread, NULL, 0, NULL);
+
+        log_message(BENJI_LOG_LEVEL_INFO, "Worker thread created");
 
         // basically run this indefinitely and rely on the thread to close properly
         WaitForSingleObject(worker_thread, INFINITE);
@@ -52,6 +64,8 @@
         switch (request) {
             case SERVICE_CONTROL_STOP: // this and shutdown are handled the same, so perform the same actions
             case SERVICE_CONTROL_SHUTDOWN: {
+                log_message(BENJI_LOG_LEVEL_INFO, "Stopping the service...");
+
                 report_service_status(SERVICE_STOP_PENDING, 0, 0);
 
                 WSASetEvent(service_stop_event);
@@ -75,7 +89,7 @@
 
                 report_service_status(SERVICE_STOPPED, 0, 0);
 
-                log_message(BENJI_LOG_LEVEL_INFO, "Service shutdown gracefully");
+                log_message(BENJI_LOG_LEVEL_INFO, "Service stopped gracefully");
 
                 break;
             }
@@ -119,7 +133,6 @@
         return BENJI_NO_ERROR;
     }
 
-    // TODO: make this log a change in status
     BENJIAPI void report_service_status(unsigned long current_state, unsigned long exit_code, unsigned long wait_hint) {
         service_status.dwCurrentState = current_state;
         service_status.dwWin32ExitCode = exit_code;
