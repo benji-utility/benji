@@ -103,21 +103,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     if (data_groups == NULL || data_group_count == 0) {
         log_warning_info("Client data is either empty or incorrectly formatted, closing client connection...");
 
-        result_t* close_client_socket_result = close_socket(client_socket);
-
-        if (close_client_socket_result->is_error) {
-            result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
-
-            log_warning(close_client_socket_result_error);
-
-            return result_error(
-                close_client_socket_result_error.code,
-                BENJI_ERROR_PACKET,
-                close_client_socket_result_error.message
-            );
-        }
-
-        result_free(close_client_socket_result);
+        close_socket_with_result();
 
         return result_error(-1, BENJI_ERROR_PACKET, "Client data is either empty or incorrectly formatted");
     }
@@ -126,21 +112,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         if (data_groups[i] == NULL) {
             log_warning_info("Invalid data group, closing client connection...");
 
-            result_t* close_client_socket_result = close_socket(client_socket);
-
-            if (close_client_socket_result->is_error) {
-                result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
-
-                log_warning(close_client_socket_result_error);
-
-                return result_error(
-                    close_client_socket_result_error.code,
-                    BENJI_ERROR_PACKET,
-                    close_client_socket_result_error.message
-                );
-            }
-
-            result_free(close_client_socket_result);
+            close_socket_with_result();
 
             return result_error(-1, BENJI_ERROR_PACKET, "Invalid data group");
         }
@@ -206,21 +178,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         );
     }
 
-    result_t* close_client_socket_result = close_socket(client_socket);
-
-    if (close_client_socket_result->is_error) {
-        result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result);
-
-        log_warning(close_client_socket_result_error);
-
-        return result_error(
-            close_client_socket_result_error.code,
-            BENJI_ERROR_PACKET,
-            close_client_socket_result_error.message
-        );
-    }
-
-    result_free(close_client_socket_result);
+    close_socket_with_result();
 
     return result_success(NULL); // nothing to return, but this signifies a successful server cycle
 }

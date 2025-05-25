@@ -19,7 +19,10 @@ int main(int argc, const char* argv[]) {
     }
 
     toml_table_t* config = (toml_table_t*) result_unwrap_value(config_result);
+
     config_details_t config_details = get_details_from_config(config);
+
+    toml_free(config);
 
     collect_server_details(config_details);
 

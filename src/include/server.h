@@ -25,6 +25,25 @@
     #endif
 #endif
 
+#ifndef close_socket_with_result
+    #define close_socket_with_result() \
+        result_t* close_client_socket_result = close_socket(client_socket); \
+        \
+        if (close_client_socket_result->is_error) { \
+            result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result); \
+            \
+            log_warning(close_client_socket_result_error); \
+            \
+            return result_error( \
+                close_client_socket_result_error.code, \
+                BENJI_ERROR_PACKET, \
+                close_client_socket_result_error.message \
+            ); \
+        } \
+        \
+        result_free(close_client_socket_result);
+#endif
+
 static enum _BENJI_SERVER_STATUS {
     BENJI_SERVER_STOPPED,
     BENJI_SERVER_RUNNING
