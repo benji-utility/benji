@@ -35,7 +35,7 @@ result_t* open_config() {
 
         config_path[config_path_length] = '\0';
 
-        log_info("Collected config path from Windows registry: '%s'", config_path);
+        log_message(BENJI_LOG_LEVEL_INFO, "Collected config path from Windows registry: '%s'", config_path);
     #endif
 
     FILE* file = fopen(config_path, "r");
@@ -52,7 +52,7 @@ result_t* open_config() {
         return result_error(-1, BENJI_ERROR_PACKET, "Error parsing config file: '%s'", error_buffer);
     }
 
-    log_info("Loaded config succesfully");
+    log_message(BENJI_LOG_LEVEL_INFO, "Loaded config succesfully");
 
     return result_success(toml_table);
 }

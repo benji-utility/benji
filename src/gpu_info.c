@@ -91,7 +91,7 @@ result_t* get_gpu_vendor() {
     #endif
 }
 
-result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type) {
+result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
     #if defined(_WIN32)
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);

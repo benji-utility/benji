@@ -31,15 +31,15 @@ typedef struct _BENJI_STORAGE_INFO {
     char* sizes; // in GB
 } storage_info_t;
 
-enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE {
+typedef enum _BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE {
     BENJI_STORAGE_DEVICE_MODEL_NAME,
     BENJI_STORAGE_DEVICE_SERIAL_NUMBER,
     BENJI_STORAGE_DEVICE_BUS_TYPE
-};
+} model_info_type_t;
 
 result_t* get_storage_info();
 
-result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE info_type);
+result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_type);
 result_t* get_storage_devices_size(size_t device_count);
 
 #ifdef _WIN32

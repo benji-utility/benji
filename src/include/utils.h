@@ -137,7 +137,7 @@
 
 void strtrim(char* string);
 size_t strsplit(const char* string, char*** tokens, const char character); // returns token count
-char* strprepend(const char* string, const char* prefix);
+void strprepend(char* string, const char* prefix);
 
 #ifdef _WIN32
     char* wcharp_to_charp(const wchar_t* wchar);

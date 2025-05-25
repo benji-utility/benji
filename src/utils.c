@@ -7,17 +7,17 @@ void strtrim(char* string) {
         i++;
     }
 
+    int string_length = strlen(string);
+
     if (i > 0) {
-        memmove(string, string + i, strlen(string) - i + 1);
+        memmove(string, string + i, string_length - i + 1);
     }
 
-    int length = strlen(string);
-
-    while (length > 0 && isspace(string[length - 1])) {
-        length--;
+    while (string_length > 0 && isspace(string[string_length - 1])) {
+        string_length--;
     }
 
-    string[length] = '\0';
+    string[string_length] = '\0';
 }
 
 size_t strsplit(const char* string, char*** tokens, const char character) {
@@ -80,19 +80,17 @@ size_t strsplit(const char* string, char*** tokens, const char character) {
     return count;  // Return the number of tokens
 }
 
-char* strprepend(const char* string, const char* prefix) {
+void strprepend(char* string, const char* prefix) {
+    if (!string || !prefix) {
+        return;
+    }
+
     size_t string_length = strlen(string);
     size_t prefix_length = strlen(prefix);
 
-    char* result = malloc(string_length + prefix_length + 1);
+    memmove(string + prefix_length, string, string_length + 1); // include null terminator in final length calculation
 
-    if (!result) {
-        return string; // just return the original string
-    }
-
-    sprintf(result, "%s%s", prefix, string);
-
-    return result;
+    memcpy(string, prefix, prefix_length);
 }
 
 #ifdef _WIN32

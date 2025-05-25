@@ -16,15 +16,15 @@ typedef struct _BENJI_DEVICE_CONTEXT_INFO {
     char* hostname;
 } device_context_info_t;
 
-enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE {
+typedef enum _BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE {
     BENJI_OPERATING_SYSTEM_VERSION_NAME,
     BENJI_OPERATING_SYSTEM_VERSION_NUMBER
-};
+} os_version_info_type_t;
 
 result_t* get_device_context_info();
 
 result_t* get_device_context_device_name();
-result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE version_info_type);
+result_t* get_device_context_operating_system_info(os_version_info_type_t version_info_type);
 result_t* get_device_context_hostname();
 
 #ifdef _WIN32

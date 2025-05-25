@@ -32,7 +32,7 @@ result_t* get_storage_info() {
     return result_success(info);
 }
 
-result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE info_type) {
+result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_type) {
     #if defined(_WIN32)
         char* devices_info = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
@@ -50,7 +50,6 @@ result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVIC
             result_t* storage_device_descriptor_result = get_storage_device_descriptor(handle, &buffer);
 
             if (storage_device_descriptor_result->is_error) {
-                log_warning(result_unwrap_error(storage_device_descriptor_result));
                 strcat(devices_info, "???");
             }
             else {

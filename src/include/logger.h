@@ -5,18 +5,33 @@
 
 #include "utils.h"
 #include "result.h"
-#include "colors.h"
 
-#define BENJI_LOG_DEBUG "[DEBUG]"
-#define BENJI_LOG_INFO "[INFO]"
-#define BENJI_LOG_WARNING "[WARNING]"
-#define BENJI_LOG_ERROR "[ERROR]"
+#ifndef BENJI_LOG_PREFIX_DEBUG
+    #define BENJI_LOG_PREFIX_DEBUG "[DEBUG]"
+#endif
 
-void log_debug(const char* string, ...);
-void log_info(const char* info, ...);
-void log_warning(result_error_payload_t error);
-void log_warning_info(const char* info, ...);
-void log_error(result_error_payload_t error);
-void log_error_info(const char* info, ...);
+#ifndef BENJI_LOG_PREFIX_INFO
+    #define BENJI_LOG_PREFIX_INFO "[INFO]"
+#endif
+
+#ifndef BENJI_LOG_PREFIX_WARNING
+    #define BENJI_LOG_PREFIX_WARNING "[WARNING]"
+#endif
+
+#ifndef BENJI_LOG_PREFIX_ERROR
+    #define BENJI_LOG_PREFIX_ERROR "[ERROR]"
+#endif
+
+typedef enum _BENJI_LOG_LEVEL {
+    BENJI_LOG_LEVEL_DEBUG,
+    BENJI_LOG_LEVEL_INFO,
+    BENJI_LOG_LEVEL_WARNING,
+    BENJI_LOG_LEVEL_ERROR
+} log_level_t;
+
+void log_message(log_level_t log_level, const char* string, ...);
+void log_error_payload(log_level_t log_level, result_error_payload_t payload);
+
+const char* get_prefix_from_log_level(log_level_t log_level);
 
 #endif

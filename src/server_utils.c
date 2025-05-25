@@ -9,23 +9,23 @@
     BENJIAPI void winsock_init() {
         struct WSAData wsa_data;
 
-        log_debug("Initializing Winsock...");
+        log_message(BENJI_LOG_LEVEL_INFO, "Initializing Winsock...");
 
         if (WSAStartup(WINSOCK_VERSION, &wsa_data) != BENJI_NO_ERROR) {
             terminate(WSAGetLastError());
         }
 
-        log_debug("Winsock initialized successfully");
+        log_message(BENJI_LOG_LEVEL_INFO, "Winsock initialized successfully");
     }
 
     BENJIAPI void winsock_cleanup() {
-        log_debug("\nCleaning up Winsock...");
+        log_message(BENJI_LOG_LEVEL_INFO, "Cleaning up Winsock...");
 
         if (WSACleanup() == BENJI_SOCKET_ERROR) {
             exit(WSAGetLastError());
         }
 
-        log_debug("Winsock cleaned up successfully");
+        log_message(BENJI_LOG_LEVEL_INFO, "Winsock cleaned up successfully");
     }
 #endif
 

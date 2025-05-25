@@ -15,7 +15,8 @@
         );
 
         if (service_status_handle == NULL) {
-            log_error_info("Service status handle is NULL");
+            // TODO: more error context
+            log_message(BENJI_LOG_LEVEL_ERROR, "Service status handle is NULL");
 
             return;
         }
@@ -25,7 +26,7 @@
         if (server_socket_result->is_error) {
             result_error_payload_t server_socket_result_error = result_unwrap_error(server_socket_result);
 
-            log_error(server_socket_result_error);
+            log_error_payload(BENJI_LOG_LEVEL_ERROR, server_socket_result_error);
 
             return;
         }
@@ -60,7 +61,7 @@
                 if (close_server_socket_result->is_error) {
                     result_error_payload_t close_server_socket_result_error = result_unwrap_error(close_server_socket_result);
 
-                    log_warning(close_server_socket_result_error);
+                    log_error_payload(BENJI_LOG_LEVEL_WARNING, close_server_socket_result_error);
                 }
 
                 result_free(close_server_socket_result);
@@ -74,7 +75,7 @@
 
                 report_service_status(SERVICE_STOPPED, 0, 0);
 
-                log_info("Service shutdown gracefully");
+                log_message(BENJI_LOG_LEVEL_INFO, "Service shutdown gracefully");
 
                 break;
             }
@@ -105,7 +106,7 @@
                     if (server_update_result->is_error) {
                         result_error_payload_t server_update_result_error = result_unwrap_error(server_update_result);
 
-                        log_warning(server_update_result_error);
+                        log_error_payload(BENJI_LOG_LEVEL_WARNING, server_update_result_error);
                     }
                 }
             }
@@ -118,6 +119,7 @@
         return BENJI_NO_ERROR;
     }
 
+    // TODO: make this log a change in status
     BENJIAPI void report_service_status(unsigned long current_state, unsigned long exit_code, unsigned long wait_hint) {
         service_status.dwCurrentState = current_state;
         service_status.dwWin32ExitCode = exit_code;

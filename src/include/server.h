@@ -32,7 +32,7 @@
         if (close_client_socket_result->is_error) { \
             result_error_payload_t close_client_socket_result_error = result_unwrap_error(close_client_socket_result); \
             \
-            log_warning(close_client_socket_result_error); \
+            log_error_payload(BENJI_LOG_LEVEL_WARNING, close_client_socket_result_error); \
             \
             return result_error( \
                 close_client_socket_result_error.code, \

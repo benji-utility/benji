@@ -71,7 +71,7 @@ result_t* get_device_context_device_name() {
     #endif
 }
 
-result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE version_info_type) {
+result_t* get_device_context_operating_system_info(os_version_info_type_t version_info_type) {
     #if defined(_WIN32)
         char* operating_system = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
