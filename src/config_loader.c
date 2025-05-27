@@ -19,8 +19,6 @@ result_t* open_config() {
             return result_error(hresult, BENJI_ERROR_PACKET, "RegGetValueA() failed");
         }
 
-        config_path[config_path_length] = '\0';
-
         log_message(BENJI_LOG_LEVEL_INFO, "Collected config path from Windows registry: '%s'", config_path);
     #elif defined(__linux__)
         /* TODO: add linux stuff */
@@ -36,6 +34,8 @@ result_t* open_config() {
 
     toml_table_t* toml_table = toml_parse_file(file, error_buffer, BENJI_BASIC_STRING_LENGTH);
 
+    fclose(file);
+
     if (!toml_table) {
         return result_error(-1, BENJI_ERROR_PACKET, "Error parsing config file: '%s'", error_buffer);
     }
@@ -46,7 +46,11 @@ result_t* open_config() {
 }
 
 config_details_t get_details_from_config(toml_table_t* config) {
-    config_details_t config_details;
+    // set initial defaults
+    config_details_t config_details = (config_details_t) {
+        .server_config.hostname = BENJI_DEFAULT_SERVER_HOSTNAME,
+        .server_config.port = BENJI_DEFAULT_SERVER_PORT
+    };
 
     toml_table_t* server_table = toml_table_table(config, "server");
 
@@ -56,11 +60,6 @@ config_details_t get_details_from_config(toml_table_t* config) {
 
         config_details.server_config.hostname = hostname.ok ? hostname.u.s : BENJI_DEFAULT_SERVER_HOSTNAME;
         config_details.server_config.port = port.ok ? port.u.i : BENJI_DEFAULT_SERVER_PORT;
-    }
-    else {
-        // unable to get the server config table, just use the default values
-        config_details.server_config.hostname = BENJI_DEFAULT_SERVER_HOSTNAME;
-        config_details.server_config.port = BENJI_DEFAULT_SERVER_PORT;
     }
 
     return config_details;
