@@ -199,3 +199,7 @@ result_t* gpu_info_to_map(gpu_info_t gpu_info) {
 
     return result_success(gpu_info_map);
 }
+
+void free_gpu_info(gpu_info_t* info) {
+    
+}

@@ -8,30 +8,30 @@ result_t* get_cpu_info() {
     }
 
     result_t* cpu_name_result = get_cpu_name();
-    return_if_error(cpu_name_result);
+    return_if_error_with_free(cpu_name_result, free_cpu_info, info);
     info->name = strdup((char*) result_unwrap_value(cpu_name_result));
     strtrim(info->name);
 
     result_t* cpu_vendor_result = get_cpu_vendor();
-    return_if_error(cpu_vendor_result);
+    return_if_error_with_free(cpu_vendor_result, free_cpu_info, info);
     info->vendor = strdup((char*) result_unwrap_value(cpu_vendor_result));
     strtrim(info->vendor);
 
     result_t* cpu_arch_result = get_cpu_arch();
-    return_if_error(cpu_arch_result);
+    return_if_error_with_free(cpu_arch_result, free_cpu_info, info);
     info->arch = strdup((char*) result_unwrap_value(cpu_arch_result));
     strtrim(info->arch);
 
     result_t* cpu_clock_speed_result = get_cpu_clock_speed();
-    return_if_error(cpu_clock_speed_result);
+    return_if_error_with_free(cpu_clock_speed_result, free_cpu_info, info);
     info->clock_speed = *(double*) result_unwrap_value(cpu_clock_speed_result);
 
     result_t* cpu_core_count_result = get_cpu_core_count();
-    return_if_error(cpu_core_count_result);
+    return_if_error_with_free(cpu_core_count_result, free_cpu_info, info);
     info->core_count = (size_t) (uintptr_t) result_unwrap_value(cpu_core_count_result);
 
     result_t* cpu_logical_processors_count_result = get_cpu_logical_processors_count();
-    return_if_error(cpu_logical_processors_count_result);
+    return_if_error_with_free(cpu_logical_processors_count_result, free_cpu_info, info);
     info->logical_processors_count = (size_t) (uintptr_t) result_unwrap_value(cpu_logical_processors_count_result);
 
     return result_success(info);
@@ -47,12 +47,15 @@ result_t* get_cpu_name() {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        cpu_name[0] = '\0';
+        memset(cpu_name, 0, BENJI_BASIC_STRING_LENGTH);
 
         for (int i = 0; i < BENJI_CPUID_CPU_NAME_SECTIONS_COUNT; ++i) {
             __cpuid(cpuid_info, BENJI_CPUID_CPU_NAME_START + i);
             memcpy(cpu_name + (i * 16), cpuid_info, sizeof(cpuid_info));
         }
+
+        // TODO: maybe make this terminate after the last character?
+        cpu_name[BENJI_BASIC_STRING_LENGTH - 1] = '\0';
 
         return result_success(cpu_name);
     #elif defined(__linux__)
@@ -74,11 +77,18 @@ result_t* get_cpu_vendor() {
 
         __cpuid(cpu_info, 0);
 
-        *((int*) cpu_vendor) = cpu_info[1];
-        *((int*) (cpu_vendor + 4)) = cpu_info[3];
-        *((int*) (cpu_vendor + 8)) = cpu_info[2];
+        // *((int*) cpu_vendor) = cpu_info[1];
+        // *((int*) (cpu_vendor + 4)) = cpu_info[3];
+        // *((int*) (cpu_vendor + 8)) = cpu_info[2];
 
-        cpu_vendor[strlen(cpu_vendor) - 2] = '\0'; // this is kinda cursed, but it works sooooo
+        // cpu_vendor[strlen(cpu_vendor) - 2] = '\0'; // this is kinda cursed, but it works sooooo
+
+        // TODO: make these not hardcoded constants
+        memcpy(cpu_vendor, &cpu_info[1], 4);
+        memcpy(cpu_vendor + 4, &cpu_info[3], 4);
+        memcpy(cpu_vendor + 8, &cpu_info[2], 4);
+
+        cpu_vendor[12] = '\0';
 
         return result_success(cpu_vendor);
     #elif defined(__linux__)
@@ -170,7 +180,7 @@ result_t* get_cpu_clock_speed() {
 
 result_t* get_cpu_core_count() {
     #if defined(_WIN32)
-        return get_cpu_processor_info(count_cpu_cores);
+        return get_cpu_processor_info(count_cpu_cores_callback);
     #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
@@ -178,7 +188,7 @@ result_t* get_cpu_core_count() {
 
 result_t* get_cpu_logical_processors_count() {
     #if defined(_WIN32)
-        return get_cpu_processor_info(count_cpu_logical_processors);
+        return get_cpu_processor_info(count_cpu_logical_processors_callback);
     #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
@@ -217,11 +227,11 @@ result_t* get_cpu_logical_processors_count() {
         return result_success((void*) (uintptr_t) result);
     }
 
-    uint32_t count_cpu_cores(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
+    uint32_t count_cpu_cores_callback(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
         return 1;
     }
 
-    uint32_t count_cpu_logical_processors(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
+    uint32_t count_cpu_logical_processors_callback(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
         return __popcnt(info->ProcessorMask);
     }
 #endif
@@ -242,15 +252,33 @@ result_t* cpu_info_to_map(cpu_info_t cpu_info) {
     map_insert(cpu_info_map, "arch", cpu_info.arch);
 
     sprintf(buffer, "%0.3f", cpu_info.clock_speed);
-    map_insert(cpu_info_map, "clock_speed", buffer);
+    map_insert(cpu_info_map, "clock_speed", strdup(buffer));
 
-    sprintf(buffer, "%lli", cpu_info.core_count);
-    map_insert(cpu_info_map, "core_count", buffer);
+    sprintf(buffer, "%zu", cpu_info.core_count);
+    map_insert(cpu_info_map, "core_count", strdup(buffer));
 
-    sprintf(buffer, "%lli", cpu_info.logical_processors_count);
-    map_insert(cpu_info_map, "logical_processors_count", buffer);
+    sprintf(buffer, "%zu", cpu_info.logical_processors_count);
+    map_insert(cpu_info_map, "logical_processors_count", strdup(buffer));
 
     free(buffer);
 
     return result_success(cpu_info_map);
+}
+
+void free_cpu_info(cpu_info_t* info) {
+    if (!info) {
+        return;
+    }
+
+    free(info->name);
+    info->name = NULL;
+
+    free(info->vendor);
+    info->vendor = NULL;
+
+    free(info->arch);
+    info->arch = NULL;
+
+    free(info);
+    info = NULL;
 }

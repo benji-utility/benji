@@ -12,7 +12,7 @@
 #endif
 
 #ifndef return_if_error
-    #define return_if_error(_result) { \
+    #define return_if_error(_result) do { \
         if (_result->is_error) { \
             result_error_payload_t error = result_unwrap_error(_result); \
             \
@@ -22,11 +22,28 @@
                 error.message \
             ); \
         } \
-    }
+    } while (false);
+#endif
+
+// being responsible 😎
+#ifndef return_if_error_with_free
+    #define return_if_error_with_free(_result, _free, _info) do { \
+        if (_result->is_error) { \
+            _free(_info); \
+            \
+            result_error_payload_t error = result_unwrap_error(_result); \
+            \
+            return result_error( \
+                error.code, \
+                error.location, \
+                error.message \
+            ); \
+        } \
+    } while (false);
 #endif
 
 #ifndef return_if_error_with_warning
-    #define return_if_error_with_warning(_result) { \
+    #define return_if_error_with_warning(_result) do { \
         if (_result->is_error) { \
             result_error_payload_t error = result_unwrap_error(_result); \
             \
@@ -38,7 +55,7 @@
                 error.message \
             ); \
         } \
-    }
+    } while (false);
 #endif
 
 typedef struct _BENJI_ERROR_PACKET {

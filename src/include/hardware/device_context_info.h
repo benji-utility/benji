@@ -35,4 +35,6 @@ result_t* get_device_context_hostname();
 
 result_t* device_context_info_to_map(device_context_info_t device_context_info);
 
+void free_device_context_info(device_context_info_t* info);
+
 #endif

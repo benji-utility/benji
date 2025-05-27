@@ -35,4 +35,6 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type);
 
 result_t* gpu_info_to_map(gpu_info_t gpu_info);
 
+void free_gpu_info(gpu_info_t* info);
+
 #endif

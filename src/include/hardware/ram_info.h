@@ -73,4 +73,6 @@ result_t* get_ram_speed();
 
 result_t* ram_info_to_map(ram_info_t ram_info);
 
+void free_ram_info(ram_info_t* info);
+
 #endif

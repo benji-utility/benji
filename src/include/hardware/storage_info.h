@@ -53,4 +53,6 @@ size_t count_storage_devices();
 
 result_t* storage_info_to_map(storage_info_t storage_info);
 
+void free_storage_info(storage_info_t* info);
+
 #endif

@@ -210,3 +210,7 @@ result_t* ram_info_to_map(ram_info_t ram_info) {
 
     return result_success(ram_info_map);
 }
+
+void free_ram_info(ram_info_t* info) {
+    
+}

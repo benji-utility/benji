@@ -304,3 +304,7 @@ result_t* storage_info_to_map(storage_info_t storage_info) {
 
     return result_success(storage_info_map);
 }
+
+void free_storage_info(storage_info_t* info) {
+    
+}
