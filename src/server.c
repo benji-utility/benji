@@ -77,17 +77,7 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     size_t data_group_count;
 
     result_t* client_handle_result = server_handle_client(server_socket, &data_groups, &data_group_count);
-    if (client_handle_result->is_error) {
-        result_error_payload_t client_handle_result_error = result_unwrap_error(client_handle_result);
-
-        log_error_payload(BENJI_LOG_LEVEL_WARNING, client_handle_result_error);
-
-        return result_error(
-            client_handle_result_error.code,
-            BENJI_ERROR_PACKET,
-            client_handle_result_error.message
-        );
-    }
+    return_if_error_with_warning(client_handle_result);
 
     BENJI_SOCKET client_socket = (BENJI_SOCKET) (uintptr_t) result_unwrap_value(client_handle_result);
 
@@ -122,18 +112,10 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
         result_t* map_data_result = get_hardware_info(data_groups[i], &header);
 
         if (map_data_result->is_error) {
-            result_error_payload_t map_data_result_error = result_unwrap_error(map_data_result);
-
-            log_error_payload(BENJI_LOG_LEVEL_WARNING, map_data_result_error);
-
             close_socket_with_result(client_socket);
-
-            return result_error(
-                map_data_result_error.code,
-                BENJI_ERROR_PACKET,
-                map_data_result_error.message
-            );
         }
+
+        return_if_error_with_warning(map_data_result);
 
         map_t* map_data = (map_t*) result_unwrap_value(map_data_result);
 
@@ -169,18 +151,10 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
     result_t* response_result = server_send_to_client(client_socket, response);
 
     if (response_result->is_error) {
-        result_error_payload_t response_result_error = result_unwrap_error(response_result);
-
-        log_error_payload(BENJI_LOG_LEVEL_WARNING, response_result_error);
-
         close_socket_with_result(client_socket);
-
-        return result_error(
-            response_result_error.code,
-            BENJI_ERROR_PACKET,
-            response_result_error.message
-        );
     }
+
+    return_if_error_with_warning(response_result);
 
     close_socket_with_result(client_socket);
 
