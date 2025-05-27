@@ -26,8 +26,8 @@
 #endif
 
 // being responsible 😎
-#ifndef return_if_error_with_free
-    #define return_if_error_with_free(_result, _free, _info) do { \
+#ifndef return_if_error_with_free_info
+    #define return_if_error_with_free_info(_result, _free, _info) do { \
         if (_result->is_error) { \
             _free(_info); \
             \

@@ -93,6 +93,16 @@ void strprepend(char* string, const char* prefix) {
     memcpy(string, prefix, prefix_length);
 }
 
+void* memdup(const void* src, size_t size) {
+    void* destination = malloc(size);
+
+    if (destination) {
+        memcpy(destination, src, size);
+    }
+
+    return destination;
+}
+
 #ifdef _WIN32
     char* wcharp_to_charp(const wchar_t* wchar) {
         if (!wchar) {
@@ -116,3 +126,7 @@ void strprepend(char* string, const char* prefix) {
         return string;
     }
 #endif
+
+double bytes_to_gigabytes(size_t bytes) {
+    return (double) (bytes / BENJI_BYTES_TO_GIGABYTES_CONVERSION_FACTOR);
+}

@@ -39,7 +39,7 @@ result_t* get_ram_total_memory() {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        *(double*) memory = status.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
+        *(double*) memory = bytes_to_gigabytes(status.ullTotalPhys);
 
         return result_success(memory);
     #elif defined(__linux__)
@@ -96,7 +96,7 @@ result_t* get_ram_free_memory() {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        *(double*) memory = status.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
+        *(double*) memory = bytes_to_gigabytes(status.ullAvailPhys);
 
         return result_success(memory);
     #elif defined(__linux__)
@@ -212,5 +212,5 @@ result_t* ram_info_to_map(ram_info_t ram_info) {
 }
 
 void free_ram_info(ram_info_t* info) {
-    
+
 }

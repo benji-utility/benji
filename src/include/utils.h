@@ -28,20 +28,24 @@
     #define BENJI_BASIC_STRING_LENGTH (1024) /* good general beginning size for a string */
 #endif
 
-#ifndef BENJI_CAPACITY
-    #define BENJI_CAPACITY(_count, _type) ((_count) * sizeof(_type))
-#endif
-
-#ifndef BENJI_STRING_EQUALS
-    #define BENJI_STRING_EQUALS(_a, _b) (strcmp(_a, _b) == 0)
-#endif
-
 #ifndef BENJI_NO_ERROR
     #ifdef NOERROR
         #define BENJI_NO_ERROR NOERROR
     #else
         #define BENJI_NO_ERROR (0)
     #endif
+#endif
+
+#ifndef BENJI_BYTES_TO_GIGABYTES_CONVERSION_FACTOR
+    #define BENJI_BYTES_TO_GIGABYTES_CONVERSION_FACTOR (1024.0 * 1024.0 * 1024.0)
+#endif
+
+#ifndef BENJI_CAPACITY
+    #define BENJI_CAPACITY(_count, _type) ((_count) * sizeof(_type))
+#endif
+
+#ifndef BENJI_STRING_EQUALS
+    #define BENJI_STRING_EQUALS(_a, _b) (strcmp(_a, _b) == 0)
 #endif
 
 #ifdef BENJI_USE_SERVER_UTILS
@@ -140,8 +144,12 @@ void strtrim(char* string);
 size_t strsplit(const char* string, char*** tokens, const char character); // returns token count
 void strprepend(char* string, const char* prefix);
 
+void* memdup(const void* src, size_t size);
+
 #ifdef _WIN32
     char* wcharp_to_charp(const wchar_t* wchar);
 #endif
+
+double bytes_to_gigabytes(size_t bytes);
 
 #endif

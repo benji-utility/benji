@@ -8,30 +8,30 @@ result_t* get_cpu_info() {
     }
 
     result_t* cpu_name_result = get_cpu_name();
-    return_if_error_with_free(cpu_name_result, free_cpu_info, info);
+    return_if_error_with_free_info(cpu_name_result, free_cpu_info, info);
     info->name = strdup((char*) result_unwrap_value(cpu_name_result));
     strtrim(info->name);
 
     result_t* cpu_vendor_result = get_cpu_vendor();
-    return_if_error_with_free(cpu_vendor_result, free_cpu_info, info);
+    return_if_error_with_free_info(cpu_vendor_result, free_cpu_info, info);
     info->vendor = strdup((char*) result_unwrap_value(cpu_vendor_result));
     strtrim(info->vendor);
 
     result_t* cpu_arch_result = get_cpu_arch();
-    return_if_error_with_free(cpu_arch_result, free_cpu_info, info);
+    return_if_error_with_free_info(cpu_arch_result, free_cpu_info, info);
     info->arch = strdup((char*) result_unwrap_value(cpu_arch_result));
     strtrim(info->arch);
 
     result_t* cpu_clock_speed_result = get_cpu_clock_speed();
-    return_if_error_with_free(cpu_clock_speed_result, free_cpu_info, info);
+    return_if_error_with_free_info(cpu_clock_speed_result, free_cpu_info, info);
     info->clock_speed = *(double*) result_unwrap_value(cpu_clock_speed_result);
 
     result_t* cpu_core_count_result = get_cpu_core_count();
-    return_if_error_with_free(cpu_core_count_result, free_cpu_info, info);
+    return_if_error_with_free_info(cpu_core_count_result, free_cpu_info, info);
     info->core_count = (size_t) (uintptr_t) result_unwrap_value(cpu_core_count_result);
 
     result_t* cpu_logical_processors_count_result = get_cpu_logical_processors_count();
-    return_if_error_with_free(cpu_logical_processors_count_result, free_cpu_info, info);
+    return_if_error_with_free_info(cpu_logical_processors_count_result, free_cpu_info, info);
     info->logical_processors_count = (size_t) (uintptr_t) result_unwrap_value(cpu_logical_processors_count_result);
 
     return result_success(info);
@@ -41,23 +41,23 @@ result_t* get_cpu_name() {
     #if defined(_WIN32)
         int cpuid_info[BENJI_CPUID_BUFFER_LENGTH];
 
-        char* cpu_name = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+        char* name = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
-        if (!cpu_name) {
+        if (!name) {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        memset(cpu_name, 0, BENJI_BASIC_STRING_LENGTH);
+        memset(name, 0, BENJI_BASIC_STRING_LENGTH);
 
         for (int i = 0; i < BENJI_CPUID_CPU_NAME_SECTIONS_COUNT; ++i) {
             __cpuid(cpuid_info, BENJI_CPUID_CPU_NAME_START + i);
-            memcpy(cpu_name + (i * 16), cpuid_info, sizeof(cpuid_info));
+            memcpy(name + (i * 16), cpuid_info, sizeof(cpuid_info));
         }
 
         // TODO: maybe make this terminate after the last character?
-        cpu_name[BENJI_BASIC_STRING_LENGTH - 1] = '\0';
+        name[BENJI_BASIC_STRING_LENGTH - 1] = '\0';
 
-        return result_success(cpu_name);
+        return result_success(name);
     #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
@@ -67,30 +67,24 @@ result_t* get_cpu_vendor() {
     #if defined(_WIN32)
         int cpu_info[BENJI_CPUID_BUFFER_LENGTH];
 
-        char* cpu_vendor = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+        char* vendor = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
-        if (!cpu_vendor) {
+        if (!vendor) {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        cpu_vendor[0] = '\0';
+        vendor[0] = '\0';
 
         __cpuid(cpu_info, 0);
 
-        // *((int*) cpu_vendor) = cpu_info[1];
-        // *((int*) (cpu_vendor + 4)) = cpu_info[3];
-        // *((int*) (cpu_vendor + 8)) = cpu_info[2];
-
-        // cpu_vendor[strlen(cpu_vendor) - 2] = '\0'; // this is kinda cursed, but it works sooooo
-
         // TODO: make these not hardcoded constants
-        memcpy(cpu_vendor, &cpu_info[1], 4);
-        memcpy(cpu_vendor + 4, &cpu_info[3], 4);
-        memcpy(cpu_vendor + 8, &cpu_info[2], 4);
+        memcpy(vendor, &cpu_info[1], 4);
+        memcpy(vendor + 4, &cpu_info[3], 4);
+        memcpy(vendor + 8, &cpu_info[2], 4);
 
-        cpu_vendor[12] = '\0';
+        vendor[12] = '\0';
 
-        return result_success(cpu_vendor);
+        return result_success(vendor);
     #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
@@ -160,15 +154,15 @@ result_t* get_cpu_clock_speed() {
                 return result_error(hresult, BENJI_ERROR_PACKET, "RegCloseKey() failed");
             }
 
-            void* speed_ghz = malloc(sizeof(double));
+            void* clock_speed = malloc(sizeof(double));
 
-            if (!speed_ghz) {
+            if (!clock_speed) {
                 return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
             }
 
-            *(double*) speed_ghz = speed / 1000.0;
+            *(double*) clock_speed = speed / 1000.0;
 
-            return result_success(speed_ghz);
+            return result_success(clock_speed);
         }
         else {
             return result_error(hresult, BENJI_ERROR_PACKET, "RegQueryValueEx() failed");
