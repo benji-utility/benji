@@ -9,6 +9,8 @@
 #include "../map.h"
 #include "../result.h"
 
+#include "hardware_base.h"
+
 #ifdef _WIN32
     #include <winioctl.h>
 #endif
@@ -21,7 +23,7 @@
     #define BENJI_DEFAULT_STORAGE_DEVICE_DESCRIPTOR_SIZE (512)
 #endif
 
-typedef struct _BENJI_STORAGE_INFO {
+BENJI_START_HARDWARE_STRUCT(STORAGE)
     size_t device_count;
 
     // these will all be CSV strings
@@ -29,7 +31,7 @@ typedef struct _BENJI_STORAGE_INFO {
     char* serial_numbers;
     char* bus_types;
     char* sizes; // in GB
-} storage_info_t;
+BENJI_END_HARDWARE_STRUCT(storage)
 
 typedef enum _BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE {
     BENJI_STORAGE_DEVICE_MODEL_NAME,
@@ -37,7 +39,7 @@ typedef enum _BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE {
     BENJI_STORAGE_DEVICE_BUS_TYPE
 } model_info_type_t;
 
-result_t* get_storage_info();
+BENJI_CREATE_HARDWARE_BASE(storage)
 
 result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_type);
 result_t* get_storage_devices_size(size_t device_count);
@@ -50,9 +52,5 @@ result_t* get_storage_devices_size(size_t device_count);
 #endif
 
 size_t count_storage_devices();
-
-result_t* storage_info_to_map(storage_info_t storage_info);
-
-void free_storage_info(storage_info_t* info);
 
 #endif
