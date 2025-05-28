@@ -132,9 +132,14 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         log_message(BENJI_LOG_LEVEL_INFO, "Collected data: '%s'", json_block);
 
+        free(header);
         free(json_block);
 
         map_free(map_data);
+    }
+
+    for (size_t i = 0; i < data_group_count; i++) {
+        free(data_groups[i]);
     }
 
     free(data_groups);
@@ -227,7 +232,7 @@ BENJIAPI result_t* server_receive_from_client(BENJI_SOCKET client_socket) {
             #if defined(_WIN32)
                 bool is_blocking = WSAGetLastError() == WSAEWOULDBLOCK;
             #elif defined(__linux__)
-                bool is_blocking = EAGAIN | EWOULDBLOCK;
+                bool is_blocking = errno == EAGAIN || errno == EWOULDBLOCK;
             #endif
 
             if (is_blocking) {
