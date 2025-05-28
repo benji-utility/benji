@@ -132,14 +132,9 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         log_message(BENJI_LOG_LEVEL_INFO, "Collected data: '%s'", json_block);
 
-        free(header);
         free(json_block);
 
         map_free(map_data);
-    }
-
-    for (size_t i = 0; i < data_group_count; i++) {
-        free(data_groups[i]);
     }
 
     free(data_groups);

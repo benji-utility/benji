@@ -37,13 +37,13 @@
 #endif
 
 #ifndef BENJI_CPU_FIELDS
-    #define BENJI_CPU_FIELDS(_field) \
-        _field(cpu, name) \
-        _field(cpu, vendor) \
-        _field(cpu, arch) \
-        _field(cpu, clock_speed) \
-        _field(cpu, core_count) \
-        _field(cpu, logical_processors_count)
+    #define BENJI_CPU_FIELDS(_field_getter_impl) \
+        _field_getter_impl(cpu, name) \
+        _field_getter_impl(cpu, vendor) \
+        _field_getter_impl(cpu, arch) \
+        _field_getter_impl(cpu, clock_speed) \
+        _field_getter_impl(cpu, core_count) \
+        _field_getter_impl(cpu, logical_processors_count)
 #endif
 
 BENJI_START_HARDWARE_STRUCT(CPU)
@@ -56,9 +56,9 @@ BENJI_START_HARDWARE_STRUCT(CPU)
     // double current_temp; // TBD until i figure out how
 BENJI_END_HARDWARE_STRUCT(cpu)
 
-BENJI_CREATE_HARDWARE_BASE(cpu);
+BENJI_CREATE_HARDWARE_BASE(cpu)
 
-BENJI_CPU_FIELDS(BENJI_EXPAND_HARDWARE_FIELDS)
+BENJI_CPU_FIELDS(BENJI_CREATE_HARDWARE_GETTER_IMPL)
 
 #ifdef _WIN32
     typedef uint32_t (*processor_info_callback_t)(SYSTEM_LOGICAL_PROCESSOR_INFORMATION*);

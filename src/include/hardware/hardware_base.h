@@ -23,9 +23,4 @@
         result_t* get_##_hardware##_##_field();
 #endif
 
-#ifndef BENJI_EXPAND_HARDWARE_FIELDS
-    #define BENJI_EXPAND_HARDWARE_FIELDS(_hardware, _field) \
-        BENJI_CREATE_HARDWARE_GETTER_IMPL(_hardware, _field)
-#endif
-
 #endif
