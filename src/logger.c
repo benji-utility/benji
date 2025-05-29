@@ -1,6 +1,6 @@
 #include "include/logger.h"
 
-void log_debug(const char* string, ...) {
+void log_message(log_level_t log_level, const char* string, ...) {
     va_list arguments;
 
     va_start(arguments, string);
@@ -15,39 +15,11 @@ void log_debug(const char* string, ...) {
 
     vsprintf(output, string, arguments);
 
-    strprepend(output, BENJI_LOG_DEBUG " ");
+    const char* log_prefix = get_prefix_from_log_level(log_level);
 
-    fprintf(stdout, output);
-
-    #if defined(_WIN32)
-        strtrim(output);
-        OutputDebugStringA(output);
-    #elif defined (__linux__)
-        /* TODO: add linux stuff */
-    #endif
-
-    free(output);
-
-    va_end(arguments);
-}
-void log_info(const char* info, ...) {
-    va_list arguments;
-
-    va_start(arguments, info);
-
-    char* output = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
-
-    if (!output) {
-        return;
-    }
-
-    output[0] = '\0';
-
-    vsprintf(output, info, arguments);
-
-    strprepend(output, BENJI_LOG_INFO " ");
-
-    fprintf(stdout, output);
+    // this is dumb but i dont really have a choice
+    strprepend(output, " ");
+    strprepend(output, log_prefix);
 
     #if defined(_WIN32)
         strtrim(output);
@@ -61,7 +33,7 @@ void log_info(const char* info, ...) {
     va_end(arguments);
 }
 
-void log_warning(result_error_payload_t error) {
+void log_error_payload(log_level_t log_level, result_error_payload_t payload) {
     char* output = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
     if (!output) {
@@ -69,19 +41,20 @@ void log_warning(result_error_payload_t error) {
     }
 
     output[0] = '\0';
+
+    const char* log_prefix = get_prefix_from_log_level(log_level);
 
     sprintf(
         output,
-        BENJI_LOG_WARNING " %s:%i under %s() -> %s (%i)\n",
-        error.location.file_name,
-        error.location.lineno,
-        error.location.function_name,
-        error.message,
-        error.code
+        "%s %s:%i under %s() -> %s (error code %i)",
+        log_prefix,
+        payload.location.file_name,
+        payload.location.lineno,
+        payload.location.function_name,
+        payload.message,
+        payload.code
     );
 
-    fprintf(stderr, output);
-
     #if defined(_WIN32)
         strtrim(output);
         OutputDebugStringA(output);
@@ -92,95 +65,11 @@ void log_warning(result_error_payload_t error) {
     free(output);
 }
 
-void log_warning_info(const char* info, ...) {
-    va_list arguments;
-
-    va_start(arguments, info);
-
-    char* output = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
-
-    if (!output) {
-        return;
+const char* get_prefix_from_log_level(log_level_t log_level) {
+    switch (log_level) {
+        case BENJI_LOG_LEVEL_DEBUG: return BENJI_LOG_PREFIX_DEBUG;
+        case BENJI_LOG_LEVEL_INFO: return BENJI_LOG_PREFIX_INFO;
+        case BENJI_LOG_LEVEL_WARNING: return BENJI_LOG_PREFIX_WARNING;
+        case BENJI_LOG_LEVEL_ERROR: return BENJI_LOG_PREFIX_ERROR;
     }
-
-    output[0] = '\0';
-
-    vsprintf(output, info, arguments);
-
-    strprepend(output, BENJI_LOG_WARNING " ");
-
-    fprintf(stderr, output);
-
-    #if defined(_WIN32)
-        strtrim(output);
-        OutputDebugStringA(output);
-    #elif defined (__linux__)
-        /* TODO: add linux stuff */
-    #endif
-
-    free(output);
-
-    va_end(arguments);
-}
-
-void log_error(result_error_payload_t error) {
-    char* output = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
-
-    if (!output) {
-        return;
-    }
-
-    output[0] = '\0';
-
-    sprintf(
-        output,
-        BENJI_LOG_ERROR " %s:%i under %s() -> %s (%i)\n",
-        error.location.file_name,
-        error.location.lineno,
-        error.location.function_name,
-        error.message,
-        error.code
-    );
-
-    fprintf(stderr, output);
-
-    #if defined(_WIN32)
-        strtrim(output);
-        OutputDebugStringA(output);
-    #elif defined (__linux__)
-        /* TODO: add linux stuff */
-    #endif
-
-    free(output);
-}
-
-void log_error_info(const char* info, ...) {
-    va_list arguments;
-
-    va_start(arguments, info);
-
-    char* output = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
-
-    if (!output) {
-        return;
-    }
-
-    output[0] = '\0';
-
-    vsprintf(output, info, arguments);
-
-    output = strprepend(output, BENJI_LOG_ERROR " ");
-
-    fprintf(stderr, output);
-
-    #if defined(_WIN32)
-        strtrim(output);
-        OutputDebugStringA(output);
-    #elif defined (__linux__)
-        /* TODO: add linux stuff */
-    #endif
-
-    free(output);
-
-    va_end(arguments);
 }

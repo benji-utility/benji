@@ -12,8 +12,8 @@
     #include "server.h"
     #include "utils.h"
 
-    #ifndef BENJI_SERVICE_EVENTS
-        #define BENJI_SERVICE_EVENTS (2) /* i dont want this to be hardcoded, but idk if sizeof will help with WSAEVENTs */
+    #ifndef BENJI_SERVICE_EVENTS_COUNT
+        #define BENJI_SERVICE_EVENTS_COUNT (2) /* i dont want this to be hardcoded, but idk if sizeof will help with WSAEVENTs */
     #endif
 
     static struct _BENJI_SERVER_INFO {

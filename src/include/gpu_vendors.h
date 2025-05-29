@@ -1,0 +1,106 @@
+#ifndef __BENJI_GPU_VENDORS_H
+#define __BENJI_GPU_VENDORS_H
+
+/* ONLY USED IN "hardware/gpu_info.h" */
+
+#ifndef BENJI_GPU_VENDOR_NVIDIA
+    #define BENJI_GPU_VENDOR_NVIDIA (0x10DE)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_AMD
+    #define BENJI_GPU_VENDOR_AMD (0x1002)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_INTEL
+    #define BENJI_GPU_VENDOR_INTEL (0x8086)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_MICROSOFT
+    #define BENJI_GPU_VENDOR_MICROSOFT (0x1414)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_QUALCOMM
+    #define BENJI_GPU_VENDOR_QUALCOMM (0x5143)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_ARM
+    #define BENJI_GPU_VENDOR_ARM (0x13B5)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_APPLE
+    #define BENJI_GPU_VENDOR_APPLE (0x106B)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_IMAGINATION
+    #define BENJI_GPU_VENDOR_IMAGINATION (0x1010)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_S3
+    #define BENJI_GPU_VENDOR_S3 (0x5333)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_MATROX
+    #define BENJI_GPU_VENDOR_MATROX (0x102B)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_VIA
+    #define BENJI_GPU_VENDOR_VIA (0x1106)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_SIS
+    #define BENJI_GPU_VENDOR_SIS (0x1039)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_3DFX
+    #define BENJI_GPU_VENDOR_3DFX (0x121A)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_TRIDENT
+    #define BENJI_GPU_VENDOR_TRIDENT (0x1023)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_XGI
+    #define BENJI_GPU_VENDOR_XGI (0x18CA)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_ASPEED
+    #define BENJI_GPU_VENDOR_ASPEED (0x1A03)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_VMWARE
+    #define BENJI_GPU_VENDOR_VMWARE (0x15AD)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_PARALLELS
+    #define BENJI_GPU_VENDOR_PARALLELS (0x1AB8)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_VIRTUALBOX
+    #define BENJI_GPU_VENDOR_VIRTUALBOX (0x80EE)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_BOCHS
+    #define BENJI_GPU_VENDOR_BOCHS (0x1234)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_REDHAT
+    #define BENJI_GPU_VENDOR_REDHAT (0x1AF4)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_NUMBER_NINE
+    #define BENJI_GPU_VENDOR_NUMBER_NINE (0x105D)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_TSENG_LABS
+    #define BENJI_GPU_VENDOR_TSENG_LABS (0x100C)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_RENDITION
+    #define BENJI_GPU_VENDOR_RENDITION (0x1163)
+#endif
+
+#ifndef BENJI_GPU_VENDOR_CIRRUS_LOGIC
+    #define BENJI_GPU_VENDOR_CIRRUS_LOGIC (0x1013)
+#endif
+
+#endif

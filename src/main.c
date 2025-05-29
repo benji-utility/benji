@@ -13,13 +13,16 @@ int main(int argc, const char* argv[]) {
     if (config_result->is_error) {
         result_error_payload_t config_result_error = result_unwrap_error(config_result);
 
-        log_error_info(config_result_error.message);
+        log_error_payload(BENJI_LOG_LEVEL_ERROR, config_result_error);
 
-        return config_result_error.code;
+        return EXIT_FAILURE;
     }
 
-    toml_table_t* config = (toml_table_t*) result_unwrap_value(config_result);
-    config_details_t config_details = get_details_from_config(config);
+    toml_table_t* toml_config = (toml_table_t*) result_unwrap_value(config_result);
+
+    config_details_t config_details = get_details_from_config(toml_config);
+
+    toml_free(toml_config);
 
     collect_server_details(config_details);
 
@@ -32,7 +35,16 @@ int main(int argc, const char* argv[]) {
         };
 
         if (!StartServiceCtrlDispatcher(service_table)) {
-            return GetLastError();
+            log_error_payload(
+                BENJI_LOG_LEVEL_ERROR,
+                (result_error_payload_t) {
+                    .code = GetLastError(),
+                    .message = "StartServiceCtrlDispatcher() failed",
+                    .location = BENJI_ERROR_PACKET
+                }
+            );
+
+            return EXIT_FAILURE;
         }
     #elif defined(__linux__)
         spawn_daemon();

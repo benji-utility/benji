@@ -7,42 +7,38 @@
 
 #include "../utils.h"
 
-#ifndef BENJI_GPU_VENDOR_INTEL
-    #define BENJI_GPU_VENDOR_INTEL (0x8086)
+#include "hardware_base.h"
+
+#include "../gpu_vendors.h"
+
+#ifndef BENJI_GPU_FIELDS
+    #define BENJI_GPU_FIELDS(_field_getter_impl) \
+        _field_getter_impl(gpu, name) \
+        _field_getter_impl(gpu, vendor)
 #endif
 
-#ifndef BENJI_GPU_VENDOR_AMD
-    #define BENJI_GPU_VENDOR_AMD (0x1002)
-#endif
-
-#ifndef BENJI_GPU_VENDOR_NVIDIA
-    #define BENJI_GPU_VENDOR_NVIDIA (0x10de)
-#endif
-
-typedef struct _BENJI_GPU_INFO {
+BENJI_START_HARDWARE_STRUCT(GPU)
     char* name;
     char* vendor;
     double dedicated_video_memory; // in GB
     double dedicated_system_memory; // in GB
     double shared_system_memory; // in GB
-} gpu_info_t;
+BENJI_END_HARDWARE_STRUCT(gpu)
 
-enum BENJI_GPU_MEMORY_TYPE {
+typedef enum _BENJI_GPU_MEMORY_TYPE {
     BENJI_GPU_DEDICATED_VIDEO_MEMORY,
     BENJI_GPU_DEDICATED_SYSTEM_MEMORY,
     BENJI_GPU_SHARED_SYSTEM_MEMORY
-};
+} gpu_memory_type_t;
 
-result_t* get_gpu_info();
+BENJI_CREATE_HARDWARE_BASE(gpu)
 
-result_t* get_gpu_name();
-result_t* get_gpu_vendor();
-result_t* get_gpu_memory(enum BENJI_GPU_MEMORY_TYPE memory_type);
+BENJI_GPU_FIELDS(BENJI_CREATE_HARDWARE_GETTER_IMPL)
+
+result_t* get_gpu_memory(gpu_memory_type_t memory_type);
 
 #ifdef _WIN32
     result_t* get_gpu_description();
 #endif
-
-result_t* gpu_info_to_map(gpu_info_t gpu_info);
 
 #endif

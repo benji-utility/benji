@@ -7,6 +7,8 @@
         service_status.dwServiceSpecificExitCode = 0;
         service_status.dwCheckPoint = 0;
 
+        log_message(BENJI_LOG_LEVEL_INFO, "Starting the service...");
+
         report_service_status(SERVICE_START_PENDING, 0, 0);
 
         service_status_handle = RegisterServiceCtrlHandler(
@@ -15,7 +17,14 @@
         );
 
         if (service_status_handle == NULL) {
-            log_error_info("Service status handle is NULL");
+            log_error_payload(
+                BENJI_LOG_LEVEL_ERROR,
+                (result_error_payload_t) {
+                    .code = -1,
+                    .message = "Service status handle is NULL",
+                    .location = BENJI_ERROR_PACKET
+                }
+            );
 
             return;
         }
@@ -25,7 +34,7 @@
         if (server_socket_result->is_error) {
             result_error_payload_t server_socket_result_error = result_unwrap_error(server_socket_result);
 
-            log_error(server_socket_result_error);
+            log_error_payload(BENJI_LOG_LEVEL_ERROR, server_socket_result_error);
 
             return;
         }
@@ -39,7 +48,11 @@
 
         report_service_status(SERVICE_RUNNING, 0, 0);
 
+        log_message(BENJI_LOG_LEVEL_INFO, "Service started, spawning worker thread...");
+
         HANDLE worker_thread = CreateThread(NULL, 0, service_worker_thread, NULL, 0, NULL);
+
+        log_message(BENJI_LOG_LEVEL_INFO, "Worker thread created");
 
         // basically run this indefinitely and rely on the thread to close properly
         WaitForSingleObject(worker_thread, INFINITE);
@@ -51,6 +64,8 @@
         switch (request) {
             case SERVICE_CONTROL_STOP: // this and shutdown are handled the same, so perform the same actions
             case SERVICE_CONTROL_SHUTDOWN: {
+                log_message(BENJI_LOG_LEVEL_INFO, "Stopping the service...");
+
                 report_service_status(SERVICE_STOP_PENDING, 0, 0);
 
                 WSASetEvent(service_stop_event);
@@ -60,7 +75,7 @@
                 if (close_server_socket_result->is_error) {
                     result_error_payload_t close_server_socket_result_error = result_unwrap_error(close_server_socket_result);
 
-                    log_warning(close_server_socket_result_error);
+                    log_error_payload(BENJI_LOG_LEVEL_WARNING, close_server_socket_result_error);
                 }
 
                 result_free(close_server_socket_result);
@@ -74,7 +89,7 @@
 
                 report_service_status(SERVICE_STOPPED, 0, 0);
 
-                log_info("Service shutdown gracefully");
+                log_message(BENJI_LOG_LEVEL_INFO, "Service stopped gracefully");
 
                 break;
             }
@@ -88,11 +103,11 @@
     }
 
     BENJIAPI unsigned long service_worker_thread() {
-        WSAEVENT events[BENJI_SERVICE_EVENTS] = {service_socket_event, service_stop_event};
+        WSAEVENT events[BENJI_SERVICE_EVENTS_COUNT] = {service_socket_event, service_stop_event};
 
         // this is safe ;)
         while (true) {
-            unsigned long wait = WSAWaitForMultipleEvents(BENJI_SERVICE_EVENTS, events, false, WSA_INFINITE, false);
+            unsigned long wait = WSAWaitForMultipleEvents(BENJI_SERVICE_EVENTS_COUNT, events, false, WSA_INFINITE, false);
 
             if (wait == WSA_WAIT_EVENT_0) {
                 WSANETWORKEVENTS network_events;
@@ -105,7 +120,7 @@
                     if (server_update_result->is_error) {
                         result_error_payload_t server_update_result_error = result_unwrap_error(server_update_result);
 
-                        log_warning(server_update_result_error);
+                        log_error_payload(BENJI_LOG_LEVEL_WARNING, server_update_result_error);
                     }
                 }
             }

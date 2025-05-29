@@ -7,6 +7,8 @@
 
 #include "../utils.h"
 
+#include "hardware_base.h"
+
 #ifndef BENJI_SMBIOS_MEMORY_DEVICE_TYPE
     #define BENJI_SMBIOS_MEMORY_DEVICE_TYPE (17)
 #endif
@@ -19,12 +21,20 @@
     #define BENJI_SYSTEM_FIRMWARE_TABLE 'RSMB'
 #endif
 
-typedef struct _BENJI_RAM_INFO {
+#ifndef BENJI_RAM_FIELDS
+    #define BENJI_RAM_FIELDS(_field_getter_impl) \
+        _field_getter_impl(ram, total_memory) \
+        _field_getter_impl(ram, memory_load) \
+        _field_getter_impl(ram, free_memory) \
+        _field_getter_impl(ram, speed)
+#endif
+
+BENJI_START_HARDWARE_STRUCT(RAM)
     double total_memory; // in GB
     double memory_load; // in GB
     double free_memory; // in GB
     uint16_t speed; // in MHz
-} ram_info_t;
+BENJI_END_HARDWARE_STRUCT(ram)
 
 #ifdef _WIN32
     #pragma pack(push, 1)
@@ -60,17 +70,12 @@ typedef struct _BENJI_RAM_INFO {
     #pragma pack(pop)
 #endif
 
-result_t* get_ram_info();
+BENJI_CREATE_HARDWARE_BASE(ram)
 
-result_t* get_ram_total_memory();
-result_t* get_ram_memory_load();
-result_t* get_ram_free_memory();
-result_t* get_ram_speed();
+BENJI_RAM_FIELDS(BENJI_CREATE_HARDWARE_GETTER_IMPL)
 
 #ifdef _WIN32
     result_t* get_memory_status();
 #endif
-
-result_t* ram_info_to_map(ram_info_t ram_info);
 
 #endif

@@ -10,17 +10,35 @@ result_t* get_hardware_info(const char* hardware_group, char** header) {
     map_t* map_data;
 
     if (BENJI_STRING_EQUALS(hardware_group, "cpu_all")) {
-        collect_map_data(cpu_info_t, get_cpu_info, cpu_info_to_map, map_data);
+        collect_map_data(
+            cpu_info_t,
+            get_cpu_info,
+            cpu_info_to_map,
+            map_data,
+            free_cpu_info
+        );
 
         *header = "cpu_info";
     }
     else if (BENJI_STRING_EQUALS(hardware_group, "gpu_all")) {
-        collect_map_data(gpu_info_t, get_gpu_info, gpu_info_to_map, map_data);
+        collect_map_data(
+            gpu_info_t,
+            get_gpu_info,
+            gpu_info_to_map,
+            map_data,
+            free_gpu_info
+        );
 
         *header = "gpu_info";
     }
     else if (BENJI_STRING_EQUALS(hardware_group, "ram_all")) {
-        collect_map_data(ram_info_t, get_ram_info, ram_info_to_map, map_data);
+        collect_map_data(
+            ram_info_t,
+            get_ram_info,
+            ram_info_to_map,
+            map_data,
+            free_ram_info
+        );
 
         *header = "ram_info";
     }
@@ -29,7 +47,8 @@ result_t* get_hardware_info(const char* hardware_group, char** header) {
             device_context_info_t,
             get_device_context_info,
             device_context_info_to_map,
-            map_data
+            map_data,
+            free_device_context_info
         );
 
         *header = "device_info";
@@ -39,7 +58,8 @@ result_t* get_hardware_info(const char* hardware_group, char** header) {
             storage_info_t,
             get_storage_info,
             storage_info_to_map,
-            map_data
+            map_data,
+            free_storage_info
         );
 
         *header = "storage_info";

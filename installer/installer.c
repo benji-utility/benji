@@ -56,27 +56,50 @@ int main(int argc, const char* argv[]) {
             return BENJI_ERROR_UNABLE_TO_OPEN_SC_MANAGER;
         }
 
-        SC_HANDLE service = CreateServiceA(
-            sc_manager,
-            BENJI_SERVICE_NAME,
-            NULL,
-            SERVICE_ALL_ACCESS,
-            SERVICE_WIN32_OWN_PROCESS,
-            SERVICE_DEMAND_START,
-            SERVICE_ERROR_NORMAL,
-            executable_filepath,
-            NULL, NULL, NULL, NULL, NULL
-        );
+        SC_HANDLE service;
 
-        if (!service) {
-            CloseServiceHandle(sc_manager);
+        while (true) {
+            service = CreateServiceA(
+                sc_manager,
+                BENJI_SERVICE_NAME,
+                NULL,
+                SERVICE_ALL_ACCESS,
+                SERVICE_WIN32_OWN_PROCESS,
+                SERVICE_DEMAND_START,
+                SERVICE_ERROR_NORMAL,
+                executable_filepath,
+                NULL, NULL, NULL, NULL, NULL
+            );
 
-            return BENJI_ERROR_UNABLE_TO_CREATE_SERVICE;
+            // jank spaghetti code funkery (which can mean whatever tf you want it to mean)
+            if (!service) {
+                int last_error = GetLastError();
+
+                if (last_error == ERROR_SERVICE_EXISTS) {
+                    int uninstall_return_code = uninstall_service();
+
+                    if (uninstall_return_code != BENJI_ERROR_NONE) {
+                        CloseServiceHandle(sc_manager);
+
+                        return uninstall_return_code;
+                    }
+                }
+                else {
+                    CloseServiceHandle(sc_manager);
+
+                    return BENJI_ERROR_UNABLE_TO_CREATE_SERVICE;
+                }
+            }
+            else {
+                break;
+            }
         }
 
         CloseServiceHandle(service);
         CloseServiceHandle(sc_manager);
 
+        // this can come after the service creation because the
+        // config is loaded only after the service is actually started
         return write_config_to_registry(config_filepath);
     }
 

@@ -9,30 +9,36 @@
 #include "../map.h"
 #include "../result.h"
 
-typedef struct _BENJI_DEVICE_CONTEXT_INFO {
+#include "hardware_base.h"
+
+#ifndef BENJI_DEVICE_CONTEXT_FIELDS
+    #define BENJI_DEVICE_CONTEXT_FIELDS(_field_getter_impl) \
+        _field_getter_impl(device_context, device_name) \
+        _field_getter_impl(device_context, hostname)
+#endif
+
+BENJI_START_HARDWARE_STRUCT(DEVICE_CONTEXT)
     char* device_name;
     char* operating_system;
     char* operating_system_version;
     char* hostname;
-} device_context_info_t;
+BENJI_END_HARDWARE_STRUCT(device_context)
 
-enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE {
+typedef enum _BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE {
     BENJI_OPERATING_SYSTEM_VERSION_NAME,
     BENJI_OPERATING_SYSTEM_VERSION_NUMBER
-};
+} os_version_info_type_t;
 
-result_t* get_device_context_info();
+BENJI_CREATE_HARDWARE_BASE(device_context)
 
-result_t* get_device_context_device_name();
-result_t* get_device_context_operating_system_info(enum BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE version_info_type);
-result_t* get_device_context_hostname();
+BENJI_DEVICE_CONTEXT_FIELDS(BENJI_CREATE_HARDWARE_GETTER_IMPL)
+
+result_t* get_device_context_operating_system_info(os_version_info_type_t version_info_type);
 
 #ifdef _WIN32
     typedef LONG (WINAPI* rtl_get_version_t)(PRTL_OSVERSIONINFOW);
 
     char* get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number);
 #endif
-
-result_t* device_context_info_to_map(device_context_info_t device_context_info);
 
 #endif

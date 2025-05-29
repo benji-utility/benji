@@ -39,7 +39,7 @@ result_t* get_ram_total_memory() {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        *(double*) memory = status.ullTotalPhys / (1024.0 * 1024.0 * 1024.0);
+        *(double*) memory = bytes_to_gigabytes(status.ullTotalPhys);
 
         return result_success(memory);
     #elif defined(__linux__)
@@ -96,7 +96,7 @@ result_t* get_ram_free_memory() {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        *(double*) memory = status.ullAvailPhys / (1024.0 * 1024.0 * 1024.0);
+        *(double*) memory = bytes_to_gigabytes(status.ullAvailPhys);
 
         return result_success(memory);
     #elif defined(__linux__)
@@ -125,7 +125,9 @@ result_t* get_ram_speed() {
         }
 
         uint8_t* data = buffer->data;
+
         uint8_t* end = data + buffer->length;
+        
         uint16_t speed = 0;
 
         bool found_memory_device = false;
@@ -195,18 +197,22 @@ result_t* ram_info_to_map(ram_info_t ram_info) {
     buffer[0] = '\0';
 
     sprintf(buffer, "%0.3f", ram_info.total_memory);
-    map_insert(ram_info_map, "total_memory", buffer);
+    map_insert(ram_info_map, "total_memory", strdup(buffer));
 
     sprintf(buffer, "%0.3f", ram_info.memory_load);
-    map_insert(ram_info_map, "memory_load", buffer);
+    map_insert(ram_info_map, "memory_load", strdup(buffer));
 
     sprintf(buffer, "%0.3f", ram_info.free_memory);
-    map_insert(ram_info_map, "free_memory", buffer);
+    map_insert(ram_info_map, "free_memory", strdup(buffer));
 
     sprintf(buffer, "%i", ram_info.speed);
-    map_insert(ram_info_map, "speed", buffer);
+    map_insert(ram_info_map, "speed", strdup(buffer));
 
     free(buffer);
 
     return result_success(ram_info_map);
+}
+
+void free_ram_info(ram_info_t* info) {
+    free(info);
 }

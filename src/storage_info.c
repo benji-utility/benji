@@ -32,7 +32,7 @@ result_t* get_storage_info() {
     return result_success(info);
 }
 
-result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE info_type) {
+result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_type) {
     #if defined(_WIN32)
         char* devices_info = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
@@ -50,7 +50,6 @@ result_t* get_storage_devices_info(size_t device_count, enum BENJI_STORAGE_DEVIC
             result_t* storage_device_descriptor_result = get_storage_device_descriptor(handle, &buffer);
 
             if (storage_device_descriptor_result->is_error) {
-                log_warning(result_unwrap_error(storage_device_descriptor_result));
                 strcat(devices_info, "???");
             }
             else {
@@ -228,8 +227,8 @@ result_t* get_storage_devices_size(size_t device_count) {
         return result_success((STORAGE_DEVICE_DESCRIPTOR*) *buffer);
     }
 
-    // largely copied from the "winioctl.h" header, hence the jank win32 macro usage
     const char* get_bus_type(STORAGE_BUS_TYPE bus_type) {
+        // largely copied from the "winioctl.h" header, hence the jank win32 macro usage
         switch (bus_type) {
             case BusTypeScsi: return "SCSI";
             case BusTypeAtapi: return "ATAPI";
@@ -266,11 +265,13 @@ size_t count_storage_devices() {
     size_t device_count = 0;
 
     for (size_t i = 0; i < BENJI_MAX_STORAGE_DEVICES; i++) {
-        HANDLE handle = open_storage_device_handle(i);
+        #ifdef _WIN32
+            HANDLE handle = open_storage_device_handle(i);
 
-        if (handle == INVALID_HANDLE_VALUE) {
-            continue;
-        }
+            if (handle == INVALID_HANDLE_VALUE) {
+                continue;
+            }
+        #endif
 
         device_count++;
 
@@ -302,4 +303,8 @@ result_t* storage_info_to_map(storage_info_t storage_info) {
     free(buffer);
 
     return result_success(storage_info_map);
+}
+
+void free_storage_info(storage_info_t* info) {
+    
 }
