@@ -265,17 +265,19 @@ size_t count_storage_devices() {
     size_t device_count = 0;
 
     for (size_t i = 0; i < BENJI_MAX_STORAGE_DEVICES; i++) {
-        #ifdef _WIN32
+        #if defined(_WIN32)
             HANDLE handle = open_storage_device_handle(i);
 
             if (handle == INVALID_HANDLE_VALUE) {
                 continue;
             }
+
+            device_count++;
+
+            CloseHandle(handle);
+        #elif defined(__linux__)
+            /* TODO: add linux stuff */
         #endif
-
-        device_count++;
-
-        CloseHandle(handle);
     }
 
     return device_count;
@@ -306,5 +308,5 @@ result_t* storage_info_to_map(storage_info_t storage_info) {
 }
 
 void free_storage_info(storage_info_t* info) {
-    
+
 }
