@@ -52,6 +52,8 @@ $(OBJ)/%.o: $(TOML)/%.c
 
 ifeq ($(OS), Windows_NT)
 .SILENT: clean test
+else ifeq ($(shell uname), Linux)
+.SILENT: clean test build_installer
 endif
 
 .PHONY: clean
@@ -78,8 +80,7 @@ ifeq ($(OS), Windows_NT)
 	if exist "$(BUILD)/$(INSTALL_EXEC).exe" del /S $(BUILD)\$(INSTALL_EXEC).exe
 	$(GXX) $(GXX_FLAGS) $(INSTALLER_SRCS) -o $(BUILD)/$(INSTALL_EXEC)
 else ifeq ($(shell uname), Linux)
-	cp benji.service /etc/systemd/system/benjid.service
-	cp $(BUILD)/$(MAIN_EXEC) /usr/local/bin/benjid
+	echo -e "\nNot supported on Linux (yet)"
 endif
 
 test:
