@@ -5,12 +5,12 @@
     #define BENJI_USE_SERVER_UTILS
 #endif
 
-#ifndef BENJI_USE_SYS_INFO_UTILS
-    #define BENJI_USE_SYS_INFO_UTILS
+#ifndef BENJI_USE_SYSTEM_TELEMETRY_UTILS
+    #define BENJI_USE_SYSTEM_TELEMETRY_UTILS
 #endif
 
 #include "utils.h"
-#include "hardware.h"
+#include "telemetry.h"
 #include "logger.h"
 
 #ifndef BENJI_RECV_RETRY_WAIT_TIME

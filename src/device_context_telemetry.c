@@ -1,4 +1,4 @@
-#include "include/hardware/device_context_info.h"
+#include "include/telemetry/device_context_telemetry.h"
 
 result_t* get_device_context_info() {
     device_context_info_t* info = malloc(sizeof(device_context_info_t));
@@ -200,5 +200,5 @@ result_t* device_context_info_to_map(device_context_info_t device_context_info) 
 }
 
 void free_device_context_info(device_context_info_t* info) {
-    
+
 }

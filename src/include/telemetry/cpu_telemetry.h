@@ -1,8 +1,8 @@
 #ifndef __BENJI_CPU_INFO_H
 #define __BENJI_CPU_INFO_H
 
-#ifndef BENJI_USE_SYS_INFO_UTILS
-    #define BENJI_USE_SYS_INFO_UTILS
+#ifndef BENJI_USE_SYSTEM_TELEMETRY_UTILS
+    #define BENJI_USE_SYSTEM_TELEMETRY_UTILS
 #endif
 
 #include "../utils.h"
@@ -53,7 +53,6 @@ BENJI_START_HARDWARE_STRUCT(CPU)
     double clock_speed; // in GHz
     size_t core_count;
     size_t logical_processors_count;
-    // double current_temp; // TBD until i figure out how
 BENJI_END_HARDWARE_STRUCT(cpu)
 
 BENJI_CREATE_HARDWARE_BASE(cpu)

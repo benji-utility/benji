@@ -1,4 +1,4 @@
-#include "include/hardware/storage_info.h"
+#include "include/telemetry/storage_telemetry.h"
 
 result_t* get_storage_info() {
     storage_info_t* info = malloc(sizeof(storage_info_t));

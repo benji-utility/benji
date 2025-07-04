@@ -109,7 +109,7 @@
     BENJIAPI void terminate(const int exit_code);
 #endif
 
-#ifdef BENJI_USE_SYS_INFO_UTILS
+#ifdef BENJI_USE_SYSTEM_TELEMETRY_UTILS
     #include "result.h"
 
     #include "map.h"

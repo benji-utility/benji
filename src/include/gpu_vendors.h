@@ -1,8 +1,6 @@
 #ifndef __BENJI_GPU_VENDORS_H
 #define __BENJI_GPU_VENDORS_H
 
-/* ONLY USED IN "hardware/gpu_info.h" */
-
 #ifndef BENJI_GPU_VENDOR_NVIDIA
     #define BENJI_GPU_VENDOR_NVIDIA (0x10DE)
 #endif

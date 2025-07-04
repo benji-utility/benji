@@ -4,6 +4,7 @@
 #include "toml-c/toml.h"
 
 #include "utils.h"
+#include "result.h"
 #include "logger.h"
 
 #ifndef BENJI_CONFIG_REGISTRY_PATH
@@ -28,9 +29,6 @@ typedef struct _BENJI_CONFIG_DETAILS {
         uint16_t port; // 1-65535
     } server_config;
 } config_details_t;
-
-#include "utils.h"
-#include "result.h"
 
 result_t* open_config();
 

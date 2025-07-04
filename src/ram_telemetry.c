@@ -1,4 +1,4 @@
-#include "include/hardware/ram_info.h"
+#include "include/telemetry/ram_telemetry.h"
 
 result_t* get_ram_info() {
     ram_info_t* info = malloc(sizeof(ram_info_t));
@@ -127,7 +127,7 @@ result_t* get_ram_speed() {
         uint8_t* data = buffer->data;
 
         uint8_t* end = data + buffer->length;
-        
+
         uint16_t speed = 0;
 
         bool found_memory_device = false;

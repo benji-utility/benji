@@ -1,8 +1,8 @@
 #ifndef __BENJI_RAM_INFO_H
 #define __BENJI_RAM_INFO_H
 
-#ifndef BENJI_USE_SYS_INFO_UTILS
-    #define BENJI_USE_SYS_INFO_UTILS
+#ifndef BENJI_USE_SYSTEM_TELEMETRY_UTILS
+    #define BENJI_USE_SYSTEM_TELEMETRY_UTILS
 #endif
 
 #include "../utils.h"

@@ -1,4 +1,4 @@
-#include "include/hardware/cpu_info.h"
+#include "include/telemetry/cpu_telemetry.h"
 
 result_t* get_cpu_info() {
     cpu_info_t* info = malloc(sizeof(cpu_info_t));
