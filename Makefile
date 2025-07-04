@@ -37,9 +37,9 @@ INCLUDES = -I$(TOML)
 OBJS = $(patsubst $(MAIN_SRC)/%.c, $(OBJ)/%.o, $(MAIN_SRCS))
 OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/%.o, $(TOML_SRCS))
 
-all: clean compile
+all: installer
 
-compile: $(BUILD)/$(MAIN_EXEC)
+compile: clean $(BUILD)/$(MAIN_EXEC)
 
 $(BUILD)/$(MAIN_EXEC): $(OBJS)
 	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS)
@@ -75,7 +75,7 @@ else ifeq ($(shell uname), Linux)
 	mkdir -p $(OBJ)
 endif
 
-build_installer: all
+installer: compile
 ifeq ($(OS), Windows_NT)
 	if exist "$(BUILD)/$(INSTALL_EXEC).exe" del /S $(BUILD)\$(INSTALL_EXEC).exe
 	$(GXX) $(GXX_FLAGS) $(INSTALLER_SRCS) -o $(BUILD)/$(INSTALL_EXEC)
