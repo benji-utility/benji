@@ -27,7 +27,7 @@ result_t* open_config() {
     FILE* file = fopen(config_path, "r");
 
     if (!file) {
-        return result_error(ERROR_FILE_NOT_FOUND, BENJI_ERROR_PACKET, "Unable to open config file '%s'", config_path);
+        return result_error(-1, BENJI_ERROR_PACKET, "Unable to open config file '%s'", config_path);
     }
 
     char error_buffer[BENJI_BASIC_STRING_LENGTH];

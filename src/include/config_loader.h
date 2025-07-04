@@ -22,13 +22,11 @@
     #define BENJI_DEFAULT_SERVER_PORT (8000)
 #endif
 
-typedef struct _BENJI_SERVER_CONFIG {
-    const char* hostname;
-    uint16_t port; // 1-65535
-} server_config_t;
-
 typedef struct _BENJI_CONFIG_DETAILS {
-    server_config_t server_config;
+    struct _BENJI_SERVER_CONFIG {
+        const char* hostname;
+        uint16_t port; // 1-65535
+    } server_config;
 } config_details_t;
 
 #include "utils.h"

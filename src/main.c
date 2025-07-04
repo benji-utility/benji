@@ -1,9 +1,8 @@
-#if defined(_WIN32)
+#ifdef _WIN32
     #include "include/service.h"
-#elif defined(__linux__)
-    #include "include/daemon.h"
 #endif
 
+#include "include/config_loader.h"
 #include "include/logger.h"
 #include "include/result.h"
 
@@ -24,7 +23,9 @@ int main(int argc, const char* argv[]) {
 
     toml_free(toml_config);
 
-    collect_server_details(config_details);
+    #ifdef _WIN32
+        collect_server_details(config_details);
+    #endif
 
     #if defined(_WIN32)
         winsock_init();
@@ -47,7 +48,7 @@ int main(int argc, const char* argv[]) {
             return EXIT_FAILURE;
         }
     #elif defined(__linux__)
-        spawn_daemon();
+        /* TODO: add linux stuff */
     #endif
 
     return EXIT_SUCCESS;

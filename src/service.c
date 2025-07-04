@@ -1,6 +1,7 @@
-#ifdef _WIN32
-    #include "include/service.h"
 
+#include "include/service.h"
+
+#if defined(_WIN32)
     BENJIAPI void service_main(unsigned long argc, LPTSTR* argv) {
         service_status.dwServiceType = SERVICE_WIN32_OWN_PROCESS;
         service_status.dwControlsAccepted = SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN;
@@ -103,11 +104,11 @@
     }
 
     BENJIAPI unsigned long service_worker_thread() {
-        WSAEVENT events[BENJI_SERVICE_EVENTS_COUNT] = {service_socket_event, service_stop_event};
+        WSAEVENT events[BENJI_SERVICE_WSAEVENTS_COUNT] = {service_socket_event, service_stop_event};
 
         // this is safe ;)
         while (true) {
-            unsigned long wait = WSAWaitForMultipleEvents(BENJI_SERVICE_EVENTS_COUNT, events, false, WSA_INFINITE, false);
+            unsigned long wait = WSAWaitForMultipleEvents(BENJI_SERVICE_WSAEVENTS_COUNT, events, false, WSA_INFINITE, false);
 
             if (wait == WSA_WAIT_EVENT_0) {
                 WSANETWORKEVENTS network_events;
@@ -140,9 +141,11 @@
 
         SetServiceStatus(service_status_handle, &service_status);
     }
-
-    void collect_server_details(config_details_t config_details) {
-        server_info.hostname = config_details.server_config.hostname;
-        server_info.port = config_details.server_config.port;
-    }
+#elif defined(__linux__)
+    /* TODO: add linux stuff */
 #endif
+
+void collect_server_details(config_details_t config_details) {
+    server_info.hostname = config_details.server_config.hostname;
+    server_info.port = config_details.server_config.port;
+}

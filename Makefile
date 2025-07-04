@@ -37,9 +37,9 @@ INCLUDES = -I$(TOML)
 OBJS = $(patsubst $(MAIN_SRC)/%.c, $(OBJ)/%.o, $(MAIN_SRCS))
 OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/%.o, $(TOML_SRCS))
 
-all: clean compile
+all: installer
 
-compile: $(BUILD)/$(MAIN_EXEC)
+compile: clean $(BUILD)/$(MAIN_EXEC)
 
 $(BUILD)/$(MAIN_EXEC): $(OBJS)
 	$(GXX) $(OBJS) -o $@ $(LINKED_LIBS)
@@ -52,6 +52,8 @@ $(OBJ)/%.o: $(TOML)/%.c
 
 ifeq ($(OS), Windows_NT)
 .SILENT: clean test
+else ifeq ($(shell uname), Linux)
+.SILENT: clean test build_installer
 endif
 
 .PHONY: clean
@@ -73,13 +75,12 @@ else ifeq ($(shell uname), Linux)
 	mkdir -p $(OBJ)
 endif
 
-build_installer: all
+installer: compile
 ifeq ($(OS), Windows_NT)
 	if exist "$(BUILD)/$(INSTALL_EXEC).exe" del /S $(BUILD)\$(INSTALL_EXEC).exe
 	$(GXX) $(GXX_FLAGS) $(INSTALLER_SRCS) -o $(BUILD)/$(INSTALL_EXEC)
 else ifeq ($(shell uname), Linux)
-	cp benji.service /etc/systemd/system/benjid.service
-	cp $(BUILD)/$(MAIN_EXEC) /usr/local/bin/benjid
+	echo -e "\nNot supported on Linux (yet)"
 endif
 
 test:
