@@ -127,10 +127,12 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         json_block[0] = '\0';
 
-        sprintf(json_block, "%s,", map_serialize(map_data, header));
+        sprintf(json_block, "%s", map_serialize(map_data, header));
         strcat(json, json_block);
 
         log_message(BENJI_LOG_LEVEL_INFO, "Collected data: '%s'", json_block);
+
+        strcat(json, ",");
 
         free(json_block);
 

@@ -1,44 +1,106 @@
 #include "include/telemetry/cpu_telemetry.h"
 
 result_t* get_cpu_info() {
-    cpu_info_t* info = malloc(sizeof(cpu_info_t));
+    cpu_info_t* cpu_info = malloc(sizeof(cpu_info_t));
 
-    if (!info) {
+    if (!cpu_info) {
         return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
-    result_t* cpu_name_result = get_cpu_name();
-    return_if_error_with_free_info(cpu_name_result, free_cpu_info, info);
-    info->name = strdup((char*) result_unwrap_value(cpu_name_result));
-    strtrim(info->name);
+    get_telemetry_info_string(
+        cpu_info,
+        cpu_info->name,
+        get_cpu_name,
+        free_cpu_info
+    );
 
-    result_t* cpu_vendor_result = get_cpu_vendor();
-    return_if_error_with_free_info(cpu_vendor_result, free_cpu_info, info);
-    info->vendor = strdup((char*) result_unwrap_value(cpu_vendor_result));
-    strtrim(info->vendor);
+    get_telemetry_info_string(
+        cpu_info,
+        cpu_info->vendor,
+        get_cpu_vendor,
+        free_cpu_info
+    );
 
-    result_t* cpu_arch_result = get_cpu_arch();
-    return_if_error_with_free_info(cpu_arch_result, free_cpu_info, info);
-    info->arch = strdup((char*) result_unwrap_value(cpu_arch_result));
-    strtrim(info->arch);
+    get_telemetry_info_string(cpu_info,
+        cpu_info->arch,
+        get_cpu_arch,
+        free_cpu_info
+    );
 
-    result_t* cpu_clock_speed_result = get_cpu_clock_speed();
-    return_if_error_with_free_info(cpu_clock_speed_result, free_cpu_info, info);
-    info->clock_speed = *(double*) result_unwrap_value(cpu_clock_speed_result);
+    get_telemetry_info_double(
+        cpu_info,
+        cpu_info->clock_speed,
+        get_cpu_clock_speed,
+        free_cpu_info
+    );
 
-    result_t* cpu_core_count_result = get_cpu_core_count();
-    return_if_error_with_free_info(cpu_core_count_result, free_cpu_info, info);
-    info->core_count = (size_t) (uintptr_t) result_unwrap_value(cpu_core_count_result);
+    get_telemetry_info_integer(
+        cpu_info,
+        cpu_info->core_count,
+        get_cpu_core_count,
+        free_cpu_info
+    );
 
-    result_t* cpu_logical_processors_count_result = get_cpu_logical_processors_count();
-    return_if_error_with_free_info(cpu_logical_processors_count_result, free_cpu_info, info);
-    info->logical_processors_count = (size_t) (uintptr_t) result_unwrap_value(cpu_logical_processors_count_result);
+    get_telemetry_info_integer(
+        cpu_info,
+        cpu_info->logical_processors_count,
+        get_cpu_logical_processors_count,
+        free_cpu_info
+    );
 
-    return result_success(info);
+    return result_success(cpu_info);
 }
 
 result_t* get_cpu_name() {
     #if defined(_WIN32)
+        return _get_cpu_name_windows();
+    #elif defined(__linux__)
+        return _get_cpu_name_linux();
+    #endif
+}
+
+result_t* get_cpu_vendor() {
+    #if defined(_WIN32)
+        return _get_cpu_vendor_windows();
+    #elif defined(__linux__)
+        return _get_cpu_vendor_linux();
+    #endif
+}
+
+result_t* get_cpu_arch() {
+   #if defined(_WIN32)
+        return _get_cpu_arch_windows();
+    #elif defined(__linux__)
+        return _get_cpu_arch_linux();
+    #endif
+}
+
+result_t* get_cpu_clock_speed() {
+    #if defined(_WIN32)
+        return _get_cpu_clock_speed_windows();
+    #elif defined(__linux__)
+        return _get_cpu_clock_speed_linux();
+    #endif
+}
+
+result_t* get_cpu_core_count() {
+    #if defined(_WIN32)
+        return _get_cpu_core_count_windows();
+    #elif defined(__linux__)
+        return _get_cpu_core_count_linux();
+    #endif
+}
+
+result_t* get_cpu_logical_processors_count() {
+    #if defined(_WIN32)
+        return _get_cpu_logical_processors_count_windows();
+    #elif defined(__linux__)
+        return _get_cpu_logical_processors_count_linux();
+    #endif
+}
+
+#ifdef _WIN32
+    result_t* _get_cpu_name_windows() {
         int cpuid_info[BENJI_CPUID_BUFFER_LENGTH];
 
         char* name = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
@@ -58,13 +120,9 @@ result_t* get_cpu_name() {
         name[BENJI_BASIC_STRING_LENGTH - 1] = '\0';
 
         return result_success(name);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_cpu_vendor() {
-    #if defined(_WIN32)
+    result_t* _get_cpu_vendor_windows() {
         int cpu_info[BENJI_CPUID_BUFFER_LENGTH];
 
         char* vendor = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
@@ -85,13 +143,9 @@ result_t* get_cpu_vendor() {
         vendor[12] = '\0';
 
         return result_success(vendor);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_cpu_arch() {
-    #if defined(_WIN32)
+    result_t* _get_cpu_arch_windows() {
         SYSTEM_INFO system_info;
 
         GetSystemInfo(&system_info);
@@ -121,13 +175,9 @@ result_t* get_cpu_arch() {
         }
 
         return result_success(arch);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_cpu_clock_speed() {
-    #if defined(_WIN32)
+    result_t* _get_cpu_clock_speed_windows() {
         HKEY hkey;
 
         HRESULT hresult = RegOpenKeyEx(
@@ -167,28 +217,16 @@ result_t* get_cpu_clock_speed() {
         else {
             return result_error(hresult, BENJI_ERROR_PACKET, "RegQueryValueEx() failed");
         }
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_cpu_core_count() {
-    #if defined(_WIN32)
+    result_t* _get_cpu_core_count_windows() {
         return get_cpu_processor_info(count_cpu_cores_callback);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_cpu_logical_processors_count() {
-    #if defined(_WIN32)
+    result_t* _get_cpu_logical_processors_count_windows() {
         return get_cpu_processor_info(count_cpu_logical_processors_callback);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-#ifdef _WIN32
     result_t* get_cpu_processor_info(processor_info_callback_t callback) {
         unsigned long int length = 0;
 
@@ -227,6 +265,30 @@ result_t* get_cpu_logical_processors_count() {
 
     uint32_t count_cpu_logical_processors_callback(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
         return __popcnt(info->ProcessorMask);
+    }
+#elif defined(__linux__)
+    result_t* _get_cpu_name_linux() {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_cpu_vendor_linux() {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_cpu_arch_linux() {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_cpu_clock_speed_linux() {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_cpu_core_count_linux() {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_cpu_logical_processors_count_linux() {
+        // TODO: add linux stuff
     }
 #endif
 
