@@ -1,38 +1,33 @@
-GXX = gcc
+GXX := gcc
 
-GXX_FLAGS = -g -Wno-discarded-qualifiers
+GXX_FLAGS := -g -Wno-discarded-qualifiers
 
-MAIN_SRC = src
-INSTALLER_SRC = installer
-TOML = $(MAIN_SRC)/include/toml-c
+MAIN_SRC := src
+INSTALLER_SRC := installer
+TOML := $(MAIN_SRC)/include/toml-c
 
-BUILD = build
-OBJ = $(BUILD)/obj
+BUILD := build
+OBJ := $(BUILD)/obj
 
-MAIN_EXEC =
-INSTALL_EXEC = benji-installer
-
-ifeq ($(OS), Windows_NT)
-	MAIN_EXEC = benji-service
-else ifeq ($(shell uname), Linux)
-	MAIN_EXEC = benjid
-endif
-
-MAIN_SRCS = $(wildcard $(MAIN_SRC)/*.c)
-INSTALLER_SRCS = $(wildcard $(INSTALLER_SRC)/*.c)
-TOML_SRCS = $(TOML)/toml.c
-
-CONFIG_FILE =
-TEST_DATA =
-TEST_PORT =
+INSTALL_EXEC := benji-installer
 
 ifeq ($(OS), Windows_NT)
-	LINKED_LIBS = -lWs2_32 -ldxgi -ldxguid -lole32
+	MAIN_EXEC := benji-service
 else ifeq ($(shell uname), Linux)
-	LINKED_LIBS =
+	MAIN_EXEC := benjid
 endif
 
-INCLUDES = -I$(TOML)
+MAIN_SRCS := $(wildcard $(MAIN_SRC)/*.c)
+INSTALLER_SRCS := $(wildcard $(INSTALLER_SRC)/*.c)
+TOML_SRCS := $(TOML)/toml.c
+
+ifeq ($(OS), Windows_NT)
+	LINKED_LIBS := -lWs2_32 -ldxgi -ldxguid -lole32
+else ifeq ($(shell uname), Linux)
+	LINKED_LIBS :=
+endif
+
+INCLUDES := -I$(TOML)
 
 OBJS = $(patsubst $(MAIN_SRC)/%.c, $(OBJ)/%.o, $(MAIN_SRCS))
 OBJS += $(patsubst $(TOML)/%.c, $(OBJ)/%.o, $(TOML_SRCS))
@@ -53,7 +48,7 @@ $(OBJ)/%.o: $(TOML)/%.c
 ifeq ($(OS), Windows_NT)
 .SILENT: clean test
 else ifeq ($(shell uname), Linux)
-.SILENT: clean test build_installer
+.SILENT: clean test installer
 endif
 
 .PHONY: clean
@@ -82,6 +77,9 @@ ifeq ($(OS), Windows_NT)
 else ifeq ($(shell uname), Linux)
 	echo -e "\nNot supported on Linux (yet)"
 endif
+
+TEST_DATA =
+TEST_PORT =
 
 test:
 ifeq ($(OS), Windows_NT)

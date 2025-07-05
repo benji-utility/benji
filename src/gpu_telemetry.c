@@ -1,39 +1,113 @@
 #include "include/telemetry/gpu_telemetry.h"
 
 result_t* get_gpu_info() {
-    gpu_info_t* info = malloc(sizeof(gpu_info_t));
+    gpu_info_t* gpu_info = malloc(sizeof(gpu_info_t));
 
-    if (!info) {
+    if (!gpu_info) {
         return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
-    result_t* gpu_name_result = get_gpu_name();
-    return_if_error(gpu_name_result);
-    info->name = strdup((char*) result_unwrap_value(gpu_name_result));
-    strtrim(info->name);
+    get_telemetry_info_string(
+        gpu_info,
+        gpu_info->name,
+        get_gpu_name,
+        free_gpu_info
+    );
 
-    result_t* gpu_vendor_result = get_gpu_vendor();
-    return_if_error(gpu_vendor_result);
-    info->vendor = strdup((char*) result_unwrap_value(gpu_vendor_result));
-    strtrim(info->vendor);
+    get_telemetry_info_string(
+        gpu_info,
+        gpu_info->vendor,
+        get_gpu_vendor,
+        free_gpu_info
+    );
 
-    result_t* gpu_dedicated_video_memory_result = get_gpu_memory(BENJI_GPU_DEDICATED_VIDEO_MEMORY);
-    return_if_error(gpu_dedicated_video_memory_result);
-    info->dedicated_video_memory = *(double*) result_unwrap_value(gpu_dedicated_video_memory_result);
+    #ifdef _WIN32
+        get_telemetry_info_double(
+            gpu_info,
+            gpu_info->dedicated_video_memory,
+            get_gpu_memory,
+            free_gpu_info,
+            BENJI_GPU_DEDICATED_VIDEO_MEMORY
+        );
 
-    result_t* gpu_dedicated_system_memory_result = get_gpu_memory(BENJI_GPU_DEDICATED_SYSTEM_MEMORY);
-    return_if_error(gpu_dedicated_system_memory_result);
-    info->dedicated_system_memory = *(double*) result_unwrap_value(gpu_dedicated_system_memory_result);
+        get_telemetry_info_double(
+            gpu_info,
+            gpu_info->dedicated_system_memory,
+            get_gpu_memory,
+            free_gpu_info,
+            BENJI_GPU_DEDICATED_SYSTEM_MEMORY
+        );
 
-    result_t* gpu_shared_system_memory_result = get_gpu_memory(BENJI_GPU_SHARED_SYSTEM_MEMORY);
-    return_if_error(gpu_shared_system_memory_result);
-    info->shared_system_memory = *(double*) result_unwrap_value(gpu_shared_system_memory_result);
+        get_telemetry_info_double(
+            gpu_info,
+            gpu_info->shared_system_memory,
+            get_gpu_memory,
+            free_gpu_info,
+            BENJI_GPU_SHARED_SYSTEM_MEMORY
+        );
+    #endif
 
-    return result_success(info);
+    return result_success(gpu_info);
 }
 
 result_t* get_gpu_name() {
     #if defined(_WIN32)
+        return _get_gpu_name_windows();
+    #elif defined(__linux__)
+        return _get_gpu_name_linux();
+    #endif
+}
+
+result_t* get_gpu_vendor() {
+    #if defined(_WIN32)
+        return _get_gpu_vendor_windows();
+    #elif defined(__linux__)
+        return _get_gpu_vendor_windows();
+    #endif
+}
+
+result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
+    #ifdef _WIN32
+        result_t* description_result = get_gpu_description();
+        return_if_error(description_result);
+
+        DXGI_ADAPTER_DESC* adapter_description = (DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
+    #endif
+
+    void* memory_value = malloc(sizeof(double));
+
+    if (!memory_value) {
+        free(adapter_description);
+
+        return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
+    }
+
+    switch (memory_type) {
+        #ifdef _WIN32
+            case BENJI_GPU_DEDICATED_VIDEO_MEMORY: {
+                *(double*) memory_value = bytes_to_gigabytes(adapter_description->DedicatedVideoMemory);
+                break;
+            }
+
+            case BENJI_GPU_DEDICATED_SYSTEM_MEMORY: {
+                *(double*) memory_value = bytes_to_gigabytes(adapter_description->DedicatedSystemMemory);
+                break;
+            }
+
+            case BENJI_GPU_SHARED_SYSTEM_MEMORY: {
+                *(double*) memory_value = bytes_to_gigabytes(adapter_description->SharedSystemMemory);
+                break;
+            }
+        #endif
+    }
+
+    free(adapter_description);
+
+    return result_success(memory_value);
+}
+
+#ifdef _WIN32
+    result_t* _get_gpu_name_windows() {
         result_t* description_result = get_gpu_description();
         return_if_error(description_result);
 
@@ -45,13 +119,9 @@ result_t* get_gpu_name() {
         free(adapter_description);
 
         return result_success(name);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_gpu_vendor() {
-    #if defined(_WIN32)
+    result_t* _get_gpu_vendor_windows() {
         char* vendor;
 
         result_t* description_result = get_gpu_description();
@@ -92,52 +162,8 @@ result_t* get_gpu_vendor() {
         free(adapter_description);
 
         return result_success(vendor);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
-    #if defined(_WIN32)
-        result_t* description_result = get_gpu_description();
-        return_if_error(description_result);
-
-        DXGI_ADAPTER_DESC* adapter_description = (DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
-
-        void* memory_value = malloc(sizeof(double));
-
-        if (!memory_value) {
-            free(adapter_description);
-
-            return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
-        }
-
-        switch (memory_type) {
-            case BENJI_GPU_DEDICATED_VIDEO_MEMORY: {
-                *(double*) memory_value = bytes_to_gigabytes(adapter_description->DedicatedVideoMemory);
-                break;
-            }
-
-            case BENJI_GPU_DEDICATED_SYSTEM_MEMORY: {
-                *(double*) memory_value = bytes_to_gigabytes(adapter_description->DedicatedSystemMemory);
-                break;
-            }
-
-            case BENJI_GPU_SHARED_SYSTEM_MEMORY: {
-                *(double*) memory_value = bytes_to_gigabytes(adapter_description->SharedSystemMemory);
-                break;
-            }
-        }
-
-        free(adapter_description);
-
-        return result_success(memory_value);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
-
-#ifdef _WIN32
     result_t* get_gpu_description() {
         HRESULT hresult;
 
@@ -178,6 +204,14 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
 
         return result_success(memdup(&primary_adapter_description, sizeof(DXGI_ADAPTER_DESC)));
     }
+#elif defined(__linux__)
+    result_t* _get_gpu_name_linux() {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_gpu_vendor_linux() {
+        // TODO: add linux stuff
+    }
 #endif
 
 result_t* gpu_info_to_map(gpu_info_t gpu_info) {
@@ -194,14 +228,16 @@ result_t* gpu_info_to_map(gpu_info_t gpu_info) {
     map_insert(gpu_info_map, "name", gpu_info.name);
     map_insert(gpu_info_map, "vendor", gpu_info.vendor);
 
-    sprintf(buffer, "%0.3f", gpu_info.dedicated_video_memory);
-    map_insert(gpu_info_map, "dedicated_video_memory", strdup(buffer));
+    #ifdef _WIN32
+        sprintf(buffer, "%0.3f", gpu_info.dedicated_video_memory);
+        map_insert(gpu_info_map, "dedicated_video_memory", strdup(buffer));
 
-    sprintf(buffer, "%0.3f", gpu_info.dedicated_system_memory);
-    map_insert(gpu_info_map, "dedicated_system_memory", strdup(buffer));
+        sprintf(buffer, "%0.3f", gpu_info.dedicated_system_memory);
+        map_insert(gpu_info_map, "dedicated_system_memory", strdup(buffer));
 
-    sprintf(buffer, "%0.3f", gpu_info.shared_system_memory);
-    map_insert(gpu_info_map, "shared_system_memory", strdup(buffer));
+        sprintf(buffer, "%0.3f", gpu_info.shared_system_memory);
+        map_insert(gpu_info_map, "shared_system_memory", strdup(buffer));
+    #endif
 
     free(buffer);
 

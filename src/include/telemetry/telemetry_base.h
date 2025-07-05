@@ -25,8 +25,8 @@
 #endif
 
 #ifndef get_telemetry_info_string
-    #define get_telemetry_info_string(_info_parent, _info, _get_info, _free_info) do { \
-        result_t* result = _get_info(); \
+    #define get_telemetry_info_string(_info_parent, _info, _get_info, _free_info, ...) do { \
+        result_t* result = _get_info(__VA_ARGS__); \
         return_if_error_with_free_info(result, _free_info, _info_parent); \
         _info = strdup((char*) result_unwrap_value(result)); \
         strtrim(_info); \
@@ -34,16 +34,16 @@
 #endif
 
 #ifndef get_telemetry_info_integer
-    #define get_telemetry_info_integer(_info_parent, _info, _get_info, _free_info) do { \
-        result_t* result = _get_info(); \
+    #define get_telemetry_info_integer(_info_parent, _info, _get_info, _free_info, ...) do { \
+        result_t* result = _get_info(__VA_ARGS__); \
         return_if_error_with_free_info(result, _free_info, _info_parent); \
         _info = (size_t) (uintptr_t) result_unwrap_value(result); \
     } while (false);
 #endif
 
 #ifndef get_telemetry_info_double
-    #define get_telemetry_info_double(_info_parent, _info, _get_info, _free_info) do { \
-        result_t* result = _get_info(); \
+    #define get_telemetry_info_double(_info_parent, _info, _get_info, _free_info, ...) do { \
+        result_t* result = _get_info(__VA_ARGS__); \
         return_if_error_with_free_info(result, _free_info, _info_parent); \
         _info = *(double*) result_unwrap_value(result); \
     } while (false);
