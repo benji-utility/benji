@@ -25,14 +25,14 @@
     #define BENJI_RAM_FIELDS(_field_getter_impl) \
         _field_getter_impl(ram, total_memory) \
         _field_getter_impl(ram, memory_load) \
-        _field_getter_impl(ram, free_memory) \
+        _field_getter_impl(ram, available_memory) \
         _field_getter_impl(ram, speed)
 #endif
 
 BENJI_CREATE_TELEMETRY_STRUCT(RAM, ram,
     double total_memory; // in GB
     double memory_load; // in GB
-    double free_memory; // in GB
+    double available_memory; // in GB
     uint16_t speed; // in MHz
 )
 
@@ -75,7 +75,7 @@ BENJI_CREATE_TELEMETRY_BASE(ram)
 BENJI_RAM_FIELDS(BENJI_CREATE_TELEMETRY_GETTER_IMPL)
 
 #ifdef _WIN32
-    result_t* get_memory_status();
+    result_t* _get_memory_status();
 #endif
 
 #endif
