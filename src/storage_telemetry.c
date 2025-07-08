@@ -7,7 +7,7 @@ result_t* get_storage_info() {
         return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
-    info->device_count = count_storage_devices();
+    info->device_count = _count_storage_devices();
 
     result_t* models_result = get_storage_devices_info(info->device_count, BENJI_STORAGE_DEVICE_MODEL_NAME);
     return_if_error(models_result);
@@ -43,11 +43,11 @@ result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_t
         devices_info[0] = '\0';
 
         for (int i = 0; i < device_count; i++) {
-            HANDLE handle = open_storage_device_handle(i);
+            HANDLE handle = _open_storage_device_handle(i);
 
             unsigned char* buffer = NULL;
 
-            result_t* storage_device_descriptor_result = get_storage_device_descriptor(handle, &buffer);
+            result_t* storage_device_descriptor_result = _get_storage_device_descriptor(handle, &buffer);
 
             if (storage_device_descriptor_result->is_error) {
                 strcat(devices_info, "???");
@@ -81,7 +81,7 @@ result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_t
                     }
                 }
                 else { // bus type
-                    strcat(devices_info, get_bus_type(storage_device_descriptor.BusType));
+                    strcat(devices_info, _get_bus_type(storage_device_descriptor.BusType));
                 }
             }
 
@@ -118,7 +118,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         sizes[0] = '\0';
 
         for (int i = 0; i < device_count; i++) {
-            HANDLE handle = open_storage_device_handle(i);
+            HANDLE handle = _open_storage_device_handle(i);
 
             DISK_GEOMETRY_EX storage_device_geometry = { 0 };
 
@@ -165,7 +165,7 @@ result_t* get_storage_devices_size(size_t device_count) {
 }
 
 #ifdef _WIN32
-    HANDLE open_storage_device_handle(size_t device_index) {
+    HANDLE _open_storage_device_handle(size_t device_index) {
         char device_path[BENJI_BASIC_STRING_LENGTH];
 
         sprintf(device_path, "\\\\.\\PhysicalDrive%d", device_index);
@@ -178,7 +178,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         );
     }
 
-    result_t* get_storage_device_descriptor(HANDLE handle, unsigned char** buffer) {
+    result_t* _get_storage_device_descriptor(HANDLE handle, unsigned char** buffer) {
         STORAGE_PROPERTY_QUERY query = {
             .PropertyId = StorageDeviceProperty,
             .QueryType = PropertyStandardQuery
@@ -227,7 +227,7 @@ result_t* get_storage_devices_size(size_t device_count) {
         return result_success((STORAGE_DEVICE_DESCRIPTOR*) *buffer);
     }
 
-    const char* get_bus_type(STORAGE_BUS_TYPE bus_type) {
+    const char* _get_bus_type(STORAGE_BUS_TYPE bus_type) {
         // largely copied from the "winioctl.h" header, hence the jank win32 macro usage
         switch (bus_type) {
             case BusTypeScsi: return "SCSI";
@@ -261,12 +261,12 @@ result_t* get_storage_devices_size(size_t device_count) {
     }
 #endif
 
-size_t count_storage_devices() {
+size_t _count_storage_devices() {
     size_t device_count = 0;
 
     for (size_t i = 0; i < BENJI_MAX_STORAGE_DEVICES; i++) {
         #if defined(_WIN32)
-            HANDLE handle = open_storage_device_handle(i);
+            HANDLE handle = _open_storage_device_handle(i);
 
             if (handle == INVALID_HANDLE_VALUE) {
                 continue;
@@ -283,7 +283,7 @@ size_t count_storage_devices() {
     return device_count;
 }
 
-result_t* storage_info_to_map(storage_info_t storage_info) {
+result_t* storage_info_to_map(const storage_info_t storage_info) {
     map_t* storage_info_map = map_init();
 
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
@@ -308,5 +308,22 @@ result_t* storage_info_to_map(storage_info_t storage_info) {
 }
 
 void free_storage_info(storage_info_t* info) {
+    if (!info) {
+        return;
+    }
 
+    free(info->models);
+    info->models = NULL;
+
+    free(info->serial_numbers);
+    info->serial_numbers = NULL;
+
+    free(info->bus_types);
+    info->bus_types = NULL;
+
+    free(info->sizes);
+    info->sizes = NULL;
+
+    free(info);
+    info = NULL;
 }

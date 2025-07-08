@@ -68,7 +68,7 @@ result_t* get_gpu_vendor() {
 
 result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
     #ifdef _WIN32
-        result_t* description_result = get_gpu_description();
+        result_t* description_result = _get_gpu_description();
         return_if_error(description_result);
 
         DXGI_ADAPTER_DESC* adapter_description = (DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
@@ -112,7 +112,7 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
 
 #ifdef _WIN32
     result_t* _get_gpu_name_windows() {
-        result_t* description_result = get_gpu_description();
+        result_t* description_result = _get_gpu_description();
         return_if_error(description_result);
 
         DXGI_ADAPTER_DESC* adapter_description = (DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
@@ -128,7 +128,7 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
     result_t* _get_gpu_vendor_windows() {
         char* vendor;
 
-        result_t* description_result = get_gpu_description();
+        result_t* description_result = _get_gpu_description();
         return_if_error(description_result);
 
         DXGI_ADAPTER_DESC* adapter_description = (DXGI_ADAPTER_DESC*) result_unwrap_value(description_result);
@@ -168,7 +168,7 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
         return result_success(vendor);
     }
 
-    result_t* get_gpu_description() {
+    result_t* _get_gpu_description() {
         HRESULT hresult;
 
         hresult = CoInitializeEx(NULL, COINIT_MULTITHREADED);
@@ -218,7 +218,7 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
     }
 #endif
 
-result_t* gpu_info_to_map(gpu_info_t gpu_info) {
+result_t* gpu_info_to_map(const gpu_info_t gpu_info) {
     map_t* gpu_info_map = map_init();
 
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));

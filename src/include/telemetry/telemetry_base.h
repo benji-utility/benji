@@ -13,7 +13,7 @@
 #ifndef BENJI_CREATE_TELEMETRY_BASE
     #define BENJI_CREATE_TELEMETRY_BASE(_telemetry_group) \
         result_t* get_##_telemetry_group##_info(); \
-        result_t* _telemetry_group##_info_to_map(_telemetry_group##_info_t info); \
+        result_t* _telemetry_group##_info_to_map(const _telemetry_group##_info_t info); \
         void free_##_telemetry_group##_info(_telemetry_group##_info_t* info);
 #endif
 

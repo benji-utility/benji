@@ -91,7 +91,7 @@ result_t* get_device_context_operating_system_info(os_version_info_type_t versio
                 if (rtl_get_version(&rtl_os_version_info) == 0) {
                     switch (version_info_type) {
                         case BENJI_OPERATING_SYSTEM_VERSION_NAME: {
-                            operating_system = get_windows_name_from_version(
+                            operating_system = _get_windows_name_from_version(
                                 rtl_os_version_info.dwMajorVersion,
                                 rtl_os_version_info.dwMinorVersion,
                                 rtl_os_version_info.dwBuildNumber
@@ -159,7 +159,7 @@ result_t* get_device_context_hostname() {
 }
 
 #ifdef _WIN32
-    char* get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number) {
+    char* _get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number) {
         if (major_version == 10 && minor_version == 0) {
             if (build_number >= 22000) {
                 return "Windows 11";
@@ -188,7 +188,7 @@ result_t* get_device_context_hostname() {
     }
 #endif
 
-result_t* device_context_info_to_map(device_context_info_t device_context_info) {
+result_t* device_context_info_to_map(const device_context_info_t device_context_info) {
     map_t* device_context_info_map = map_init();
 
     map_insert(device_context_info_map, "device_name", device_context_info.device_name);
@@ -200,5 +200,22 @@ result_t* device_context_info_to_map(device_context_info_t device_context_info) 
 }
 
 void free_device_context_info(device_context_info_t* info) {
+    if (!info) {
+        return;
+    }
 
+    free(info->device_name);
+    info->device_name = NULL;
+
+    free(info->operating_system);
+    info->operating_system = NULL;
+
+    free(info->operating_system_version);
+    info->operating_system_version = NULL;
+
+    free(info->hostname);
+    info->hostname = NULL;
+
+    free(info);
+    info = NULL;
 }

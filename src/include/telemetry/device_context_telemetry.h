@@ -38,7 +38,7 @@ result_t* get_device_context_operating_system_info(os_version_info_type_t versio
 #ifdef _WIN32
     typedef LONG (WINAPI* rtl_get_version_t)(PRTL_OSVERSIONINFOW);
 
-    char* get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number);
+    char* _get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number);
 #endif
 
 #endif

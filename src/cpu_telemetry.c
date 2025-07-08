@@ -220,14 +220,14 @@ result_t* get_cpu_logical_processors_count() {
     }
 
     result_t* _get_cpu_core_count_windows() {
-        return get_cpu_processor_info(count_cpu_cores_callback);
+        return _get_cpu_processor_info(_count_cpu_cores_callback);
     }
 
     result_t* _get_cpu_logical_processors_count_windows() {
-        return get_cpu_processor_info(count_cpu_logical_processors_callback);
+        return _get_cpu_processor_info(_count_cpu_logical_processors_callback);
     }
 
-    result_t* get_cpu_processor_info(processor_info_callback_t callback) {
+    result_t* _get_cpu_processor_info(processor_info_callback_t callback) {
         unsigned long int length = 0;
 
         GetLogicalProcessorInformation(NULL, &length);
@@ -259,11 +259,11 @@ result_t* get_cpu_logical_processors_count() {
         return result_success((void*) (uintptr_t) result);
     }
 
-    uint32_t count_cpu_cores_callback(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
+    uint32_t _count_cpu_cores_callback(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
         return 1;
     }
 
-    uint32_t count_cpu_logical_processors_callback(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
+    uint32_t _count_cpu_logical_processors_callback(SYSTEM_LOGICAL_PROCESSOR_INFORMATION* info) {
         return __popcnt(info->ProcessorMask);
     }
 #elif defined(__linux__)
@@ -292,7 +292,7 @@ result_t* get_cpu_logical_processors_count() {
     }
 #endif
 
-result_t* cpu_info_to_map(cpu_info_t cpu_info) {
+result_t* cpu_info_to_map(const cpu_info_t cpu_info) {
     map_t* cpu_info_map = map_init();
 
     char* buffer = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));

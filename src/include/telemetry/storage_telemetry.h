@@ -45,12 +45,12 @@ result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_t
 result_t* get_storage_devices_size(size_t device_count);
 
 #ifdef _WIN32
-    HANDLE open_storage_device_handle(size_t device_index);
-    result_t* get_storage_device_descriptor(HANDLE handle, unsigned char** buffer);
+    HANDLE _open_storage_device_handle(size_t device_index);
+    result_t* _get_storage_device_descriptor(HANDLE handle, unsigned char** buffer);
 
-    const char* get_bus_type(STORAGE_BUS_TYPE bus_type);
+    const char* _get_bus_type(STORAGE_BUS_TYPE bus_type);
 #endif
 
-size_t count_storage_devices();
+size_t _count_storage_devices();
 
 #endif

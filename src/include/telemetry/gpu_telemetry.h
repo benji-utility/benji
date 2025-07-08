@@ -43,7 +43,7 @@ BENJI_GPU_FIELDS(BENJI_CREATE_TELEMETRY_GETTER_IMPL)
 result_t* get_gpu_memory(gpu_memory_type_t memory_type);
 
 #ifdef _WIN32
-    result_t* get_gpu_description();
+    result_t* _get_gpu_description();
 #endif
 
 #endif
