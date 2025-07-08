@@ -75,7 +75,7 @@ ifeq ($(OS), Windows_NT)
 	if exist "$(BUILD)/$(INSTALL_EXEC).exe" del /S $(BUILD)\$(INSTALL_EXEC).exe
 	$(GXX) $(GXX_FLAGS) $(INSTALLER_SRCS) -o $(BUILD)/$(INSTALL_EXEC)
 else ifeq ($(shell uname), Linux)
-	echo -e "\nNot supported on Linux (yet)"
+	@echo "\nInstallation not supported on Linux (yet)"
 endif
 
 TEST_DATA =

@@ -46,7 +46,7 @@ void log_error_payload(log_level_t log_level, result_error_payload_t payload) {
 
     sprintf(
         output,
-        "%s %s:%i under %s() -> %s (error code %i)",
+        "%s %s:%lu under %s() -> %s (error code %i)",
         log_prefix,
         payload.location.file_name,
         payload.location.lineno,

@@ -1,7 +1,7 @@
 #ifndef __BENJI_TELEMETRY_BASE_H
 #define __BENJI_TELEMETRY_BASE_H
 
-#include "..\result.h"
+#include "../result.h"
 
 #ifndef BENJI_CREATE_TELEMETRY_STRUCT
     #define BENJI_CREATE_TELEMETRY_STRUCT(_telemetry_group_upper, _telemetry_group_lower, ...) \

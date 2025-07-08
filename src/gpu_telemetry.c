@@ -27,7 +27,7 @@ result_t* get_gpu_info() {
             gpu_info->dedicated_video_memory,
             get_gpu_memory,
             free_gpu_info,
-            BENJI_GPU_DEDICATED_VIDEO_MEMORY
+            BENJI_GPU_WIN32_DEDICATED_VIDEO_MEMORY
         );
 
         get_telemetry_info_double(
@@ -35,7 +35,7 @@ result_t* get_gpu_info() {
             gpu_info->dedicated_system_memory,
             get_gpu_memory,
             free_gpu_info,
-            BENJI_GPU_DEDICATED_SYSTEM_MEMORY
+            BENJI_GPU_WIN32_DEDICATED_SYSTEM_MEMORY
         );
 
         get_telemetry_info_double(
@@ -43,7 +43,7 @@ result_t* get_gpu_info() {
             gpu_info->shared_system_memory,
             get_gpu_memory,
             free_gpu_info,
-            BENJI_GPU_SHARED_SYSTEM_MEMORY
+            BENJI_GPU_WIN32_SHARED_SYSTEM_MEMORY
         );
     #endif
 
@@ -62,7 +62,7 @@ result_t* get_gpu_vendor() {
     #if defined(_WIN32)
         return _get_gpu_vendor_windows();
     #elif defined(__linux__)
-        return _get_gpu_vendor_windows();
+        return _get_gpu_vendor_linux();
     #endif
 }
 
@@ -77,31 +77,35 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
     void* memory_value = malloc(sizeof(double));
 
     if (!memory_value) {
-        free(adapter_description);
+        #ifdef _WIN32
+            free(adapter_description);
+        #endif
 
         return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
     switch (memory_type) {
         #ifdef _WIN32
-            case BENJI_GPU_DEDICATED_VIDEO_MEMORY: {
+            case BENJI_GPU_WIN32_DEDICATED_VIDEO_MEMORY: {
                 *(double*) memory_value = bytes_to_gigabytes(adapter_description->DedicatedVideoMemory);
                 break;
             }
 
-            case BENJI_GPU_DEDICATED_SYSTEM_MEMORY: {
+            case BENJI_GPU_WIN32_DEDICATED_SYSTEM_MEMORY: {
                 *(double*) memory_value = bytes_to_gigabytes(adapter_description->DedicatedSystemMemory);
                 break;
             }
 
-            case BENJI_GPU_SHARED_SYSTEM_MEMORY: {
+            case BENJI_GPU_WIN32_SHARED_SYSTEM_MEMORY: {
                 *(double*) memory_value = bytes_to_gigabytes(adapter_description->SharedSystemMemory);
                 break;
             }
         #endif
     }
 
-    free(adapter_description);
+    #ifdef _WIN32
+        free(adapter_description);
+    #endif
 
     return result_success(memory_value);
 }
