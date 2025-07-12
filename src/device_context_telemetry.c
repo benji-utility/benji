@@ -1,37 +1,71 @@
 #include "include/telemetry/device_context_telemetry.h"
 
 result_t* get_device_context_info() {
-    device_context_info_t* info = malloc(sizeof(device_context_info_t));
+    device_context_info_t* device_context_info = malloc(sizeof(device_context_info_t));
 
-    if (!info) {
+    if (!device_context_info) {
         return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
-    result_t* device_name_result = get_device_context_device_name();
-    return_if_error(device_name_result);
-    info->device_name = strdup((char*) result_unwrap_value(device_name_result));
-    strtrim(info->device_name);
+    get_telemetry_info_string(
+        device_context_info,
+        device_context_info->device_name,
+        get_device_context_device_name,
+        free_device_context_info
+    );
 
-    result_t* operating_system_result = get_device_context_operating_system_info(BENJI_OPERATING_SYSTEM_VERSION_NAME);
-    return_if_error(operating_system_result);
-    info->operating_system = strdup((char*) result_unwrap_value(operating_system_result));
-    strtrim(info->operating_system);
+    get_telemetry_info_string(
+        device_context_info,
+        device_context_info->operating_system_name,
+        get_device_context_operating_system_version_info,
+        free_device_context_info,
+        BENJI_OPERATING_SYSTEM_VERSION_NAME
+    );
 
-    result_t* operating_system_version_result = get_device_context_operating_system_info(BENJI_OPERATING_SYSTEM_VERSION_NUMBER);
-    return_if_error(operating_system_version_result);
-    info->operating_system_version = strdup((char*) result_unwrap_value(operating_system_version_result));
-    strtrim(info->operating_system_version);
+    get_telemetry_info_string(
+        device_context_info,
+        device_context_info->operating_system_version,
+        get_device_context_operating_system_version_info,
+        free_device_context_info,
+        BENJI_OPERATING_SYSTEM_VERSION_NUMBER
+    );
 
-    result_t* hostname_result = get_device_context_hostname();
-    return_if_error(hostname_result);
-    info->hostname = strdup((char*) result_unwrap_value(hostname_result));
-    strtrim(info->hostname);
+    get_telemetry_info_string(
+        device_context_info,
+        device_context_info->hostname,
+        get_device_context_hostname,
+        free_device_context_info
+    );
 
-    return result_success(info);
+    return result_success(device_context_info);
 }
 
 result_t* get_device_context_device_name() {
     #if defined(_WIN32)
+        return _get_device_context_device_name_windows();
+    #elif defined(__linux__)
+        return _get_device_context_device_name_linux();
+    #endif
+}
+
+result_t* get_device_context_operating_system_version_info(os_version_info_type_t version_info_type) {
+    #if defined(_WIN32)
+        return _get_device_context_operating_system_version_info_windows(version_info_type);
+    #elif defined(__linux__)
+        return _get_device_context_operating_system_version_info_linux(version_info_type);
+    #endif
+}
+
+result_t* get_device_context_hostname() {
+    #if defined(_WIN32)
+        return _get_device_context_hostname_windows();
+    #elif defined(__linux__)
+        return _get_device_context_hostname_linux();
+    #endif
+}
+
+#if defined(_WIN32)
+    result_t* _get_device_context_device_name_windows() {
         HKEY hkey;
 
         HRESULT hresult = RegOpenKeyEx(
@@ -44,12 +78,12 @@ result_t* get_device_context_device_name() {
             return result_error(hresult, BENJI_ERROR_PACKET, "RegOpenKeyEx() failed");
         }
 
-        char device_name[MAX_COMPUTERNAME_LENGTH + 1];
+        wchar_t device_name[MAX_COMPUTERNAME_LENGTH + 1];
         unsigned long device_name_size = sizeof(device_name);
 
         unsigned long type = REG_SZ;
 
-        hresult = RegQueryValueExA(hkey, "ComputerName", NULL, &type, (unsigned char*) device_name, &device_name_size);
+        hresult = RegQueryValueEx(hkey, TEXT("ComputerName"), NULL, &type, (unsigned char*) device_name, &device_name_size);
 
         if (FAILED(hresult)) {
             RegCloseKey(hkey);
@@ -65,17 +99,13 @@ result_t* get_device_context_device_name() {
             return result_error(hresult, BENJI_ERROR_PACKET, "RegCloseKey() failed");
         }
 
-        return result_success(device_name);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+        return result_success(wcharp_to_charp(device_name));
+    }
 
-result_t* get_device_context_operating_system_info(os_version_info_type_t version_info_type) {
-    #if defined(_WIN32)
-        char* operating_system = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+    result_t* _get_device_context_operating_system_version_info_windows(os_version_info_type_t version_info_type) {
+        char* operating_system_version_info = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
-        if (!operating_system) {
+        if (!operating_system_version_info) {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
@@ -91,7 +121,7 @@ result_t* get_device_context_operating_system_info(os_version_info_type_t versio
                 if (rtl_get_version(&rtl_os_version_info) == 0) {
                     switch (version_info_type) {
                         case BENJI_OPERATING_SYSTEM_VERSION_NAME: {
-                            operating_system = _get_windows_name_from_version(
+                            operating_system_version_info = _get_windows_name_from_version(
                                 rtl_os_version_info.dwMajorVersion,
                                 rtl_os_version_info.dwMinorVersion,
                                 rtl_os_version_info.dwBuildNumber
@@ -102,7 +132,7 @@ result_t* get_device_context_operating_system_info(os_version_info_type_t versio
 
                         case BENJI_OPERATING_SYSTEM_VERSION_NUMBER: {
                             sprintf(
-                                operating_system,
+                                operating_system_version_info,
                                 "%lu.%lu (Build %lu)",
                                 rtl_os_version_info.dwMajorVersion,
                                 rtl_os_version_info.dwMinorVersion,
@@ -125,14 +155,10 @@ result_t* get_device_context_operating_system_info(os_version_info_type_t versio
             return result_error(GetLastError(), BENJI_ERROR_PACKET, "GetModuleHandle() failed");
         }
 
-        return result_success(operating_system);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+        return result_success(operating_system_version_info);
+    }
 
-result_t* get_device_context_hostname() {
-    #if defined(_WIN32)
+    result_t* _get_device_context_hostname_windows() {
         unsigned long hostname_size = 0;
 
         GetComputerNameEx(ComputerNameDnsHostname, NULL, &hostname_size);
@@ -153,12 +179,8 @@ result_t* get_device_context_hostname() {
         else {
             return result_error(GetLastError(), BENJI_ERROR_PACKET, "GetComputerNameEx() failed");
         }
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-#ifdef _WIN32
     char* _get_windows_name_from_version(unsigned long major_version, unsigned long minor_version, unsigned long build_number) {
         if (major_version == 10 && minor_version == 0) {
             if (build_number >= 22000) {
@@ -186,13 +208,25 @@ result_t* get_device_context_hostname() {
             return "???";
         }
     }
+#elif defined(__linux__)
+    result_t* _get_device_context_device_name_linux() {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_device_context_operating_system_version_info_linux(os_version_info_type_t version_info_type) {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_device_context_hostname_linux() {
+        // TODO: add linux stuff
+    }
 #endif
 
 result_t* device_context_info_to_map(const device_context_info_t device_context_info) {
     map_t* device_context_info_map = map_init();
 
     map_insert(device_context_info_map, "device_name", device_context_info.device_name);
-    map_insert(device_context_info_map, "operating_system", device_context_info.operating_system);
+    map_insert(device_context_info_map, "operating_system_name", device_context_info.operating_system_name);
     map_insert(device_context_info_map, "operating_system_version", device_context_info.operating_system_version);
     map_insert(device_context_info_map, "hostname", device_context_info.hostname);
 
@@ -207,8 +241,8 @@ void free_device_context_info(device_context_info_t* info) {
     free(info->device_name);
     info->device_name = NULL;
 
-    free(info->operating_system);
-    info->operating_system = NULL;
+    free(info->operating_system_name);
+    info->operating_system_name = NULL;
 
     free(info->operating_system_version);
     info->operating_system_version = NULL;

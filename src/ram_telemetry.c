@@ -70,7 +70,7 @@ result_t* get_ram_speed() {
     #endif
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
     result_t* _get_ram_total_memory_windows() {
         result_t* status_result = _get_memory_status();
         return_if_error(status_result);

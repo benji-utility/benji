@@ -164,7 +164,7 @@ result_t* get_storage_devices_size(size_t device_count) {
     #endif
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
     HANDLE _open_storage_device_handle(size_t device_index) {
         char device_path[BENJI_BASIC_STRING_LENGTH];
 

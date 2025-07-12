@@ -40,7 +40,7 @@
     #define BENJI_CPU_FIELDS(_field_getter_impl) \
         _field_getter_impl(cpu, name) \
         _field_getter_impl(cpu, vendor) \
-        _field_getter_impl(cpu, arch) \
+        _field_getter_impl(cpu, architecture) \
         _field_getter_impl(cpu, clock_speed) \
         _field_getter_impl(cpu, core_count) \
         _field_getter_impl(cpu, logical_processors_count)
@@ -49,7 +49,7 @@
 BENJI_CREATE_TELEMETRY_STRUCT(CPU, cpu,
     char* name;
     char* vendor;
-    char* arch;
+    char* architecture;
     double clock_speed; // in GHz
     size_t core_count;
     size_t logical_processors_count;

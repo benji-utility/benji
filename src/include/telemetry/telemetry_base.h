@@ -18,10 +18,10 @@
 #endif
 
 #ifndef BENJI_CREATE_TELEMETRY_GETTER_IMPL
-    #define BENJI_CREATE_TELEMETRY_GETTER_IMPL(_telemetry_group, _field) \
-        result_t* get_##_telemetry_group##_##_field(); \
-        result_t* _get_##_telemetry_group##_##_field##_windows(); \
-        result_t* _get_##_telemetry_group##_##_field##_linux();
+    #define BENJI_CREATE_TELEMETRY_GETTER_IMPL(_telemetry_group, _field, ...) \
+        result_t* get_##_telemetry_group##_##_field(__VA_ARGS__); \
+        result_t* _get_##_telemetry_group##_##_field##_windows(__VA_ARGS__); \
+        result_t* _get_##_telemetry_group##_##_field##_linux(__VA_ARGS__);
 #endif
 
 #ifndef get_telemetry_info_string

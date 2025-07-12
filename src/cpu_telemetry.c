@@ -22,8 +22,8 @@ result_t* get_cpu_info() {
     );
 
     get_telemetry_info_string(cpu_info,
-        cpu_info->arch,
-        get_cpu_arch,
+        cpu_info->architecture,
+        get_cpu_architecture,
         free_cpu_info
     );
 
@@ -67,11 +67,11 @@ result_t* get_cpu_vendor() {
     #endif
 }
 
-result_t* get_cpu_arch() {
+result_t* get_cpu_architecture() {
    #if defined(_WIN32)
-        return _get_cpu_arch_windows();
+        return _get_cpu_architecture_windows();
     #elif defined(__linux__)
-        return _get_cpu_arch_linux();
+        return _get_cpu_architecture_linux();
     #endif
 }
 
@@ -99,82 +99,82 @@ result_t* get_cpu_logical_processors_count() {
     #endif
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
     result_t* _get_cpu_name_windows() {
         int cpuid_info[BENJI_CPUID_BUFFER_LENGTH];
 
-        char* name = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+        char* cpu_name = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
-        if (!name) {
+        if (!cpu_name) {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        memset(name, 0, BENJI_BASIC_STRING_LENGTH);
+        memset(cpu_name, 0, BENJI_BASIC_STRING_LENGTH);
 
         for (int i = 0; i < BENJI_CPUID_CPU_NAME_SECTIONS_COUNT; ++i) {
             __cpuid(cpuid_info, BENJI_CPUID_CPU_NAME_START + i);
-            memcpy(name + (i * 16), cpuid_info, sizeof(cpuid_info));
+            memcpy(cpu_name + (i * 16), cpuid_info, sizeof(cpuid_info));
         }
 
         // TODO: maybe make this terminate after the last character?
-        name[BENJI_BASIC_STRING_LENGTH - 1] = '\0';
+        cpu_name[BENJI_BASIC_STRING_LENGTH - 1] = '\0';
 
-        return result_success(name);
+        return result_success(cpu_name);
     }
 
     result_t* _get_cpu_vendor_windows() {
         int cpu_info[BENJI_CPUID_BUFFER_LENGTH];
 
-        char* vendor = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+        char* cpu_vendor = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
 
-        if (!vendor) {
+        if (!cpu_vendor) {
             return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
         }
 
-        vendor[0] = '\0';
+        cpu_vendor[0] = '\0';
 
         __cpuid(cpu_info, 0);
 
         // TODO: make these not hardcoded constants
-        memcpy(vendor, &cpu_info[1], 4);
-        memcpy(vendor + 4, &cpu_info[3], 4);
-        memcpy(vendor + 8, &cpu_info[2], 4);
+        memcpy(cpu_vendor, &cpu_info[1], 4);
+        memcpy(cpu_vendor + 4, &cpu_info[3], 4);
+        memcpy(cpu_vendor + 8, &cpu_info[2], 4);
 
-        vendor[12] = '\0';
+        cpu_vendor[12] = '\0';
 
-        return result_success(vendor);
+        return result_success(cpu_vendor);
     }
 
-    result_t* _get_cpu_arch_windows() {
+    result_t* _get_cpu_architecture_windows() {
         SYSTEM_INFO system_info;
 
         GetSystemInfo(&system_info);
 
-        char* arch;
+        char* cpu_architecture;
 
         // copied from "winnt.h" for max support
         switch (system_info.wProcessorArchitecture) {
-            case PROCESSOR_ARCHITECTURE_INTEL: arch = "x86"; break;
-            case PROCESSOR_ARCHITECTURE_MIPS: arch = "MIPS"; break;
-            case PROCESSOR_ARCHITECTURE_ALPHA: arch = "Alpha"; break;
-            case PROCESSOR_ARCHITECTURE_PPC: arch = "PowerPC"; break;
-            case PROCESSOR_ARCHITECTURE_SHX: arch = "Hitachi SHx"; break;
-            case PROCESSOR_ARCHITECTURE_ARM: arch = "ARM"; break;
-            case PROCESSOR_ARCHITECTURE_IA64: arch = "IA-64"; break;
-            case PROCESSOR_ARCHITECTURE_ALPHA64: arch = "Alpha64"; break;
-            case PROCESSOR_ARCHITECTURE_MSIL: arch = "MSIL"; break;
-            case PROCESSOR_ARCHITECTURE_AMD64: arch = "x64"; break;
-            case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64: arch = "x86 on x64"; break;
-            case PROCESSOR_ARCHITECTURE_NEUTRAL: arch = "Neutral"; break;
-            case PROCESSOR_ARCHITECTURE_ARM64: arch = "ARM64"; break;
-            case PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64: arch = "ARM32 on x64"; break;
-            case PROCESSOR_ARCHITECTURE_IA32_ON_ARM64: arch = "x86 on ARM64"; break;
+            case PROCESSOR_ARCHITECTURE_INTEL: cpu_architecture = "x86"; break;
+            case PROCESSOR_ARCHITECTURE_MIPS: cpu_architecture = "MIPS"; break;
+            case PROCESSOR_ARCHITECTURE_ALPHA: cpu_architecture = "Alpha"; break;
+            case PROCESSOR_ARCHITECTURE_PPC: cpu_architecture = "PowerPC"; break;
+            case PROCESSOR_ARCHITECTURE_SHX: cpu_architecture = "Hitachi SHx"; break;
+            case PROCESSOR_ARCHITECTURE_ARM: cpu_architecture = "ARM"; break;
+            case PROCESSOR_ARCHITECTURE_IA64: cpu_architecture = "IA-64"; break;
+            case PROCESSOR_ARCHITECTURE_ALPHA64: cpu_architecture = "Alpha64"; break;
+            case PROCESSOR_ARCHITECTURE_MSIL: cpu_architecture = "MSIL"; break;
+            case PROCESSOR_ARCHITECTURE_AMD64: cpu_architecture = "x64"; break;
+            case PROCESSOR_ARCHITECTURE_IA32_ON_WIN64: cpu_architecture = "x86 on x64"; break;
+            case PROCESSOR_ARCHITECTURE_NEUTRAL: cpu_architecture = "Neutral"; break;
+            case PROCESSOR_ARCHITECTURE_ARM64: cpu_architecture = "ARM64"; break;
+            case PROCESSOR_ARCHITECTURE_ARM32_ON_WIN64: cpu_architecture = "ARM32 on x64"; break;
+            case PROCESSOR_ARCHITECTURE_IA32_ON_ARM64: cpu_architecture = "x86 on ARM64"; break;
 
             case PROCESSOR_ARCHITECTURE_UNKNOWN: // make this one fall through because i dont wanna deal with edge cases
-            default: arch = "???"; break;
+            default: cpu_architecture = "???"; break;
         }
 
-        return result_success(arch);
+        return result_success(cpu_architecture);
     }
 
     result_t* _get_cpu_clock_speed_windows() {
@@ -275,7 +275,7 @@ result_t* get_cpu_logical_processors_count() {
         // TODO: add linux stuff
     }
 
-    result_t* _get_cpu_arch_linux() {
+    result_t* _get_cpu_architecture_linux() {
         // TODO: add linux stuff
     }
 
@@ -305,7 +305,7 @@ result_t* cpu_info_to_map(const cpu_info_t cpu_info) {
 
     map_insert(cpu_info_map, "name", cpu_info.name);
     map_insert(cpu_info_map, "vendor", cpu_info.vendor);
-    map_insert(cpu_info_map, "arch", cpu_info.arch);
+    map_insert(cpu_info_map, "arch", cpu_info.architecture);
 
     sprintf(buffer, "%0.3f", cpu_info.clock_speed);
     map_insert(cpu_info_map, "clock_speed", strdup(buffer));
@@ -332,8 +332,8 @@ void free_cpu_info(cpu_info_t* info) {
     free(info->vendor);
     info->vendor = NULL;
 
-    free(info->arch);
-    info->arch = NULL;
+    free(info->architecture);
+    info->architecture = NULL;
 
     free(info);
     info = NULL;

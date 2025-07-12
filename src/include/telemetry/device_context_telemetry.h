@@ -14,12 +14,13 @@
 #ifndef BENJI_DEVICE_CONTEXT_FIELDS
     #define BENJI_DEVICE_CONTEXT_FIELDS(_field_getter_impl) \
         _field_getter_impl(device_context, device_name) \
+        _field_getter_impl(device_context, operating_system_version_info, os_version_info_type_t version_info_type) \
         _field_getter_impl(device_context, hostname)
 #endif
 
 BENJI_CREATE_TELEMETRY_STRUCT(DEVICE_CONTEXT, device_context,
     char* device_name;
-    char* operating_system;
+    char* operating_system_name;
     char* operating_system_version;
     char* hostname;
 )
@@ -32,8 +33,6 @@ typedef enum _BENJI_OPERATING_SYSTEM_VERSION_INFO_TYPE {
 BENJI_CREATE_TELEMETRY_BASE(device_context)
 
 BENJI_DEVICE_CONTEXT_FIELDS(BENJI_CREATE_TELEMETRY_GETTER_IMPL)
-
-result_t* get_device_context_operating_system_info(os_version_info_type_t version_info_type);
 
 #ifdef _WIN32
     typedef LONG (WINAPI* rtl_get_version_t)(PRTL_OSVERSIONINFOW);

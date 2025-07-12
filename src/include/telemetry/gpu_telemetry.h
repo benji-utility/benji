@@ -27,11 +27,11 @@ BENJI_CREATE_TELEMETRY_STRUCT(GPU, gpu,
     char* name;
     char* vendor;
 
-    #ifdef _WIN32
+    #if defined(_WIN32)
         double dedicated_video_memory; // in GB
         double dedicated_system_memory; // in GB
         double shared_system_memory; // in GB
-    #elif __linux__
+    #elif defined(__linux__)
         /* TODO: add linux stuff */
     #endif
 )

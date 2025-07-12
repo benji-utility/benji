@@ -85,7 +85,7 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
     }
 
     switch (memory_type) {
-        #ifdef _WIN32
+        #if defined(_WIN32)
             case BENJI_GPU_WIN32_DEDICATED_VIDEO_MEMORY: {
                 *(double*) memory_value = bytes_to_gigabytes(adapter_description->DedicatedVideoMemory);
                 break;
@@ -110,7 +110,7 @@ result_t* get_gpu_memory(gpu_memory_type_t memory_type) {
     return result_success(memory_value);
 }
 
-#ifdef _WIN32
+#if defined(_WIN32)
     result_t* _get_gpu_name_windows() {
         result_t* description_result = _get_gpu_description();
         return_if_error(description_result);
