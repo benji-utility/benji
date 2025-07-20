@@ -1,39 +1,70 @@
 #include "include/telemetry/storage_telemetry.h"
 
 result_t* get_storage_info() {
-    storage_info_t* info = malloc(sizeof(storage_info_t));
+    storage_info_t* storage_info = malloc(sizeof(storage_info_t));
 
-    if (!info) {
+    if (!storage_info) {
         return result_error(-1, BENJI_ERROR_PACKET, "malloc() failed");
     }
 
-    info->device_count = _count_storage_devices();
+    storage_info->device_count = _count_storage_devices();
 
-    result_t* models_result = get_storage_devices_info(info->device_count, BENJI_STORAGE_DEVICE_MODEL_NAME);
-    return_if_error(models_result);
-    info->models = strdup((char*) result_unwrap_value(models_result));
-    strtrim(info->models);
+    get_telemetry_info_string(
+        storage_info,
+        storage_info->models,
+        get_storage_devices_model_info,
+        free_storage_info,
+        storage_info->device_count,
+        BENJI_STORAGE_DEVICE_MODEL_NAME
+    );
 
-    result_t* serial_numbers_result = get_storage_devices_info(info->device_count, BENJI_STORAGE_DEVICE_SERIAL_NUMBER);
-    return_if_error(serial_numbers_result);
-    info->serial_numbers = strdup((char*) result_unwrap_value(serial_numbers_result));
-    strtrim(info->serial_numbers);
+    get_telemetry_info_string(
+        storage_info,
+        storage_info->serial_numbers,
+        get_storage_devices_model_info,
+        free_storage_info,
+        storage_info->device_count,
+        BENJI_STORAGE_DEVICE_SERIAL_NUMBER
+    );
 
-    result_t* bus_types_result = get_storage_devices_info(info->device_count, BENJI_STORAGE_DEVICE_BUS_TYPE);
-    return_if_error(bus_types_result);
-    info->bus_types = strdup((char*) result_unwrap_value(bus_types_result));
-    strtrim(info->bus_types);
+    get_telemetry_info_string(
+        storage_info,
+        storage_info->bus_types,
+        get_storage_devices_model_info,
+        free_storage_info,
+        storage_info->device_count,
+        BENJI_STORAGE_DEVICE_BUS_TYPE
+    );
 
-    result_t* sizes_result = get_storage_devices_size(info->device_count);
-    return_if_error(sizes_result);
-    info->sizes = strdup((char*) result_unwrap_value(sizes_result));
-    strtrim(info->sizes);
+    get_telemetry_info_string(
+        storage_info,
+        storage_info->sizes,
+        get_storage_devices_sizes,
+        free_storage_info,
+        storage_info->device_count
+    );
 
-    return result_success(info);
+    return result_success(storage_info);
 }
 
-result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_type) {
+result_t* get_storage_devices_model_info(size_t device_count, model_info_type_t model_info_type) {
     #if defined(_WIN32)
+        return _get_storage_devices_model_info_windows(device_count, model_info_type);
+    #elif defined(__linux__)
+        return _get_storage_devices_model_info_linux(device_count, model_info_type);
+    #endif
+}
+
+result_t* get_storage_devices_sizes(size_t device_count) {
+    #if defined(_WIN32)
+        return _get_storage_devices_sizes_windows(device_count);
+    #elif defined(__linux__)
+        return _get_storage_devices_sizes_linux(device_count);
+    #endif
+}
+
+#if defined(_WIN32)
+    result_t* _get_storage_devices_model_info_windows(size_t device_count, model_info_type_t model_info_type) {
         char* devices_info = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
         if (!devices_info) {
@@ -58,10 +89,10 @@ result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_t
                 );
 
                 // model name or serial number
-                if (info_type != BENJI_STORAGE_DEVICE_BUS_TYPE) {
+                if (model_info_type != BENJI_STORAGE_DEVICE_BUS_TYPE) {
                     unsigned long offset;
 
-                    switch (info_type) {
+                    switch (model_info_type) {
                         case BENJI_STORAGE_DEVICE_MODEL_NAME: {
                             offset = storage_device_descriptor.ProductIdOffset;
                             break;
@@ -102,13 +133,9 @@ result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_t
         }
 
         return result_success(devices_info);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-result_t* get_storage_devices_size(size_t device_count) {
-    #if defined(_WIN32)
+    result_t* _get_storage_devices_sizes_windows(size_t device_count) {
         char* sizes = malloc(BENJI_MAX_STORAGE_DEVICES * BENJI_BASIC_STRING_LENGTH);
 
         if (!sizes) {
@@ -159,12 +186,8 @@ result_t* get_storage_devices_size(size_t device_count) {
         }
 
         return result_success(sizes);
-    #elif defined(__linux__)
-        /* TODO: add linux stuff */
-    #endif
-}
+    }
 
-#if defined(_WIN32)
     HANDLE _open_storage_device_handle(size_t device_index) {
         char device_path[BENJI_BASIC_STRING_LENGTH];
 
@@ -258,6 +281,14 @@ result_t* get_storage_devices_size(size_t device_count) {
 
             default: return "???";
         }
+    }
+#elif defined(__linux__)
+    result_t* _get_storage_devices_model_info_linux(size_t device_count, model_info_type_t model_info_type) {
+        // TODO: add linux stuff
+    }
+
+    result_t* _get_storage_devices_sizes_linux(size_t device_count) {
+        // TODO: add linux stuff
     }
 #endif
 

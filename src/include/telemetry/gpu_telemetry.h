@@ -18,12 +18,6 @@
         _field_getter_impl(gpu, memory, gpu_memory_type_t memory_type)
 #endif
 
-typedef enum _BENJI_GPU_MEMORY_TYPE {
-    BENJI_GPU_WIN32_DEDICATED_VIDEO_MEMORY,
-    BENJI_GPU_WIN32_DEDICATED_SYSTEM_MEMORY,
-    BENJI_GPU_WIN32_SHARED_SYSTEM_MEMORY
-} gpu_memory_type_t;
-
 BENJI_CREATE_TELEMETRY_STRUCT(GPU, gpu,
     char* name;
     char* vendor;
@@ -36,6 +30,12 @@ BENJI_CREATE_TELEMETRY_STRUCT(GPU, gpu,
         /* TODO: add linux stuff */
     #endif
 )
+
+typedef enum _BENJI_GPU_MEMORY_TYPE {
+    BENJI_GPU_WIN32_DEDICATED_VIDEO_MEMORY,
+    BENJI_GPU_WIN32_DEDICATED_SYSTEM_MEMORY,
+    BENJI_GPU_WIN32_SHARED_SYSTEM_MEMORY
+} gpu_memory_type_t;
 
 BENJI_CREATE_TELEMETRY_BASE(gpu)
 

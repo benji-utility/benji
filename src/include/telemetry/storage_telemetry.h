@@ -23,6 +23,12 @@
     #define BENJI_DEFAULT_STORAGE_DEVICE_DESCRIPTOR_SIZE (512)
 #endif
 
+#ifndef BENJI_STORAGE_FIELDS
+    #define BENJI_STORAGE_FIELDS(_field_getter_impl) \
+        _field_getter_impl(storage_devices, model_info, size_t device_count, model_info_type_t model_info_type) \
+        _field_getter_impl(storage_devices, sizes, size_t device_count)
+#endif
+
 BENJI_CREATE_TELEMETRY_STRUCT(STORAGE, storage,
     size_t device_count;
 
@@ -41,8 +47,7 @@ typedef enum _BENJI_STORAGE_DEVICE_MODEL_INFO_TYPE {
 
 BENJI_CREATE_TELEMETRY_BASE(storage)
 
-result_t* get_storage_devices_info(size_t device_count, model_info_type_t info_type);
-result_t* get_storage_devices_size(size_t device_count);
+BENJI_STORAGE_FIELDS(BENJI_CREATE_TELEMETRY_GETTER_IMPL)
 
 #ifdef _WIN32
     HANDLE _open_storage_device_handle(size_t device_index);
