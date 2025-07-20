@@ -14,7 +14,8 @@
 #ifndef BENJI_GPU_FIELDS
     #define BENJI_GPU_FIELDS(_field_getter_impl) \
         _field_getter_impl(gpu, name) \
-        _field_getter_impl(gpu, vendor)
+        _field_getter_impl(gpu, vendor) \
+        _field_getter_impl(gpu, memory, gpu_memory_type_t memory_type)
 #endif
 
 typedef enum _BENJI_GPU_MEMORY_TYPE {
@@ -39,8 +40,6 @@ BENJI_CREATE_TELEMETRY_STRUCT(GPU, gpu,
 BENJI_CREATE_TELEMETRY_BASE(gpu)
 
 BENJI_GPU_FIELDS(BENJI_CREATE_TELEMETRY_GETTER_IMPL)
-
-result_t* get_gpu_memory(gpu_memory_type_t memory_type);
 
 #ifdef _WIN32
     result_t* _get_gpu_description();
