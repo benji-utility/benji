@@ -4,7 +4,7 @@
 
 A light background application written in C that collects hardware information, accessible through a locally hosted TCP server
 
-## Installation
+## Installation (WIP, Windows only)
 1. Download and extract the zip attached to the latest release [here](https://github.com/benji-utility/benji/releases/latest)
 2. Open Command Prompt as Administrator
 3. Change the current working directory to where the files in the zip were extracted to
@@ -27,7 +27,7 @@ A light background application written in C that collects hardware information, 
 |      -8      |   Unable to Create Registry Key  |
 |      -9      | Unable to Set Registry Key Value |
 
-## Usage Info (WIP, only for Windows)
+## Usage Info (WIP, Windows only)
 To test grabbing [data](#data-requests-wip) from Benji, install Netcat [here](https://nmap.org/download.html#windows) and use one of the corresponding commands:
 1. If the repo was cloned/downloaded, then change into the root of the project directory and run the following command:
 ```
