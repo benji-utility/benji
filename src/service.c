@@ -30,7 +30,7 @@
             return;
         }
 
-        result_t* server_socket_result = server_init(server_info.hostname, server_info.port);
+        result_t* server_socket_result = server_init(server_config.hostname, server_config.port);
 
         if (server_socket_result->is_error) {
             result_error_payload_t server_socket_result_error = result_unwrap_error(server_socket_result);
@@ -145,7 +145,11 @@
     /* TODO: add linux stuff */
 #endif
 
-void collect_server_details(config_details_t config_details) {
-    server_info.hostname = config_details.server_config.hostname;
-    server_info.port = config_details.server_config.port;
+void collect_server_config_details(config_details_t config_details) {
+    server_config.hostname = config_details.server_config_details.hostname;
+    server_config.port = config_details.server_config_details.port;
+}
+
+void collect_telemetry_config_details(config_details_t config_details) {
+    telemetry_config.max_processes = config_details.telemetry_config_details.max_processes;
 }

@@ -19,10 +19,10 @@
     #endif
 #endif
 
-static struct _BENJI_SERVER_INFO {
+static struct _BENJI_SERVER_CONFIG {
     const char* hostname;
     uint16_t port;
-} server_info;
+} server_config;
 
 static BENJI_SOCKET server_socket;
 
@@ -41,7 +41,8 @@ static BENJI_SOCKET server_socket;
     /* TODO: add linux stuff */
 #endif
 
-// prolly the closest anything in this project will get to a constructor
-void collect_server_details(config_details_t config_details);
+// mock constructors
+void collect_server_config_details(config_details_t config_details);
+void collect_telemetry_config_details(config_details_t config_details);
 
 #endif
