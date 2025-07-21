@@ -1,9 +1,9 @@
-#ifndef BENJI_USE_SYS_INFO_UTILS
-    #define BENJI_USE_SYS_INFO_UTILS
+#ifndef BENJI_USE_SYSTEM_TELEMETRY_UTILS
+    #define BENJI_USE_SYSTEM_TELEMETRY_UTILS
 #endif
 
-#include "include/hardware.h"
 #include "include/utils.h"
+#include "include/telemetry.h"
 #include "include/result.h"
 
 result_t* get_hardware_info(const char* hardware_group, char** header) {

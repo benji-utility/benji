@@ -1,13 +1,13 @@
-#ifndef __BENJI_RAM_INFO_H
-#define __BENJI_RAM_INFO_H
+#ifndef __BENJI_RAM_TELEMETRY_H
+#define __BENJI_RAM_TELEMETRY_H
 
-#ifndef BENJI_USE_SYS_INFO_UTILS
-    #define BENJI_USE_SYS_INFO_UTILS
+#ifndef BENJI_USE_SYSTEM_TELEMETRY_UTILS
+    #define BENJI_USE_SYSTEM_TELEMETRY_UTILS
 #endif
 
 #include "../utils.h"
 
-#include "hardware_base.h"
+#include "telemetry_base.h"
 
 #ifndef BENJI_SMBIOS_MEMORY_DEVICE_TYPE
     #define BENJI_SMBIOS_MEMORY_DEVICE_TYPE (17)
@@ -25,16 +25,16 @@
     #define BENJI_RAM_FIELDS(_field_getter_impl) \
         _field_getter_impl(ram, total_memory) \
         _field_getter_impl(ram, memory_load) \
-        _field_getter_impl(ram, free_memory) \
+        _field_getter_impl(ram, available_memory) \
         _field_getter_impl(ram, speed)
 #endif
 
-BENJI_START_HARDWARE_STRUCT(RAM)
+BENJI_CREATE_TELEMETRY_STRUCT(RAM, ram,
     double total_memory; // in GB
     double memory_load; // in GB
-    double free_memory; // in GB
+    double available_memory; // in GB
     uint16_t speed; // in MHz
-BENJI_END_HARDWARE_STRUCT(ram)
+)
 
 #ifdef _WIN32
     #pragma pack(push, 1)
@@ -70,12 +70,12 @@ BENJI_END_HARDWARE_STRUCT(ram)
     #pragma pack(pop)
 #endif
 
-BENJI_CREATE_HARDWARE_BASE(ram)
+BENJI_CREATE_TELEMETRY_BASE(ram)
 
-BENJI_RAM_FIELDS(BENJI_CREATE_HARDWARE_GETTER_IMPL)
+BENJI_RAM_FIELDS(BENJI_CREATE_TELEMETRY_GETTER_IMPL)
 
 #ifdef _WIN32
-    result_t* get_memory_status();
+    result_t* _get_memory_status();
 #endif
 
 #endif

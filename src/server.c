@@ -65,7 +65,7 @@ BENJIAPI result_t* server_init(const char* hostname, uint16_t port) {
 
     getsockname(server_socket, (struct sockaddr*) &server_address, &server_address_length);
 
-    log_message(BENJI_LOG_LEVEL_INFO, "Server created at '127.0.0.1:%d'", ntohs(server_address.sin_port));
+    log_message(BENJI_LOG_LEVEL_INFO, "Server created at '%s:%d'", hostname, ntohs(server_address.sin_port));
 
     server_status = BENJI_SERVER_RUNNING;
 
@@ -127,10 +127,12 @@ BENJIAPI result_t* server_update(BENJI_SOCKET server_socket) {
 
         json_block[0] = '\0';
 
-        sprintf(json_block, "%s,", map_serialize(map_data, header));
+        sprintf(json_block, "%s", map_serialize(map_data, header));
         strcat(json, json_block);
 
         log_message(BENJI_LOG_LEVEL_INFO, "Collected data: '%s'", json_block);
+
+        strcat(json, ",");
 
         free(json_block);
 
