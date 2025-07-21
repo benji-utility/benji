@@ -65,7 +65,7 @@ BENJIAPI result_t* server_init(const char* hostname, uint16_t port) {
 
     getsockname(server_socket, (struct sockaddr*) &server_address, &server_address_length);
 
-    log_message(BENJI_LOG_LEVEL_INFO, "Server created at '127.0.0.1:%d'", ntohs(server_address.sin_port));
+    log_message(BENJI_LOG_LEVEL_INFO, "Server created at '%s:%d'", hostname, ntohs(server_address.sin_port));
 
     server_status = BENJI_SERVER_RUNNING;
 
