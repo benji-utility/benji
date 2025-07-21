@@ -22,7 +22,7 @@ INSTALLER_SRCS := $(wildcard $(INSTALLER_SRC)/*.c)
 TOML_SRCS := $(TOML)/toml.c
 
 ifeq ($(OS), Windows_NT)
-	LINKED_LIBS := -lWs2_32 -ldxgi -ldxguid -lole32
+	LINKED_LIBS := -lWs2_32 -ldxgi -ldxguid -lole32 -lpsapi
 else ifeq ($(shell uname), Linux)
 	LINKED_LIBS :=
 endif
