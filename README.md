@@ -1,4 +1,4 @@
-[![wakatime](https://wakatime.com/badge/github/kryllyxofficial01/benji.svg)](https://wakatime.com/badge/github/kryllyxofficial01/benji)
+[![wakatime](https://wakatime.com/badge/github/benji-utility/benji.svg)](https://wakatime.com/badge/github/benji-utility/benji)
 
 # benji
 
