@@ -1,6 +1,8 @@
 #ifndef __BENJI_TELEMETRY_BASE_H
 #define __BENJI_TELEMETRY_BASE_H
 
+#include <stdint.h>
+
 #include "../result.h"
 
 #ifndef BENJI_CREATE_TELEMETRY_STRUCT
@@ -48,5 +50,9 @@
         _info = *(double*) result_unwrap_value(result); \
     } while (false);
 #endif
+
+static struct _BENJI_TELEMETRY_CONFIG {
+    // TODO: add values here
+} telemetry_config;
 
 #endif

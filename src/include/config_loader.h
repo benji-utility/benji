@@ -23,11 +23,19 @@
     #define BENJI_DEFAULT_SERVER_PORT (8000)
 #endif
 
+#ifndef BENJI_DEFAULT_MAX_PROCESSES
+    #define BENJI_DEFAULT_MAX_PROCESSES (10)
+#endif
+
 typedef struct _BENJI_CONFIG_DETAILS {
-    struct _BENJI_SERVER_CONFIG {
+    struct _BENJI_SERVER_CONFIG_DETAILS {
         const char* hostname;
         uint16_t port; // 1-65535
-    } server_config;
+    } server_config_details;
+
+    struct _TELEMETRY_CONFIG_DETAILS {
+        // TODO: add values here
+    } telemetry_config_details;
 } config_details_t;
 
 result_t* open_config();

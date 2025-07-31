@@ -21,11 +21,10 @@ int main(int argc, const char* argv[]) {
 
     config_details_t config_details = get_details_from_config(toml_config);
 
-    toml_free(toml_config);
+    collect_server_config_details(config_details);
+    collect_telemetry_config_details(config_details);
 
-    #ifdef _WIN32
-        collect_server_details(config_details);
-    #endif
+    toml_free(toml_config);
 
     #if defined(_WIN32)
         winsock_init();

@@ -48,18 +48,28 @@ result_t* open_config() {
 config_details_t get_details_from_config(toml_table_t* config) {
     // set initial defaults
     config_details_t config_details = (config_details_t) {
-        .server_config.hostname = BENJI_DEFAULT_SERVER_HOSTNAME,
-        .server_config.port = BENJI_DEFAULT_SERVER_PORT
+        .server_config_details.hostname = BENJI_DEFAULT_SERVER_HOSTNAME,
+        .server_config_details.port = BENJI_DEFAULT_SERVER_PORT,
     };
 
     toml_table_t* server_table = toml_table_table(config, "server");
+    toml_table_t* telemetry_table = toml_table_table(config, "telemetry");
 
     if (server_table) {
         toml_value_t hostname = toml_table_string(server_table, "hostname");
         toml_value_t port = toml_table_int(server_table, "port");
 
-        config_details.server_config.hostname = hostname.ok ? hostname.u.s : BENJI_DEFAULT_SERVER_HOSTNAME;
-        config_details.server_config.port = port.ok ? port.u.i : BENJI_DEFAULT_SERVER_PORT;
+        if (hostname.ok) {
+            config_details.server_config_details.hostname = hostname.u.s;
+        }
+
+        if (port.ok) {
+            config_details.server_config_details.port = port.u.i;
+        }
+    }
+
+    if (telemetry_table) {
+        // TODO: add values here
     }
 
     return config_details;

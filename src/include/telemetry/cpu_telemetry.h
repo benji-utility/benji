@@ -1,20 +1,19 @@
 #ifndef __BENJI_CPU_TELEMETRY_H
 #define __BENJI_CPU_TELEMETRY_H
 
+#if defined(_WIN32)
+    #include <intrin.h>
+    #include <unistd.h>
+#endif
+
 #ifndef BENJI_USE_SYSTEM_TELEMETRY_UTILS
     #define BENJI_USE_SYSTEM_TELEMETRY_UTILS
 #endif
 
 #include "../utils.h"
-#include "../map.h"
 #include "../result.h"
 
 #include "telemetry_base.h"
-
-#if defined(_WIN32)
-    #include <intrin.h>
-    #include <unistd.h>
-#endif
 
 #ifndef BENJI_CPUID_BUFFER_LENGTH
     #define BENJI_CPUID_BUFFER_LENGTH (4)
