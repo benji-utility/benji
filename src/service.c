@@ -1,4 +1,3 @@
-
 #include "include/service.h"
 
 #if defined(_WIN32)
@@ -151,5 +150,5 @@ void collect_server_config_details(config_details_t config_details) {
 }
 
 void collect_telemetry_config_details(config_details_t config_details) {
-    telemetry_config.max_processes = config_details.telemetry_config_details.max_processes;
+    // TODO: add values
 }

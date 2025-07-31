@@ -50,8 +50,6 @@ config_details_t get_details_from_config(toml_table_t* config) {
     config_details_t config_details = (config_details_t) {
         .server_config_details.hostname = BENJI_DEFAULT_SERVER_HOSTNAME,
         .server_config_details.port = BENJI_DEFAULT_SERVER_PORT,
-
-        .telemetry_config_details.max_processes = BENJI_DEFAULT_MAX_PROCESSES
     };
 
     toml_table_t* server_table = toml_table_table(config, "server");
@@ -71,11 +69,7 @@ config_details_t get_details_from_config(toml_table_t* config) {
     }
 
     if (telemetry_table) {
-        toml_value_t max_processes = toml_table_int(server_table, "max_processes");
-
-        if (max_processes.ok) {
-            config_details.telemetry_config_details.max_processes = max_processes.u.i;
-        }
+        // TODO: add values here
     }
 
     return config_details;

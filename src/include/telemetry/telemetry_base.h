@@ -52,7 +52,7 @@
 #endif
 
 static struct _BENJI_TELEMETRY_CONFIG {
-    size_t max_processes;
+    // TODO: add values here
 } telemetry_config;
 
 #endif

@@ -34,7 +34,7 @@ typedef struct _BENJI_CONFIG_DETAILS {
     } server_config_details;
 
     struct _TELEMETRY_CONFIG_DETAILS {
-        size_t max_processes;
+        // TODO: add values here
     } telemetry_config_details;
 } config_details_t;
 
