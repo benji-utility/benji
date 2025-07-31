@@ -28,7 +28,7 @@
 #endif
 
 typedef struct _BENJI_CONFIG_DETAILS {
-    struct _BENJI_SERVER_CONFIG_DETAILS {
+    struct _SERVER_CONFIG_DETAILS {
         const char* hostname;
         uint16_t port; // 1-65535
     } server_config_details;
