@@ -34,35 +34,16 @@ void log_message(log_level_t log_level, const char* string, ...) {
 }
 
 void log_error_payload(log_level_t log_level, result_error_payload_t payload) {
-    char* output = malloc(BENJI_CAPACITY(BENJI_BASIC_STRING_LENGTH, char));
+    log_message(
+        log_level,
 
-    if (!output) {
-        return;
-    }
-
-    output[0] = '\0';
-
-    const char* log_prefix = get_prefix_from_log_level(log_level);
-
-    sprintf(
-        output,
-        "%s %s:%lu under %s() -> %s (error code %i)",
-        log_prefix,
+        "%s:%lu under %s() -> %s (error code %i)",
         payload.location.file_name,
         payload.location.lineno,
         payload.location.function_name,
         payload.message,
         payload.code
     );
-
-    #if defined(_WIN32)
-        strtrim(output);
-        OutputDebugStringA(output);
-    #elif defined (__linux__)
-        /* TODO: add linux stuff */
-    #endif
-
-    free(output);
 }
 
 const char* get_prefix_from_log_level(log_level_t log_level) {
